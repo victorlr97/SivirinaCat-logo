@@ -29,7 +29,8 @@ type Product = {
   category: string | null
   sizes: string[]
   available: boolean
-  image_url: string | null
+  images: string[]
+  product_code: string | null
   created_at: string
 }
 
@@ -86,16 +87,24 @@ export function ProductsList({ products }: { products: Product[] }) {
         {products.map((product) => (
           <Card key={product.id} className="overflow-hidden">
             <div className="aspect-[3/4] relative bg-muted">
-              {product.image_url ? (
-                <Image src={product.image_url || "/placeholder.svg"} alt={product.name} fill className="object-cover" />
+              {product.images && product.images.length > 0 ? (
+                <Image src={product.images[0] || "/placeholder.svg"} alt={product.name} fill className="object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-muted-foreground">Sem imagem</div>
+              )}
+              {product.images && product.images.length > 1 && (
+                <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-md">
+                  +{product.images.length - 1} fotos
+                </div>
               )}
             </div>
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
                   <h3 className="font-medium mb-1">{product.name}</h3>
+                  {product.product_code && (
+                    <p className="text-xs text-muted-foreground mb-1">Cód: {product.product_code}</p>
+                  )}
                   <p className="text-sm text-muted-foreground mb-2">R$ {product.price.toFixed(2)}</p>
                 </div>
                 <Badge variant={product.available ? "default" : "secondary"}>

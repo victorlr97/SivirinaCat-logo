@@ -9,8 +9,8 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
+  title: "SIVIRINA | Moda Feminina Elegante",
+  description: "Roupas casuais sofisticadas para mulheres que transitam entre trabalho e eventos sociais",
   generator: "v0.app",
 }
 
