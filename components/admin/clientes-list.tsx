@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation"
 import { createBrowserClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Pencil, Trash2, Search, Plus } from "lucide-react"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Pencil, Trash2, Eye, Search, Plus } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   AlertDialog,
@@ -21,28 +21,36 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import Image from "next/image"
-import { ProductForm } from "./product-form"
+import { ClienteDetails } from "./cliente-details"
+import { ClienteForm } from "./cliente-form"
 
-type Product = {
+type Cliente = {
   id: string
-  name: string
-  description: string | null
-  price: number
-  category: string | null
-  sizes: string[]
-  available: boolean
-  images: string[]
-  product_code: string | null
+  nome: string
+  cpf: string | null
+  telefone: string | null
+  email: string | null
+  rua: string | null
+  numero: string | null
+  complemento: string | null
+  bairro: string | null
+  cidade: string | null
+  estado: string | null
+  cep: string | null
+  ano_nascimento: number | null
+  data_nascimento: string | null // Added data_nascimento to type
   created_at: string
+  updated_at: string
 }
 
-export function ProductsList({ products }: { products: Product[] }) {
+export function ClientesList({ clientes }: { clientes: Cliente[] }) {
   const [searchTerm, setSearchTerm] = useState("")
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null)
+  const [detailsOpen, setDetailsOpen] = useState(false)
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [editingCliente, setEditingCliente] = useState<Cliente | null>(null)
   const [deleting, setDeleting] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
@@ -53,20 +61,20 @@ export function ProductsList({ products }: { products: Product[] }) {
 
     setDeleting(true)
     try {
-      const { error } = await supabase.from("products").delete().eq("id", deleteId)
+      const { error } = await supabase.from("clientes").delete().eq("id", deleteId)
 
       if (error) throw error
 
       toast({
-        title: "Produto deletado",
-        description: "O produto foi removido com sucesso",
+        title: "Cliente deletado",
+        description: "O cliente foi removido com sucesso",
       })
 
       router.refresh()
     } catch (error) {
       toast({
         title: "Erro ao deletar",
-        description: "Não foi possível deletar o produto",
+        description: "Não foi possível deletar o cliente",
         variant: "destructive",
       })
     } finally {
@@ -75,8 +83,19 @@ export function ProductsList({ products }: { products: Product[] }) {
     }
   }
 
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product)
+  const handleViewDetails = (cliente: Cliente) => {
+    setSelectedCliente(cliente)
+    setDetailsOpen(true)
+  }
+
+  const handleEdit = (cliente: Cliente) => {
+    setEditingCliente(cliente)
+    setEditModalOpen(true)
+  }
+
+  const handleEditFromDetails = (cliente: Cliente) => {
+    setDetailsOpen(false)
+    setEditingCliente(cliente)
     setEditModalOpen(true)
   }
 
@@ -87,27 +106,37 @@ export function ProductsList({ products }: { products: Product[] }) {
 
   const handleEditSuccess = () => {
     setEditModalOpen(false)
-    setEditingProduct(null)
+    setEditingCliente(null)
     router.refresh()
   }
 
-  const filteredProducts = products.filter((product) => {
+  const getInitials = (nome: string) => {
+    return nome
+      .split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase()
+  }
+
+  const filteredClientes = clientes.filter((cliente) => {
     const search = searchTerm.toLowerCase()
     return (
-      product.name.toLowerCase().includes(search) ||
-      product.product_code?.toLowerCase().includes(search) ||
-      product.category?.toLowerCase().includes(search)
+      cliente.nome.toLowerCase().includes(search) ||
+      cliente.email?.toLowerCase().includes(search) ||
+      cliente.telefone?.toLowerCase().includes(search) ||
+      cliente.cpf?.toLowerCase().includes(search)
     )
   })
 
-  if (products.length === 0) {
+  if (clientes.length === 0) {
     return (
       <>
         <div className="mb-6 flex items-center gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar por nome, código ou categoria..."
+              placeholder="Buscar por nome, email, telefone ou CPF..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -115,24 +144,24 @@ export function ProductsList({ products }: { products: Product[] }) {
           </div>
           <Button onClick={() => setAddModalOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Adicionar Produto
+            Adicionar Cliente
           </Button>
         </div>
 
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-4">Nenhum produto cadastrado ainda</p>
-            <Button onClick={() => setAddModalOpen(true)}>Adicionar primeiro produto</Button>
+            <p className="text-muted-foreground mb-4">Nenhum cliente cadastrado ainda</p>
+            <Button onClick={() => setAddModalOpen(true)}>Adicionar primeiro cliente</Button>
           </CardContent>
         </Card>
 
         <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Adicionar Produto</DialogTitle>
-              <DialogDescription>Preencha os dados do novo produto</DialogDescription>
+              <DialogTitle>Adicionar Cliente</DialogTitle>
+              <DialogDescription>Preencha os dados do novo cliente</DialogDescription>
             </DialogHeader>
-            <ProductForm onSuccess={handleAddSuccess} onCancel={() => setAddModalOpen(false)} />
+            <ClienteForm onSuccess={handleAddSuccess} onCancel={() => setAddModalOpen(false)} />
           </DialogContent>
         </Dialog>
       </>
@@ -145,7 +174,7 @@ export function ProductsList({ products }: { products: Product[] }) {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar por nome, código ou categoria..."
+            placeholder="Buscar por nome, email, telefone ou CPF..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -153,7 +182,7 @@ export function ProductsList({ products }: { products: Product[] }) {
         </div>
         <Button onClick={() => setAddModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Adicionar Produto
+          Adicionar Cliente
         </Button>
       </div>
 
@@ -162,68 +191,58 @@ export function ProductsList({ products }: { products: Product[] }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Produto</TableHead>
-                <TableHead>Código</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Preço</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Telefone</TableHead>
+                <TableHead>Cidade</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredProducts.length === 0 ? (
+              {filteredClientes.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    Nenhum produto encontrado
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    Nenhum cliente encontrado
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredProducts.map((product) => (
-                  <TableRow key={product.id}>
+                filteredClientes.map((cliente) => (
+                  <TableRow key={cliente.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="relative w-20 h-24 bg-muted rounded overflow-hidden flex-shrink-0">
-                          {product.images && product.images.length > 0 ? (
-                            <Image
-                              src={product.images[0] || "/placeholder.svg"}
-                              alt={product.name}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                              Sem foto
-                            </div>
-                          )}
-                        </div>
+                        <Avatar className="h-10 w-10">
+                          <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                            {getInitials(cliente.nome)}
+                          </AvatarFallback>
+                        </Avatar>
                         <div>
-                          <p className="font-medium">{product.name}</p>
-                          {product.sizes.length > 0 && (
-                            <p className="text-xs text-muted-foreground">Tamanhos: {product.sizes.join(", ")}</p>
-                          )}
+                          <p className="font-medium">{cliente.nome}</p>
+                          {cliente.cpf && <p className="text-xs text-muted-foreground">{cliente.cpf}</p>}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{product.product_code || "-"}</span>
+                      <span className="text-sm">{cliente.email || "-"}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{product.category || "-"}</span>
+                      <span className="text-sm">{cliente.telefone || "-"}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm font-medium">R$ {product.price.toFixed(2)}</span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={product.available ? "default" : "secondary"}>
-                        {product.available ? "Disponível" : "Indisponível"}
-                      </Badge>
+                      <span className="text-sm">
+                        {cliente.cidade && cliente.estado
+                          ? `${cliente.cidade}, ${cliente.estado}`
+                          : cliente.cidade || cliente.estado || "-"}
+                      </span>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(product)}>
+                        <Button variant="ghost" size="sm" onClick={() => handleViewDetails(cliente)}>
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(cliente)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setDeleteId(product.id)}>
+                        <Button variant="ghost" size="sm" onClick={() => setDeleteId(cliente.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -237,38 +256,45 @@ export function ProductsList({ products }: { products: Product[] }) {
       </Card>
 
       <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Adicionar Produto</DialogTitle>
-            <DialogDescription>Preencha os dados do novo produto</DialogDescription>
+            <DialogTitle>Adicionar Cliente</DialogTitle>
+            <DialogDescription>Preencha os dados do novo cliente</DialogDescription>
           </DialogHeader>
-          <ProductForm onSuccess={handleAddSuccess} onCancel={() => setAddModalOpen(false)} />
+          <ClienteForm onSuccess={handleAddSuccess} onCancel={() => setAddModalOpen(false)} />
         </DialogContent>
       </Dialog>
 
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Editar Produto</DialogTitle>
-            <DialogDescription>Atualize os dados do produto</DialogDescription>
+            <DialogTitle>Editar Cliente</DialogTitle>
+            <DialogDescription>Atualize os dados do cliente</DialogDescription>
           </DialogHeader>
-          <ProductForm
-            product={editingProduct || undefined}
+          <ClienteForm
+            cliente={editingCliente || undefined}
             onSuccess={handleEditSuccess}
             onCancel={() => {
               setEditModalOpen(false)
-              setEditingProduct(null)
+              setEditingCliente(null)
             }}
           />
         </DialogContent>
       </Dialog>
+
+      <ClienteDetails
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+        cliente={selectedCliente}
+        onEditClick={handleEditFromDetails}
+      />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja deletar este produto? Esta ação não pode ser desfeita.
+              Tem certeza que deseja deletar este cliente? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -1,16 +1,12 @@
 import { redirect, notFound } from "next/navigation"
 import { createServerClient } from "@/lib/supabase/server"
 import { AdminHeader } from "@/components/admin/admin-header"
-import { ProductForm } from "@/components/admin/product-form"
+import { ClienteForm } from "@/components/admin/cliente-form"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
-export default async function EditProductPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
+export default async function EditarClientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const supabase = await createServerClient()
 
@@ -22,9 +18,9 @@ export default async function EditProductPage({
     redirect("/admin")
   }
 
-  const { data: product } = await supabase.from("products").select("*").eq("id", id).single()
+  const { data: cliente } = await supabase.from("clientes").select("*").eq("id", id).single()
 
-  if (!product) {
+  if (!cliente) {
     notFound()
   }
 
@@ -32,14 +28,19 @@ export default async function EditProductPage({
     <div className="min-h-screen bg-background">
       <AdminHeader />
       <main className="container mx-auto px-4 py-8 max-w-3xl">
-        <Button asChild variant="ghost" size="sm" className="mb-6">
-          <Link href="/admin/produtos">
+        <Button variant="ghost" asChild className="mb-6">
+          <Link href="/admin/clientes">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Voltar
           </Link>
         </Button>
-        <h1 className="text-3xl font-light tracking-wide mb-8">Editar Produto</h1>
-        <ProductForm product={product} />
+
+        <div className="mb-8">
+          <h1 className="text-3xl font-light tracking-wide mb-2">Editar Cliente</h1>
+          <p className="text-muted-foreground">Atualize as informações do cliente</p>
+        </div>
+
+        <ClienteForm cliente={cliente} />
       </main>
     </div>
   )
