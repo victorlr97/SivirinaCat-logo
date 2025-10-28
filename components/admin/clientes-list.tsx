@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation"
 import { createBrowserClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Pencil, Trash2, Eye } from "lucide-react"
+import { Pencil, Trash2, Eye, Search } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   AlertDialog,
@@ -18,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import Link from "next/link"
 import { ClienteDetails } from "./cliente-details"
 
@@ -40,6 +42,7 @@ type Cliente = {
 }
 
 export function ClientesList({ clientes }: { clientes: Cliente[] }) {
+  const [searchTerm, setSearchTerm] = useState("")
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
@@ -93,6 +96,16 @@ export function ClientesList({ clientes }: { clientes: Cliente[] }) {
       .toUpperCase()
   }
 
+  const filteredClientes = clientes.filter((cliente) => {
+    const search = searchTerm.toLowerCase()
+    return (
+      cliente.nome.toLowerCase().includes(search) ||
+      cliente.email?.toLowerCase().includes(search) ||
+      cliente.telefone?.toLowerCase().includes(search) ||
+      cliente.cpf?.toLowerCase().includes(search)
+    )
+  })
+
   if (clientes.length === 0) {
     return (
       <Card>
@@ -108,53 +121,88 @@ export function ClientesList({ clientes }: { clientes: Cliente[] }) {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {clientes.map((cliente) => (
-          <Card key={cliente.id} className="overflow-hidden">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4 mb-4">
-                <Avatar className="h-12 w-12">
-                  <AvatarFallback className="bg-primary/10 text-primary">{getInitials(cliente.nome)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium mb-1 truncate">{cliente.nome}</h3>
-                  {cliente.email && <p className="text-sm text-muted-foreground truncate">{cliente.email}</p>}
-                  {cliente.telefone && <p className="text-sm text-muted-foreground">{cliente.telefone}</p>}
-                </div>
-              </div>
-
-              {(cliente.cidade || cliente.estado) && (
-                <p className="text-xs text-muted-foreground mb-4">
-                  {cliente.cidade}
-                  {cliente.cidade && cliente.estado && ", "}
-                  {cliente.estado}
-                </p>
-              )}
-
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 bg-transparent"
-                  onClick={() => handleViewDetails(cliente)}
-                >
-                  <Eye className="mr-2 h-3 w-3" />
-                  Ver
-                </Button>
-                <Button asChild variant="outline" size="sm" className="flex-1 bg-transparent">
-                  <Link href={`/admin/clientes/${cliente.id}/editar`}>
-                    <Pencil className="mr-2 h-3 w-3" />
-                    Editar
-                  </Link>
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => setDeleteId(cliente.id)}>
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="mb-6">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nome, email, telefone ou CPF..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
       </div>
+
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Telefone</TableHead>
+                <TableHead>Cidade</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredClientes.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    Nenhum cliente encontrado
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredClientes.map((cliente) => (
+                  <TableRow key={cliente.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                            {getInitials(cliente.nome)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{cliente.nome}</p>
+                          {cliente.cpf && <p className="text-xs text-muted-foreground">{cliente.cpf}</p>}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">{cliente.email || "-"}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">{cliente.telefone || "-"}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">
+                        {cliente.cidade && cliente.estado
+                          ? `${cliente.cidade}, ${cliente.estado}`
+                          : cliente.cidade || cliente.estado || "-"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="sm" onClick={() => handleViewDetails(cliente)}>
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button asChild variant="ghost" size="sm">
+                          <Link href={`/admin/clientes/${cliente.id}/editar`}>
+                            <Pencil className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => setDeleteId(cliente.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       <ClienteDetails
         open={detailsOpen}
