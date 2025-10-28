@@ -29,7 +29,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     <div className="grid gap-12 md:grid-cols-2 md:gap-16">
       {/* Galeria de Imagens */}
       <div className="space-y-4">
-        <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-muted shadow-md">
           {images.length > 0 ? (
             <Image
               src={images[selectedImage] || "/placeholder.svg"}
@@ -52,7 +52,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
               <button
                 key={index}
                 onClick={() => setSelectedImage(index)}
-                className={`relative aspect-[3/4] overflow-hidden bg-muted transition-opacity ${
+                className={`relative aspect-[3/4] overflow-hidden rounded-md bg-muted shadow-sm transition-opacity ${
                   selectedImage === index ? "ring-2 ring-primary" : "opacity-60 hover:opacity-100"
                 }`}
               >
