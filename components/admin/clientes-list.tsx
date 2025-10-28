@@ -38,6 +38,7 @@ type Cliente = {
   estado: string | null
   cep: string | null
   ano_nascimento: number | null
+  data_nascimento: string | null // Added data_nascimento to type
   created_at: string
   updated_at: string
 }

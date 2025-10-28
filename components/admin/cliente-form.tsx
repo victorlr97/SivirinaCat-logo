@@ -24,6 +24,7 @@ type ClienteFormProps = {
     estado: string | null
     cep: string | null
     ano_nascimento: number | null
+    data_nascimento: string | null // Added data_nascimento field
   }
   onSuccess?: () => void
   onCancel?: () => void
@@ -42,6 +43,7 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
   const [estado, setEstado] = useState(cliente?.estado || "")
   const [cep, setCep] = useState(cliente?.cep || "")
   const [anoNascimento, setAnoNascimento] = useState(cliente?.ano_nascimento?.toString() || "")
+  const [dataNascimento, setDataNascimento] = useState(cliente?.data_nascimento || "")
   const [saving, setSaving] = useState(false)
   const { toast } = useToast()
   const supabase = createBrowserClient()
@@ -64,6 +66,7 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
         estado: estado || null,
         cep: cep || null,
         ano_nascimento: anoNascimento ? Number.parseInt(anoNascimento) : null,
+        data_nascimento: dataNascimento || null, // Include data_nascimento in save
       }
 
       if (cliente?.id) {
@@ -119,15 +122,13 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="ano_nascimento">Ano de Nascimento</Label>
+            <Label htmlFor="data_nascimento">Data de Nascimento</Label>
             <Input
-              id="ano_nascimento"
-              type="number"
-              min="1900"
-              max={new Date().getFullYear()}
-              value={anoNascimento}
-              onChange={(e) => setAnoNascimento(e.target.value)}
-              placeholder="1990"
+              id="data_nascimento"
+              type="date"
+              value={dataNascimento}
+              onChange={(e) => setDataNascimento(e.target.value)}
+              max={new Date().toISOString().split("T")[0]}
             />
           </div>
         </div>

@@ -22,6 +22,7 @@ type Cliente = {
   estado: string | null
   cep: string | null
   ano_nascimento: number | null
+  data_nascimento: string | null // Added data_nascimento field
   created_at: string
   updated_at: string
 }
@@ -64,6 +65,17 @@ export function ClienteDetails({ open, onOpenChange, cliente, onEditClick }: Cli
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString("pt-BR")
+  }
+
+  const calculateAge = (birthDate: string) => {
+    const today = new Date()
+    const birth = new Date(birthDate)
+    let age = today.getFullYear() - birth.getFullYear()
+    const monthDiff = today.getMonth() - birth.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--
+    }
+    return age
   }
 
   const hasAddressInfo =
@@ -131,10 +143,12 @@ export function ClienteDetails({ open, onOpenChange, cliente, onEditClick }: Cli
               </>
             )}
 
-            {cliente.ano_nascimento && (
+            {cliente.data_nascimento && (
               <>
                 <Cake className="h-4 w-4 text-muted-foreground" />
-                <span>Nascimento: {cliente.ano_nascimento}</span>
+                <span>
+                  {formatDate(cliente.data_nascimento)} ({calculateAge(cliente.data_nascimento)} anos)
+                </span>
               </>
             )}
 
