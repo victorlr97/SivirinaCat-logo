@@ -182,7 +182,7 @@ export function ProductsList({ products }: { products: Product[] }) {
                   <TableRow key={product.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="relative w-12 h-16 bg-muted rounded overflow-hidden flex-shrink-0">
+                        <div className="relative w-20 h-24 bg-muted rounded overflow-hidden flex-shrink-0">
                           {product.images && product.images.length > 0 ? (
                             <Image
                               src={product.images[0] || "/placeholder.svg"}
