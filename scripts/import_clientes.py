@@ -15,7 +15,7 @@ if not supabase_url or not supabase_key:
 supabase = create_client(supabase_url, supabase_key)
 
 # CSV URL
-csv_url = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/clientes_rows-A2Fk5crwCNmKAO5BiZkxDcWIm2bfX1.csv"
+csv_url = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/clientes_rows-kfvh1LZ2pYiYPq4UPEoFnYXvt4OcK4.csv"
 
 print("Downloading CSV...")
 response = urlopen(csv_url)
