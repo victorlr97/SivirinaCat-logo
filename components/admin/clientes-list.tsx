@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Pencil, Trash2, Eye, Search } from "lucide-react"
+import { Pencil, Trash2, Eye, Search, Plus } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   AlertDialog,
@@ -19,9 +19,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import Link from "next/link"
 import { ClienteDetails } from "./cliente-details"
+import { ClienteForm } from "./cliente-form"
 
 type Cliente = {
   id: string
@@ -46,6 +47,9 @@ export function ClientesList({ clientes }: { clientes: Cliente[] }) {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editingCliente, setEditingCliente] = useState<Cliente | null>(null)
   const [deleting, setDeleting] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
@@ -83,8 +87,26 @@ export function ClientesList({ clientes }: { clientes: Cliente[] }) {
     setDetailsOpen(true)
   }
 
+  const handleEdit = (cliente: Cliente) => {
+    setEditingCliente(cliente)
+    setEditModalOpen(true)
+  }
+
   const handleEditFromDetails = (cliente: Cliente) => {
-    router.push(`/admin/clientes/${cliente.id}/editar`)
+    setDetailsOpen(false)
+    setEditingCliente(cliente)
+    setEditModalOpen(true)
+  }
+
+  const handleAddSuccess = () => {
+    setAddModalOpen(false)
+    router.refresh()
+  }
+
+  const handleEditSuccess = () => {
+    setEditModalOpen(false)
+    setEditingCliente(null)
+    router.refresh()
   }
 
   const getInitials = (nome: string) => {
@@ -108,21 +130,47 @@ export function ClientesList({ clientes }: { clientes: Cliente[] }) {
 
   if (clientes.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center">
-          <p className="text-muted-foreground mb-4">Nenhum cliente cadastrado ainda</p>
-          <Button asChild>
-            <Link href="/admin/clientes/novo">Adicionar primeiro cliente</Link>
+      <>
+        <div className="mb-6 flex items-center gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por nome, email, telefone ou CPF..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Button onClick={() => setAddModalOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Adicionar Cliente
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground mb-4">Nenhum cliente cadastrado ainda</p>
+            <Button onClick={() => setAddModalOpen(true)}>Adicionar primeiro cliente</Button>
+          </CardContent>
+        </Card>
+
+        <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Adicionar Cliente</DialogTitle>
+              <DialogDescription>Preencha os dados do novo cliente</DialogDescription>
+            </DialogHeader>
+            <ClienteForm onSuccess={handleAddSuccess} onCancel={() => setAddModalOpen(false)} />
+          </DialogContent>
+        </Dialog>
+      </>
     )
   }
 
   return (
     <>
-      <div className="mb-6">
-        <div className="relative">
+      <div className="mb-6 flex items-center gap-4">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por nome, email, telefone ou CPF..."
@@ -131,6 +179,10 @@ export function ClientesList({ clientes }: { clientes: Cliente[] }) {
             className="pl-10"
           />
         </div>
+        <Button onClick={() => setAddModalOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Adicionar Cliente
+        </Button>
       </div>
 
       <Card>
@@ -186,10 +238,8 @@ export function ClientesList({ clientes }: { clientes: Cliente[] }) {
                         <Button variant="ghost" size="sm" onClick={() => handleViewDetails(cliente)}>
                           <Eye className="h-4 w-4" />
                         </Button>
-                        <Button asChild variant="ghost" size="sm">
-                          <Link href={`/admin/clientes/${cliente.id}/editar`}>
-                            <Pencil className="h-4 w-4" />
-                          </Link>
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(cliente)}>
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => setDeleteId(cliente.id)}>
                           <Trash2 className="h-4 w-4" />
@@ -203,6 +253,33 @@ export function ClientesList({ clientes }: { clientes: Cliente[] }) {
           </Table>
         </CardContent>
       </Card>
+
+      <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Adicionar Cliente</DialogTitle>
+            <DialogDescription>Preencha os dados do novo cliente</DialogDescription>
+          </DialogHeader>
+          <ClienteForm onSuccess={handleAddSuccess} onCancel={() => setAddModalOpen(false)} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Editar Cliente</DialogTitle>
+            <DialogDescription>Atualize os dados do cliente</DialogDescription>
+          </DialogHeader>
+          <ClienteForm
+            cliente={editingCliente || undefined}
+            onSuccess={handleEditSuccess}
+            onCancel={() => {
+              setEditModalOpen(false)
+              setEditingCliente(null)
+            }}
+          />
+        </DialogContent>
+      </Dialog>
 
       <ClienteDetails
         open={detailsOpen}
