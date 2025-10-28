@@ -164,7 +164,7 @@ export function ProductForm({ product }: ProductFormProps) {
         })
       }
 
-      router.push("/admin/dashboard")
+      router.push("/admin/produtos")
       router.refresh()
     } catch (error) {
       toast({
