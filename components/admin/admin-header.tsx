@@ -27,6 +27,7 @@ export function AdminHeader() {
   const navItems = [
     { name: "Dashboard", href: "/admin/dashboard" },
     { name: "Produtos", href: "/admin/produtos" },
+    { name: "Clientes", href: "/admin/clientes" },
   ]
 
   return (
