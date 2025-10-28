@@ -27,9 +27,11 @@ type ProductFormProps = {
     images: string[]
     product_code: string | null
   }
+  onSuccess?: () => void
+  onCancel?: () => void
 }
 
-export function ProductForm({ product }: ProductFormProps) {
+export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) {
   const [name, setName] = useState(product?.name || "")
   const [description, setDescription] = useState(product?.description || "")
   const [price, setPrice] = useState(product?.price?.toString() || "")
@@ -61,12 +63,10 @@ export function ProductForm({ product }: ProductFormProps) {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
-    console.log("[v0] Files selected:", files?.length)
     if (!files || files.length === 0) return
 
     setUploading(true)
     try {
-      console.log("[v0] Starting upload for", files.length, "files")
       const uploadPromises = Array.from(files).map(async (file) => {
         const formData = new FormData()
         formData.append("file", file)
@@ -85,17 +85,14 @@ export function ProductForm({ product }: ProductFormProps) {
       })
 
       const newUrls = await Promise.all(uploadPromises)
-      console.log("[v0] Upload complete. URLs:", newUrls)
 
       setImages([...images, ...newUrls])
-      console.log("[v0] Images state updated:", [...images, ...newUrls])
 
       toast({
         title: "Imagens enviadas",
         description: `${newUrls.length} imagem(ns) carregada(s) com sucesso`,
       })
     } catch (error) {
-      console.error("[v0] Upload error:", error)
       toast({
         title: "Erro no upload",
         description: "Não foi possível enviar as imagens",
@@ -164,8 +161,12 @@ export function ProductForm({ product }: ProductFormProps) {
         })
       }
 
-      router.push("/admin/produtos")
-      router.refresh()
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        router.push("/admin/produtos")
+        router.refresh()
+      }
     } catch (error) {
       toast({
         title: "Erro ao salvar",
@@ -174,6 +175,14 @@ export function ProductForm({ product }: ProductFormProps) {
       })
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel()
+    } else {
+      router.back()
     }
   }
 
@@ -388,7 +397,13 @@ export function ProductForm({ product }: ProductFormProps) {
           </div>
 
           <div className="flex gap-4 pt-4">
-            <Button type="button" variant="outline" onClick={() => router.back()} disabled={saving} className="flex-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCancel}
+              disabled={saving}
+              className="flex-1 bg-transparent"
+            >
               Cancelar
             </Button>
             <Button type="submit" disabled={saving || uploading || images.length === 0} className="flex-1">

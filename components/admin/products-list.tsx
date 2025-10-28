@@ -6,7 +6,8 @@ import { createBrowserClient } from "@/lib/supabase/client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Pencil, Trash2 } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Pencil, Trash2, Search, Plus } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   AlertDialog,
@@ -18,8 +19,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import Link from "next/link"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import Image from "next/image"
+import { ProductForm } from "./product-form"
 
 type Product = {
   id: string
@@ -35,7 +38,11 @@ type Product = {
 }
 
 export function ProductsList({ products }: { products: Product[] }) {
+  const [searchTerm, setSearchTerm] = useState("")
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [deleting, setDeleting] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
@@ -68,67 +75,193 @@ export function ProductsList({ products }: { products: Product[] }) {
     }
   }
 
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product)
+    setEditModalOpen(true)
+  }
+
+  const handleAddSuccess = () => {
+    setAddModalOpen(false)
+    router.refresh()
+  }
+
+  const handleEditSuccess = () => {
+    setEditModalOpen(false)
+    setEditingProduct(null)
+    router.refresh()
+  }
+
+  const filteredProducts = products.filter((product) => {
+    const search = searchTerm.toLowerCase()
+    return (
+      product.name.toLowerCase().includes(search) ||
+      product.product_code?.toLowerCase().includes(search) ||
+      product.category?.toLowerCase().includes(search)
+    )
+  })
+
   if (products.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-12 text-center">
-          <p className="text-muted-foreground mb-4">Nenhum produto cadastrado ainda</p>
-          <Button asChild>
-            <Link href="/admin/produtos/novo">Adicionar primeiro produto</Link>
+      <>
+        <div className="mb-6 flex items-center gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por nome, código ou categoria..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Button onClick={() => setAddModalOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Adicionar Produto
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground mb-4">Nenhum produto cadastrado ainda</p>
+            <Button onClick={() => setAddModalOpen(true)}>Adicionar primeiro produto</Button>
+          </CardContent>
+        </Card>
+
+        <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Adicionar Produto</DialogTitle>
+              <DialogDescription>Preencha os dados do novo produto</DialogDescription>
+            </DialogHeader>
+            <ProductForm onSuccess={handleAddSuccess} onCancel={() => setAddModalOpen(false)} />
+          </DialogContent>
+        </Dialog>
+      </>
     )
   }
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
-          <Card key={product.id} className="overflow-hidden">
-            <div className="aspect-[3/4] relative bg-muted">
-              {product.images && product.images.length > 0 ? (
-                <Image src={product.images[0] || "/placeholder.svg"} alt={product.name} fill className="object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-muted-foreground">Sem imagem</div>
-              )}
-              {product.images && product.images.length > 1 && (
-                <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-md">
-                  +{product.images.length - 1} fotos
-                </div>
-              )}
-            </div>
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <h3 className="font-medium mb-1">{product.name}</h3>
-                  {product.product_code && (
-                    <p className="text-xs text-muted-foreground mb-1">Cód: {product.product_code}</p>
-                  )}
-                  <p className="text-sm text-muted-foreground mb-2">R$ {product.price.toFixed(2)}</p>
-                </div>
-                <Badge variant={product.available ? "default" : "secondary"}>
-                  {product.available ? "Disponível" : "Indisponível"}
-                </Badge>
-              </div>
-              {product.sizes.length > 0 && (
-                <p className="text-xs text-muted-foreground mb-3">Tamanhos: {product.sizes.join(", ")}</p>
-              )}
-              <div className="flex gap-2">
-                <Button asChild variant="outline" size="sm" className="flex-1 bg-transparent">
-                  <Link href={`/admin/produtos/${product.id}/editar`}>
-                    <Pencil className="mr-2 h-3 w-3" />
-                    Editar
-                  </Link>
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => setDeleteId(product.id)}>
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="mb-6 flex items-center gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nome, código ou categoria..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Button onClick={() => setAddModalOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Adicionar Produto
+        </Button>
       </div>
+
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Produto</TableHead>
+                <TableHead>Código</TableHead>
+                <TableHead>Categoria</TableHead>
+                <TableHead>Preço</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredProducts.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    Nenhum produto encontrado
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredProducts.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-12 h-16 bg-muted rounded overflow-hidden flex-shrink-0">
+                          {product.images && product.images.length > 0 ? (
+                            <Image
+                              src={product.images[0] || "/placeholder.svg"}
+                              alt={product.name}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                              Sem foto
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium">{product.name}</p>
+                          {product.sizes.length > 0 && (
+                            <p className="text-xs text-muted-foreground">Tamanhos: {product.sizes.join(", ")}</p>
+                          )}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">{product.product_code || "-"}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">{product.category || "-"}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm font-medium">R$ {product.price.toFixed(2)}</span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={product.available ? "default" : "secondary"}>
+                        {product.available ? "Disponível" : "Indisponível"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(product)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => setDeleteId(product.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Adicionar Produto</DialogTitle>
+            <DialogDescription>Preencha os dados do novo produto</DialogDescription>
+          </DialogHeader>
+          <ProductForm onSuccess={handleAddSuccess} onCancel={() => setAddModalOpen(false)} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Editar Produto</DialogTitle>
+            <DialogDescription>Atualize os dados do produto</DialogDescription>
+          </DialogHeader>
+          <ProductForm
+            product={editingProduct || undefined}
+            onSuccess={handleEditSuccess}
+            onCancel={() => {
+              setEditModalOpen(false)
+              setEditingProduct(null)
+            }}
+          />
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
