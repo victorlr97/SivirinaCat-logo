@@ -177,6 +177,7 @@ export function ClientAuthForm() {
         })
 
         if (signUpError) {
+          console.error("[v0] SignUp error:", signUpError)
           toast({
             title: "Erro ao criar senha",
             description: signUpError.message,
@@ -232,7 +233,10 @@ export function ClientAuthForm() {
     e.preventDefault()
     setLoading(true)
 
+    console.log("[v0] Starting registration process")
+
     try {
+      console.log("[v0] Creating auth user...")
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -242,6 +246,7 @@ export function ClientAuthForm() {
       })
 
       if (signUpError) {
+        console.error("[v0] SignUp error:", signUpError)
         toast({
           title: "Erro ao criar conta",
           description: signUpError.message,
@@ -251,7 +256,10 @@ export function ClientAuthForm() {
         return
       }
 
+      console.log("[v0] Auth user created:", authData.user?.id)
+
       if (authData.user) {
+        console.log("[v0] Inserting client data...")
         const { error: insertError } = await supabase.from("clientes").insert({
           user_id: authData.user.id,
           email,
@@ -270,32 +278,36 @@ export function ClientAuthForm() {
         })
 
         if (insertError) {
-          console.error("[v0] Error creating client:", insertError)
+          console.error("[v0] Insert error:", insertError)
           toast({
             title: "Erro ao criar cadastro",
-            description: "Tente novamente",
+            description: insertError.message,
             variant: "destructive",
           })
           setLoading(false)
           return
         }
 
+        console.log("[v0] Client data inserted successfully")
+
         toast({
           title: "Conta criada com sucesso!",
           description: "Bem-vindo à SIVIRINA.",
         })
 
-        router.push("/")
-        router.refresh()
+        console.log("[v0] Redirecting to home...")
+        setTimeout(() => {
+          router.push("/")
+          router.refresh()
+        }, 500)
       }
     } catch (error) {
-      console.error("[v0] Error:", error)
+      console.error("[v0] Unexpected error:", error)
       toast({
         title: "Erro inesperado",
         description: "Tente novamente mais tarde",
         variant: "destructive",
       })
-    } finally {
       setLoading(false)
     }
   }
