@@ -137,8 +137,7 @@ export function ClientAuthForm() {
         description: "Bem-vindo de volta.",
       })
 
-      router.push("/")
-      router.refresh()
+      window.location.href = "/"
     } catch (error) {
       toast({
         title: "Erro inesperado",
@@ -207,7 +206,9 @@ export function ClientAuthForm() {
             description: "Faça login para acessar sua conta.",
           })
 
-          window.location.href = "/login"
+          setTimeout(() => {
+            window.location.href = "/login"
+          }, 1000)
         }
       } catch (error) {
         toast({
@@ -259,7 +260,7 @@ export function ClientAuthForm() {
           cidade: cidade || null,
           estado: estado || null,
           cep: cep || null,
-          data_nascimento: dataNascimento || null,
+          data_nascimento: dataNascimento,
           origem: "self_register",
         })
 
@@ -278,7 +279,9 @@ export function ClientAuthForm() {
           description: "Faça login para acessar sua conta.",
         })
 
-        window.location.href = "/login"
+        setTimeout(() => {
+          window.location.href = "/login"
+        }, 1000)
       }
     } catch (error) {
       toast({
@@ -357,11 +360,11 @@ export function ClientAuthForm() {
                   setPassword("")
                 }}
                 disabled={loading}
-                className="w-full"
+                className="w-[48%] mx-[3px]"
               >
                 Voltar
               </Button>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-[48%]" disabled={loading}>
                 {loading ? "Entrando..." : "Entrar"}
               </Button>
             </div>
