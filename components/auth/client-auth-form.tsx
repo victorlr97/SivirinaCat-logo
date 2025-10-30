@@ -470,36 +470,39 @@ export function ClientAuthForm() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="cpf">CPF</Label>
+              <Label htmlFor="cpf">CPF *</Label>
               <Input
                 id="cpf"
                 type="text"
                 placeholder="000.000.000-00"
                 value={cpf}
                 onChange={(e) => setCpf(e.target.value)}
+                required
                 disabled={loading}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="telefone">Telefone</Label>
+              <Label htmlFor="telefone">Telefone *</Label>
               <Input
                 id="telefone"
                 type="tel"
                 placeholder="(00) 00000-0000"
                 value={telefone}
                 onChange={(e) => setTelefone(e.target.value)}
+                required
                 disabled={loading}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="data_nascimento">Data de Nascimento</Label>
+            <Label htmlFor="data_nascimento">Data de Nascimento *</Label>
             <Input
               id="data_nascimento"
               type="date"
               value={dataNascimento}
               onChange={(e) => setDataNascimento(e.target.value)}
+              required
               disabled={loading}
             />
           </div>
