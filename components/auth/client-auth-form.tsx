@@ -407,11 +407,11 @@ export function ClientAuthForm() {
                   setConfirmPassword("")
                 }}
                 disabled={loading}
-                className="w-full"
+                className="w-[48%] px-0 mx-[3px]"
               >
                 Voltar
               </Button>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-[48%]" disabled={loading}>
                 {loading ? "Processando..." : emailStatus === "no-password" ? "Criar Senha" : "Continuar"}
               </Button>
             </div>
