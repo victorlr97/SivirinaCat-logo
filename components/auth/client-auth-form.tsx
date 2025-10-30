@@ -207,8 +207,7 @@ export function ClientAuthForm() {
             description: "Faça login para acessar sua conta.",
           })
 
-          router.push("/login")
-          router.refresh()
+          window.location.href = "/login"
         }
       } catch (error) {
         toast({
@@ -279,8 +278,7 @@ export function ClientAuthForm() {
           description: "Faça login para acessar sua conta.",
         })
 
-        router.push("/login")
-        router.refresh()
+        window.location.href = "/login"
       }
     } catch (error) {
       toast({
