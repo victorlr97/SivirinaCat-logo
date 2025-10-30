@@ -575,11 +575,11 @@ export function ClientAuthForm() {
               variant="outline"
               onClick={() => setStep("create-password")}
               disabled={loading}
-              className="w-full"
+              className="w-[48%] mx-[3px]"
             >
               Voltar
             </Button>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-[48%]" disabled={loading}>
               {loading ? "Criando conta..." : "Criar Conta"}
             </Button>
           </div>
