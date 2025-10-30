@@ -25,10 +25,17 @@ export async function updateSession(request: NextRequest) {
     },
   )
 
-  // IMPORTANTE: Não execute código entre createServerClient e supabase.auth.getUser()
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser()
+
+  // Se houver erro de JWT inválido, redirecionar para página de limpeza
+  if (error && error.message.includes("does not exist")) {
+    const url = request.nextUrl.clone()
+    url.pathname = "/auth/clear-session"
+    return NextResponse.redirect(url)
+  }
 
   if (request.nextUrl.pathname.startsWith("/admin") && request.nextUrl.pathname !== "/admin") {
     if (!user) {
@@ -43,7 +50,6 @@ export async function updateSession(request: NextRequest) {
 
     if (!adminData) {
       // Usuário autenticado mas NÃO é admin - redireciona para home
-      console.log("[v0] User is not admin, redirecting to home")
       const url = request.nextUrl.clone()
       url.pathname = "/"
       return NextResponse.redirect(url)

@@ -69,7 +69,6 @@ export function ClientAuthForm() {
           })
         }
       } catch (error) {
-        console.error("[v0] Error fetching CEP:", error)
         toast({
           title: "Erro ao buscar CEP",
           description: "Tente novamente",
@@ -103,7 +102,6 @@ export function ClientAuthForm() {
         setStep("create-password")
       }
     } catch (error) {
-      console.error("[v0] Error checking email:", error)
       toast({
         title: "Erro ao verificar email",
         description: "Tente novamente",
@@ -142,7 +140,6 @@ export function ClientAuthForm() {
       router.push("/")
       router.refresh()
     } catch (error) {
-      console.error("[v0] Error logging in:", error)
       toast({
         title: "Erro inesperado",
         description: "Tente novamente mais tarde",
@@ -177,7 +174,6 @@ export function ClientAuthForm() {
         })
 
         if (signUpError) {
-          console.error("[v0] SignUp error:", signUpError)
           toast({
             title: "Erro ao criar senha",
             description: signUpError.message,
@@ -197,7 +193,6 @@ export function ClientAuthForm() {
             .eq("id", existingClientId)
 
           if (updateError) {
-            console.error("[v0] Error linking account:", updateError)
             toast({
               title: "Erro ao vincular conta",
               description: "Tente novamente",
@@ -208,15 +203,14 @@ export function ClientAuthForm() {
           }
 
           toast({
-            title: "Senha criada com sucesso!",
-            description: "Seus dados foram vinculados à sua conta.",
+            title: "Conta criada com sucesso!",
+            description: "Faça login para acessar sua conta.",
           })
 
-          router.push("/")
+          router.push("/login")
           router.refresh()
         }
       } catch (error) {
-        console.error("[v0] Error:", error)
         toast({
           title: "Erro inesperado",
           description: "Tente novamente mais tarde",
@@ -233,10 +227,7 @@ export function ClientAuthForm() {
     e.preventDefault()
     setLoading(true)
 
-    console.log("[v0] Starting registration process")
-
     try {
-      console.log("[v0] Creating auth user...")
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -246,7 +237,6 @@ export function ClientAuthForm() {
       })
 
       if (signUpError) {
-        console.error("[v0] SignUp error:", signUpError)
         toast({
           title: "Erro ao criar conta",
           description: signUpError.message,
@@ -256,10 +246,7 @@ export function ClientAuthForm() {
         return
       }
 
-      console.log("[v0] Auth user created:", authData.user?.id)
-
       if (authData.user) {
-        console.log("[v0] Inserting client data...")
         const { error: insertError } = await supabase.from("clientes").insert({
           user_id: authData.user.id,
           email,
@@ -278,7 +265,6 @@ export function ClientAuthForm() {
         })
 
         if (insertError) {
-          console.error("[v0] Insert error:", insertError)
           toast({
             title: "Erro ao criar cadastro",
             description: insertError.message,
@@ -288,21 +274,15 @@ export function ClientAuthForm() {
           return
         }
 
-        console.log("[v0] Client data inserted successfully")
-
         toast({
           title: "Conta criada com sucesso!",
-          description: "Bem-vindo à SIVIRINA.",
+          description: "Faça login para acessar sua conta.",
         })
 
-        console.log("[v0] Redirecting to home...")
-        setTimeout(() => {
-          router.push("/")
-          router.refresh()
-        }, 500)
+        router.push("/login")
+        router.refresh()
       }
     } catch (error) {
-      console.error("[v0] Unexpected error:", error)
       toast({
         title: "Erro inesperado",
         description: "Tente novamente mais tarde",
