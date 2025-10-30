@@ -17,9 +17,9 @@ export function ClientAuthForm() {
   const [step, setStep] = useState<Step>("credentials")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false)
 
-  // Dados adicionais para novos clientes
   const [nome, setNome] = useState("")
   const [cpf, setCpf] = useState("")
   const [telefone, setTelefone] = useState("")
@@ -38,17 +38,24 @@ export function ClientAuthForm() {
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (password !== confirmPassword) {
+      toast({
+        title: "Senhas não coincidem",
+        description: "Por favor, verifique se as senhas são iguais.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setLoading(true)
 
     try {
-      // Verifica se email já existe na tabela clientes
       const { data: existingClient } = await supabase.from("clientes").select("id, user_id").eq("email", email).single()
 
       console.log("[v0] Existing client check:", existingClient)
 
       if (existingClient && !existingClient.user_id) {
-        // Email existe mas não tem user_id (cadastrado pelo admin)
-        // Cria autenticação e vincula
         const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -68,7 +75,6 @@ export function ClientAuthForm() {
         }
 
         if (authData.user) {
-          // Vincula user_id ao cliente existente
           const { error: updateError } = await supabase
             .from("clientes")
             .update({
@@ -97,7 +103,6 @@ export function ClientAuthForm() {
           router.refresh()
         }
       } else if (existingClient && existingClient.user_id) {
-        // Email existe e já tem user_id - fazer login
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -121,7 +126,6 @@ export function ClientAuthForm() {
         router.push("/")
         router.refresh()
       } else {
-        // Email não existe - pedir dados adicionais
         setStep("additional-info")
       }
     } catch (error) {
@@ -141,7 +145,6 @@ export function ClientAuthForm() {
     setLoading(true)
 
     try {
-      // Cria autenticação
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -161,7 +164,6 @@ export function ClientAuthForm() {
       }
 
       if (authData.user) {
-        // Cria registro completo na tabela clientes
         const { error: insertError } = await supabase.from("clientes").insert({
           user_id: authData.user.id,
           email,
@@ -239,6 +241,19 @@ export function ClientAuthForm() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+                minLength={6}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 disabled={loading}
                 minLength={6}
