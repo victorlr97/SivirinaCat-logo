@@ -346,6 +346,9 @@ export function ClientAuthForm() {
   }
 
   if (step === "create-password") {
+    const passwordsMatch = password && confirmPassword && password === confirmPassword
+    const showPasswordFeedback = password && confirmPassword
+
     return (
       <Card>
         <CardHeader>
@@ -388,8 +391,13 @@ export function ClientAuthForm() {
                 disabled={loading}
                 minLength={6}
               />
+              {showPasswordFeedback && (
+                <p className={`text-sm ${passwordsMatch ? "text-green-600" : "text-red-600"}`}>
+                  {passwordsMatch ? "✓ As senhas coincidem" : "✗ As senhas não coincidem"}
+                </p>
+              )}
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 pt-2">
               <Button
                 type="button"
                 variant="outline"
