@@ -37,6 +37,15 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  if (request.nextUrl.pathname.startsWith("/perfil")) {
+    if (!user) {
+      // Not authenticated - redirect to login
+      const url = request.nextUrl.clone()
+      url.pathname = "/login"
+      return NextResponse.redirect(url)
+    }
+  }
+
   if (request.nextUrl.pathname.startsWith("/admin") && request.nextUrl.pathname !== "/admin") {
     if (!user) {
       // Não autenticado - redireciona para login do admin
