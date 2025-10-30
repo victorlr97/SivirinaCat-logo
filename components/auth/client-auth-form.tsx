@@ -85,19 +85,34 @@ export function ClientAuthForm() {
     setLoading(true)
 
     try {
-      const { data: existingClient } = await supabase.from("clientes").select("id, user_id").eq("email", email).single()
+      const { data, error } = await supabase.rpc("check_email_for_login", {
+        email_input: email,
+      })
 
-      if (existingClient) {
-        setExistingClientId(existingClient.id)
+      if (error) {
+        toast({
+          title: "Erro ao verificar email",
+          description: "Tente novamente",
+          variant: "destructive",
+        })
+        setLoading(false)
+        return
+      }
 
-        if (existingClient.user_id) {
+      const result = data as { exists: boolean; has_password: boolean }
+
+      if (result.exists) {
+        if (result.has_password) {
+          // Email exists and has password - show login
           setEmailStatus("has-password")
           setStep("login")
         } else {
+          // Email exists but no password - show create password
           setEmailStatus("no-password")
           setStep("create-password")
         }
       } else {
+        // Email doesn't exist - show create password then additional info
         setEmailStatus("new")
         setStep("create-password")
       }
@@ -182,33 +197,37 @@ export function ClientAuthForm() {
           return
         }
 
-        if (authData.user && existingClientId) {
-          const { error: updateError } = await supabase
-            .from("clientes")
-            .update({
-              user_id: authData.user.id,
-              origem: "vinculado",
-            })
-            .eq("id", existingClientId)
+        if (authData.user) {
+          const { data: clientData } = await supabase.from("clientes").select("id").eq("email", email).single()
 
-          if (updateError) {
+          if (clientData) {
+            const { error: updateError } = await supabase
+              .from("clientes")
+              .update({
+                user_id: authData.user.id,
+                origem: "vinculado",
+              })
+              .eq("id", clientData.id)
+
+            if (updateError) {
+              toast({
+                title: "Erro ao vincular conta",
+                description: "Tente novamente",
+                variant: "destructive",
+              })
+              setLoading(false)
+              return
+            }
+
             toast({
-              title: "Erro ao vincular conta",
-              description: "Tente novamente",
-              variant: "destructive",
+              title: "Conta criada com sucesso!",
+              description: "Faça login para acessar sua conta.",
             })
-            setLoading(false)
-            return
+
+            setTimeout(() => {
+              window.location.href = "/login"
+            }, 1000)
           }
-
-          toast({
-            title: "Conta criada com sucesso!",
-            description: "Faça login para acessar sua conta.",
-          })
-
-          setTimeout(() => {
-            window.location.href = "/login"
-          }, 1000)
         }
       } catch (error) {
         toast({
@@ -251,8 +270,8 @@ export function ClientAuthForm() {
           user_id: authData.user.id,
           email,
           nome,
-          cpf: cpf || null,
-          telefone: telefone || null,
+          cpf,
+          telefone,
           rua: rua || null,
           numero: numero || null,
           complemento: complemento || null,
