@@ -11,10 +11,14 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 
-type Step = "credentials" | "additional-info"
+type Step = "email" | "login" | "create-password" | "additional-info"
+type EmailStatus = "has-password" | "no-password" | "new"
 
 export function ClientAuthForm() {
-  const [step, setStep] = useState<Step>("credentials")
+  const [step, setStep] = useState<Step>("email")
+  const [emailStatus, setEmailStatus] = useState<EmailStatus | null>(null)
+  const [existingClientId, setExistingClientId] = useState<string | null>(null)
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -36,7 +40,81 @@ export function ClientAuthForm() {
   const { toast } = useToast()
   const supabase = createBrowserClient()
 
-  const handleCredentialsSubmit = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const { data: existingClient } = await supabase.from("clientes").select("id, user_id").eq("email", email).single()
+
+      if (existingClient) {
+        setExistingClientId(existingClient.id)
+
+        if (existingClient.user_id) {
+          // Email exists with password - go to login
+          setEmailStatus("has-password")
+          setStep("login")
+        } else {
+          // Email exists without password - go to create password
+          setEmailStatus("no-password")
+          setStep("create-password")
+        }
+      } else {
+        // Email doesn't exist - go to create password then full registration
+        setEmailStatus("new")
+        setStep("create-password")
+      }
+    } catch (error) {
+      console.error("[v0] Error checking email:", error)
+      toast({
+        title: "Erro ao verificar email",
+        description: "Tente novamente",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (signInError) {
+        toast({
+          title: "Erro ao fazer login",
+          description: "Verifique seu email e senha",
+          variant: "destructive",
+        })
+        setLoading(false)
+        return
+      }
+
+      toast({
+        title: "Login realizado!",
+        description: "Bem-vindo de volta.",
+      })
+
+      router.push("/")
+      router.refresh()
+    } catch (error) {
+      console.error("[v0] Error logging in:", error)
+      toast({
+        title: "Erro inesperado",
+        description: "Tente novamente mais tarde",
+        variant: "destructive",
+      })
+      setLoading(false)
+    }
+  }
+
+  const handleCreatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (password !== confirmPassword) {
@@ -48,14 +126,11 @@ export function ClientAuthForm() {
       return
     }
 
-    setLoading(true)
+    if (emailStatus === "no-password") {
+      // Link existing client to new auth
+      setLoading(true)
 
-    try {
-      const { data: existingClient } = await supabase.from("clientes").select("id, user_id").eq("email", email).single()
-
-      console.log("[v0] Existing client check:", existingClient)
-
-      if (existingClient && !existingClient.user_id) {
+      try {
         const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -66,7 +141,7 @@ export function ClientAuthForm() {
 
         if (signUpError) {
           toast({
-            title: "Erro ao criar conta",
+            title: "Erro ao criar senha",
             description: signUpError.message,
             variant: "destructive",
           })
@@ -74,17 +149,17 @@ export function ClientAuthForm() {
           return
         }
 
-        if (authData.user) {
+        if (authData.user && existingClientId) {
           const { error: updateError } = await supabase
             .from("clientes")
             .update({
               user_id: authData.user.id,
               origem: "vinculado",
             })
-            .eq("id", existingClient.id)
+            .eq("id", existingClientId)
 
           if (updateError) {
-            console.error("[v0] Error updating client:", updateError)
+            console.error("[v0] Error linking account:", updateError)
             toast({
               title: "Erro ao vincular conta",
               description: "Tente novamente",
@@ -95,48 +170,25 @@ export function ClientAuthForm() {
           }
 
           toast({
-            title: "Conta criada com sucesso!",
+            title: "Senha criada com sucesso!",
             description: "Seus dados foram vinculados à sua conta.",
           })
 
           router.push("/")
           router.refresh()
         }
-      } else if (existingClient && existingClient.user_id) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-
-        if (signInError) {
-          toast({
-            title: "Erro ao fazer login",
-            description: signInError.message,
-            variant: "destructive",
-          })
-          setLoading(false)
-          return
-        }
-
+      } catch (error) {
+        console.error("[v0] Error:", error)
         toast({
-          title: "Login realizado!",
-          description: "Bem-vindo de volta.",
+          title: "Erro inesperado",
+          description: "Tente novamente mais tarde",
+          variant: "destructive",
         })
-
-        router.push("/")
-        router.refresh()
-      } else {
-        setStep("additional-info")
+        setLoading(false)
       }
-    } catch (error) {
-      console.error("[v0] Error:", error)
-      toast({
-        title: "Erro inesperado",
-        description: "Tente novamente mais tarde",
-        variant: "destructive",
-      })
-    } finally {
-      setLoading(false)
+    } else if (emailStatus === "new") {
+      // New email - proceed to additional info
+      setStep("additional-info")
     }
   }
 
@@ -182,7 +234,7 @@ export function ClientAuthForm() {
         })
 
         if (insertError) {
-          console.error("[v0] Error inserting client:", insertError)
+          console.error("[v0] Error creating client:", insertError)
           toast({
             title: "Erro ao criar cadastro",
             description: "Tente novamente",
@@ -212,15 +264,15 @@ export function ClientAuthForm() {
     }
   }
 
-  if (step === "credentials") {
+  if (step === "email") {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Entrar ou Criar Conta</CardTitle>
-          <CardDescription>Digite seu email e senha para continuar</CardDescription>
+          <CardTitle>Bem-vindo à SIVIRINA</CardTitle>
+          <CardDescription>Digite seu email para continuar</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleCredentialsSubmit} className="space-y-4">
+          <form onSubmit={handleEmailSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -231,7 +283,30 @@ export function ClientAuthForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                autoFocus
               />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Verificando..." : "Continuar"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (step === "login") {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Entrar</CardTitle>
+          <CardDescription>Digite sua senha para acessar sua conta</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" value={email} disabled className="bg-muted" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
@@ -244,6 +319,61 @@ export function ClientAuthForm() {
                 required
                 disabled={loading}
                 minLength={6}
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setStep("email")
+                  setPassword("")
+                }}
+                disabled={loading}
+                className="w-full"
+              >
+                Voltar
+              </Button>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Entrando..." : "Entrar"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (step === "create-password") {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{emailStatus === "no-password" ? "Criar Senha" : "Criar Conta"}</CardTitle>
+          <CardDescription>
+            {emailStatus === "no-password"
+              ? "Seu email já está cadastrado. Crie uma senha para acessar sua conta."
+              : "Crie uma senha para sua nova conta"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleCreatePassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" value={email} disabled className="bg-muted" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+                minLength={6}
+                autoFocus
               />
             </div>
             <div className="space-y-2">
@@ -259,9 +389,24 @@ export function ClientAuthForm() {
                 minLength={6}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Verificando..." : "Continuar"}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setStep("email")
+                  setPassword("")
+                  setConfirmPassword("")
+                }}
+                disabled={loading}
+                className="w-full"
+              >
+                Voltar
+              </Button>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Processando..." : emailStatus === "no-password" ? "Criar Senha" : "Continuar"}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
@@ -420,7 +565,7 @@ export function ClientAuthForm() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setStep("credentials")}
+              onClick={() => setStep("create-password")}
               disabled={loading}
               className="w-full"
             >
