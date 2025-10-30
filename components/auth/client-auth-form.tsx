@@ -35,10 +35,51 @@ export function ClientAuthForm() {
   const [estado, setEstado] = useState("")
   const [cep, setCep] = useState("")
   const [dataNascimento, setDataNascimento] = useState("")
+  const [cepLoading, setCepLoading] = useState(false)
 
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createBrowserClient()
+
+  const handleCepChange = async (value: string) => {
+    const cleanCep = value.replace(/\D/g, "")
+    setCep(cleanCep)
+
+    if (cleanCep.length === 8) {
+      setCepLoading(true)
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`)
+        const data = await response.json()
+
+        if (data.erro) {
+          toast({
+            title: "CEP não encontrado",
+            description: "Verifique o CEP digitado",
+            variant: "destructive",
+          })
+        } else {
+          setRua(data.logradouro || "")
+          setBairro(data.bairro || "")
+          setCidade(data.localidade || "")
+          setEstado(data.uf || "")
+
+          toast({
+            title: "Endereço encontrado!",
+            description: "Os campos foram preenchidos automaticamente",
+          })
+        }
+      } catch (error) {
+        console.error("[v0] Error fetching CEP:", error)
+        toast({
+          title: "Erro ao buscar CEP",
+          description: "Tente novamente",
+          variant: "destructive",
+        })
+      } finally {
+        setCepLoading(false)
+      }
+    }
+  }
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,16 +92,13 @@ export function ClientAuthForm() {
         setExistingClientId(existingClient.id)
 
         if (existingClient.user_id) {
-          // Email exists with password - go to login
           setEmailStatus("has-password")
           setStep("login")
         } else {
-          // Email exists without password - go to create password
           setEmailStatus("no-password")
           setStep("create-password")
         }
       } else {
-        // Email doesn't exist - go to create password then full registration
         setEmailStatus("new")
         setStep("create-password")
       }
@@ -127,7 +165,6 @@ export function ClientAuthForm() {
     }
 
     if (emailStatus === "no-password") {
-      // Link existing client to new auth
       setLoading(true)
 
       try {
@@ -187,7 +224,6 @@ export function ClientAuthForm() {
         setLoading(false)
       }
     } else if (emailStatus === "new") {
-      // New email - proceed to additional info
       setStep("additional-info")
     }
   }
@@ -481,6 +517,20 @@ export function ClientAuthForm() {
           <div className="space-y-4">
             <h3 className="text-sm font-medium">Endereço (opcional)</h3>
 
+            <div className="space-y-2">
+              <Label htmlFor="cep">CEP</Label>
+              <Input
+                id="cep"
+                type="text"
+                placeholder="00000-000"
+                value={cep}
+                onChange={(e) => handleCepChange(e.target.value)}
+                disabled={loading || cepLoading}
+                maxLength={8}
+              />
+              {cepLoading && <p className="text-sm text-muted-foreground">Buscando endereço...</p>}
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="rua">Rua</Label>
@@ -531,7 +581,7 @@ export function ClientAuthForm() {
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="cidade">Cidade</Label>
                 <Input
@@ -552,17 +602,6 @@ export function ClientAuthForm() {
                   value={estado}
                   onChange={(e) => setEstado(e.target.value)}
                   maxLength={2}
-                  disabled={loading}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cep">CEP</Label>
-                <Input
-                  id="cep"
-                  type="text"
-                  placeholder="00000-000"
-                  value={cep}
-                  onChange={(e) => setCep(e.target.value)}
                   disabled={loading}
                 />
               </div>
