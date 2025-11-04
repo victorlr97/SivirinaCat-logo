@@ -41,11 +41,12 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [produtos, setProdutos] = useState<Product[]>([])
   const [clienteId, setClienteId] = useState("")
+  const [searchCliente, setSearchCliente] = useState("")
   const [searchProduto, setSearchProduto] = useState("")
   const [carrinho, setCarrinho] = useState<CartItem[]>([])
   const [formaPagamento, setFormaPagamento] = useState("dinheiro")
   const [parcelas, setParcelas] = useState("1")
-  const [desconto, setDesconto] = useState("0")
+  const [descontoPercentual, setDescontoPercentual] = useState("0")
   const [observacoes, setObservacoes] = useState("")
   const [saving, setSaving] = useState(false)
   const [showClienteForm, setShowClienteForm] = useState(false)
@@ -123,7 +124,8 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
 
   const calculateTotal = () => {
     const subtotal = carrinho.reduce((sum, item) => sum + item.subtotal, 0)
-    return subtotal - Number.parseFloat(desconto || "0")
+    const descontoValor = (subtotal * Number.parseFloat(descontoPercentual || "0")) / 100
+    return subtotal - descontoValor
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -151,15 +153,16 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
 
     try {
       const total = calculateTotal()
+      const subtotal = carrinho.reduce((sum, item) => sum + item.subtotal, 0)
+      const descontoValor = (subtotal * Number.parseFloat(descontoPercentual || "0")) / 100
 
-      // Insert venda
       const { data: venda, error: vendaError } = await supabase
         .from("vendas")
         .insert({
           cliente_id: clienteId,
           forma_pagamento: formaPagamento,
           parcelas: formaPagamento === "credito" ? Number.parseInt(parcelas) : null,
-          desconto: Number.parseFloat(desconto || "0"),
+          desconto: descontoValor,
           total,
           observacoes: observacoes || null,
         })
@@ -168,7 +171,6 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
 
       if (vendaError) throw vendaError
 
-      // Insert itens_venda
       const itens = carrinho.map((item) => ({
         venda_id: venda.id,
         produto_id: item.produto_id,
@@ -186,12 +188,12 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
         description: "A venda foi salva com sucesso",
       })
 
-      // Reset form
       setClienteId("")
+      setSearchCliente("")
       setCarrinho([])
       setFormaPagamento("dinheiro")
       setParcelas("1")
-      setDesconto("0")
+      setDescontoPercentual("0")
       setObservacoes("")
 
       onOpenChange(false)
@@ -212,6 +214,8 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
     loadClientes()
   }
 
+  const filteredClientes = clientes.filter((c) => c.nome.toLowerCase().includes(searchCliente.toLowerCase()))
+
   const filteredProdutos = produtos.filter(
     (p) =>
       p.name.toLowerCase().includes(searchProduto.toLowerCase()) ||
@@ -228,16 +232,24 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Cliente Selection */}
             <div className="space-y-2">
               <Label>Cliente *</Label>
+              <div className="relative mb-2">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar cliente..."
+                  value={searchCliente}
+                  onChange={(e) => setSearchCliente(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
               <div className="flex gap-2">
                 <Select value={clienteId} onValueChange={setClienteId}>
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="Selecione um cliente" />
                   </SelectTrigger>
                   <SelectContent>
-                    {clientes.map((cliente) => (
+                    {filteredClientes.map((cliente) => (
                       <SelectItem key={cliente.id} value={cliente.id}>
                         {cliente.nome}
                       </SelectItem>
@@ -250,7 +262,6 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
               </div>
             </div>
 
-            {/* Product Search */}
             <div className="space-y-2">
               <Label>Adicionar Produtos</Label>
               <div className="relative">
@@ -262,10 +273,10 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                   className="pl-10"
                 />
               </div>
-              {searchProduto && filteredProdutos.length > 0 && (
+              {filteredProdutos.length > 0 && (
                 <Card>
-                  <CardContent className="p-2">
-                    {filteredProdutos.slice(0, 5).map((produto) => (
+                  <CardContent className="p-2 max-h-48 overflow-y-auto">
+                    {filteredProdutos.map((produto) => (
                       <Button
                         key={produto.id}
                         type="button"
@@ -285,7 +296,6 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
               )}
             </div>
 
-            {/* Cart */}
             {carrinho.length > 0 && (
               <div className="space-y-2">
                 <Label>Carrinho</Label>
@@ -335,7 +345,6 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
               </div>
             )}
 
-            {/* Payment Details */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Forma de Pagamento *</Label>
@@ -348,7 +357,6 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                     <SelectItem value="pix">PIX</SelectItem>
                     <SelectItem value="credito">Crédito</SelectItem>
                     <SelectItem value="debito">Débito</SelectItem>
-                    <SelectItem value="outro">Outro</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -367,18 +375,18 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
               )}
 
               <div className="space-y-2">
-                <Label>Desconto (R$)</Label>
+                <Label>Desconto (%)</Label>
                 <Input
                   type="number"
                   min="0"
+                  max="100"
                   step="0.01"
-                  value={desconto}
-                  onChange={(e) => setDesconto(e.target.value)}
+                  value={descontoPercentual}
+                  onChange={(e) => setDescontoPercentual(e.target.value)}
                 />
               </div>
             </div>
 
-            {/* Observações */}
             <div className="space-y-2">
               <Label>Observações</Label>
               <Textarea
@@ -389,7 +397,6 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
               />
             </div>
 
-            {/* Total */}
             {carrinho.length > 0 && (
               <div className="flex justify-end">
                 <div className="text-right">
@@ -399,7 +406,6 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
               </div>
             )}
 
-            {/* Actions */}
             <div className="flex gap-4 pt-4">
               <Button
                 type="button"
@@ -418,7 +424,6 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
         </DialogContent>
       </Dialog>
 
-      {/* Cliente Form Dialog */}
       <Dialog open={showClienteForm} onOpenChange={setShowClienteForm}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
