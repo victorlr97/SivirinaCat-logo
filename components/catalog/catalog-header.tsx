@@ -5,6 +5,15 @@ import Link from "next/link"
 import { createBrowserClient } from "@supabase/ssr"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { User, LogOut } from "lucide-react"
 
 export function CatalogHeader() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -69,12 +78,12 @@ export function CatalogHeader() {
               alt="SIVIRINA"
               width={180}
               height={40}
-              className="h-8 w-auto md:h-[135px]"
+              className="h-16 w-auto md:h-[135px]"
               priority
             />
           </Link>
 
-          {/* <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             {!isLoggedIn ? (
               <Button asChild variant="outline" size="sm">
                 <Link href="/login">Entrar</Link>
@@ -102,7 +111,7 @@ export function CatalogHeader() {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-          </div> */}
+          </div>
 
           <div className="w-24" />
         </div>
