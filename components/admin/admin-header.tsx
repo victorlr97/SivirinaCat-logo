@@ -28,6 +28,7 @@ export function AdminHeader() {
     { name: "Dashboard", href: "/admin/dashboard" },
     { name: "Produtos", href: "/admin/produtos" },
     { name: "Clientes", href: "/admin/clientes" },
+    { name: "Vendas", href: "/admin/vendas" }, // Added Vendas navigation item
   ]
 
   return (
