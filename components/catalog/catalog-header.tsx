@@ -67,7 +67,7 @@ export function CatalogHeader() {
   }
 
   return (
-    <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-20 items-center justify-between md:h-24">
           <div className="w-24" />
@@ -78,7 +78,7 @@ export function CatalogHeader() {
               alt="SIVIRINA"
               width={180}
               height={40}
-              className="h-16 w-auto md:h-[135px]"
+              className="h-24 w-auto md:h-[135px]"
               priority
             />
           </Link>
