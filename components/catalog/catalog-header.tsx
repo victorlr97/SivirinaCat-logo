@@ -2,15 +2,6 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { User, LogOut } from "lucide-react"
 import { createBrowserClient } from "@supabase/ssr"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -83,7 +74,7 @@ export function CatalogHeader() {
             />
           </Link>
 
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             {!isLoggedIn ? (
               <Button asChild variant="outline" size="sm">
                 <Link href="/login">Entrar</Link>
@@ -111,7 +102,9 @@ export function CatalogHeader() {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-          </div>
+          </div> */}
+
+          <div className="w-24" />
         </div>
       </div>
     </header>
