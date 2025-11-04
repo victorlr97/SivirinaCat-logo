@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
 import { Upload, X, Star } from "lucide-react"
@@ -26,6 +25,7 @@ type ProductFormProps = {
     available: boolean
     images: string[]
     product_code: string | null
+    quantidade_estoque: number
   }
   onSuccess?: () => void
   onCancel?: () => void
@@ -40,7 +40,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState("")
   const [sizes, setSizes] = useState(product?.sizes?.join(", ") || "")
-  const [available, setAvailable] = useState(product?.available ?? true)
+  const [quantidadeEstoque, setQuantidadeEstoque] = useState(product?.quantidade_estoque?.toString() || "0")
   const [images, setImages] = useState<string[]>(product?.images || [])
   const [productCode, setProductCode] = useState(product?.product_code || "")
   const [uploading, setUploading] = useState(false)
@@ -136,7 +136,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         price: Number.parseFloat(price),
         category: finalCategory || null,
         sizes: sizesArray,
-        available,
+        quantidade_estoque: Number.parseInt(quantidadeEstoque),
         images: images,
         product_code: productCode || null,
       }
@@ -388,12 +388,20 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
             <p className="text-xs text-muted-foreground">Separe os tamanhos por vírgula</p>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="available">Produto Disponível</Label>
-              <p className="text-xs text-muted-foreground">Desmarque para ocultar do catálogo público</p>
-            </div>
-            <Switch id="available" checked={available} onCheckedChange={setAvailable} />
+          <div className="space-y-2">
+            <Label htmlFor="quantidade_estoque">Quantidade em Estoque *</Label>
+            <Input
+              id="quantidade_estoque"
+              type="number"
+              min="0"
+              value={quantidadeEstoque}
+              onChange={(e) => setQuantidadeEstoque(e.target.value)}
+              required
+              placeholder="0"
+            />
+            <p className="text-xs text-muted-foreground">
+              Produtos com estoque 0 ficam automaticamente indisponíveis no catálogo
+            </p>
           </div>
 
           <div className="flex gap-4 pt-4">

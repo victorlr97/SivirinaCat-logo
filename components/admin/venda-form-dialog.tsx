@@ -28,6 +28,7 @@ type Product = {
   name: string
   price: number
   product_code: string | null
+  quantidade_estoque: number
 }
 
 type CartItem = {
@@ -70,7 +71,10 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
   }
 
   const loadProdutos = async () => {
-    const { data } = await supabase.from("products").select("id, name, price, product_code").eq("available", true)
+    const { data } = await supabase
+      .from("products")
+      .select("id, name, price, product_code, quantidade_estoque")
+      .eq("available", true)
     setProdutos(data || [])
   }
 
@@ -187,9 +191,28 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
 
       if (itensError) throw itensError
 
+      for (const item of carrinho) {
+        const { error: stockError } = await supabase.rpc("decrement_product_stock", {
+          product_id: item.produto_id,
+          quantity: item.quantidade,
+        })
+
+        // If RPC doesn't exist, use direct update
+        if (stockError) {
+          const { error: updateError } = await supabase
+            .from("products")
+            .update({
+              quantidade_estoque: supabase.raw(`quantidade_estoque - ${item.quantidade}`),
+            })
+            .eq("id", item.produto_id)
+
+          if (updateError) throw updateError
+        }
+      }
+
       toast({
         title: "Venda registrada",
-        description: "A venda foi salva com sucesso",
+        description: "A venda foi salva com sucesso e o estoque foi atualizado",
       })
 
       setClienteId("")

@@ -35,6 +35,7 @@ type Product = {
   images: string[]
   product_code: string | null
   created_at: string
+  quantidade_estoque: number
 }
 
 export function ProductsList({ products }: { products: Product[] }) {
@@ -166,6 +167,7 @@ export function ProductsList({ products }: { products: Product[] }) {
                 <TableHead>Código</TableHead>
                 <TableHead>Categoria</TableHead>
                 <TableHead>Preço</TableHead>
+                <TableHead>Estoque</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
@@ -173,7 +175,7 @@ export function ProductsList({ products }: { products: Product[] }) {
             <TableBody>
               {filteredProducts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     Nenhum produto encontrado
                   </TableCell>
                 </TableRow>
@@ -212,6 +214,13 @@ export function ProductsList({ products }: { products: Product[] }) {
                     </TableCell>
                     <TableCell>
                       <span className="text-sm font-medium">R$ {product.price.toFixed(2)}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`text-sm font-medium ${product.quantidade_estoque === 0 ? "text-destructive" : ""}`}
+                      >
+                        {product.quantidade_estoque} {product.quantidade_estoque === 1 ? "unidade" : "unidades"}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <Badge variant={product.available ? "default" : "secondary"}>
