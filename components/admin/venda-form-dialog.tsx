@@ -260,7 +260,7 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                         />
                       </div>
                     </div>
-                    <div className="max-h-[300px] overflow-y-auto">
+                    <div className="max-h-[300px] overflow-y-auto" onWheel={(e) => e.stopPropagation()}>
                       {filteredClientes.length > 0 ? (
                         filteredClientes.map((cliente) => (
                           <Button
@@ -310,7 +310,7 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                       />
                     </div>
                   </div>
-                  <div className="max-h-[300px] overflow-y-auto">
+                  <div className="max-h-[300px] overflow-y-auto" onWheel={(e) => e.stopPropagation()}>
                     {filteredProdutos.length > 0 ? (
                       filteredProdutos.map((produto) => (
                         <Button
