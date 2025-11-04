@@ -11,8 +11,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useToast } from "@/hooks/use-toast"
-import { Plus, Search, Trash2, UserPlus } from "lucide-react"
+import { Plus, Search, Trash2, UserPlus, ChevronDown } from "lucide-react"
 import { ClienteForm } from "./cliente-form"
 import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -50,6 +51,8 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
   const [observacoes, setObservacoes] = useState("")
   const [saving, setSaving] = useState(false)
   const [showClienteForm, setShowClienteForm] = useState(false)
+  const [clientePopoverOpen, setClientePopoverOpen] = useState(false)
+  const [produtoPopoverOpen, setProdutoPopoverOpen] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createBrowserClient()
@@ -98,6 +101,7 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
       ])
     }
     setSearchProduto("")
+    setProdutoPopoverOpen(false)
   }
 
   const updateQuantity = (produto_id: string, quantidade: number) => {
@@ -222,6 +226,8 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
       p.product_code?.toLowerCase().includes(searchProduto.toLowerCase()),
   )
 
+  const selectedCliente = clientes.find((c) => c.id === clienteId)
+
   return (
     <>
       <Dialog open={open && !showClienteForm} onOpenChange={onOpenChange}>
@@ -234,28 +240,49 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label>Cliente *</Label>
-              <div className="relative mb-2">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar cliente..."
-                  value={searchCliente}
-                  onChange={(e) => setSearchCliente(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
               <div className="flex gap-2">
-                <Select value={clienteId} onValueChange={setClienteId}>
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Selecione um cliente" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredClientes.map((cliente) => (
-                      <SelectItem key={cliente.id} value={cliente.id}>
-                        {cliente.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Popover open={clientePopoverOpen} onOpenChange={setClientePopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button type="button" variant="outline" className="flex-1 justify-between bg-transparent">
+                      {selectedCliente ? selectedCliente.nome : "Selecionar Cliente"}
+                      <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px] p-0" align="start">
+                    <div className="p-2 border-b">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Buscar cliente..."
+                          value={searchCliente}
+                          onChange={(e) => setSearchCliente(e.target.value)}
+                          className="pl-10"
+                        />
+                      </div>
+                    </div>
+                    <div className="max-h-[300px] overflow-y-auto">
+                      {filteredClientes.length > 0 ? (
+                        filteredClientes.map((cliente) => (
+                          <Button
+                            key={cliente.id}
+                            type="button"
+                            variant="ghost"
+                            className="w-full justify-start"
+                            onClick={() => {
+                              setClienteId(cliente.id)
+                              setClientePopoverOpen(false)
+                              setSearchCliente("")
+                            }}
+                          >
+                            {cliente.nome}
+                          </Button>
+                        ))
+                      ) : (
+                        <div className="p-4 text-center text-sm text-muted-foreground">Nenhum cliente encontrado</div>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 <Button type="button" variant="outline" onClick={() => setShowClienteForm(true)}>
                   <UserPlus className="h-4 w-4" />
                 </Button>
@@ -264,36 +291,48 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
 
             <div className="space-y-2">
               <Label>Adicionar Produtos</Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar produto por nome ou código..."
-                  value={searchProduto}
-                  onChange={(e) => setSearchProduto(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              {filteredProdutos.length > 0 && (
-                <Card>
-                  <CardContent className="p-2 max-h-48 overflow-y-auto">
-                    {filteredProdutos.map((produto) => (
-                      <Button
-                        key={produto.id}
-                        type="button"
-                        variant="ghost"
-                        className="w-full justify-start"
-                        onClick={() => addToCart(produto)}
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        {produto.name} - R$ {produto.price.toFixed(2)}
-                        {produto.product_code && (
-                          <span className="ml-2 text-muted-foreground">({produto.product_code})</span>
-                        )}
-                      </Button>
-                    ))}
-                  </CardContent>
-                </Card>
-              )}
+              <Popover open={produtoPopoverOpen} onOpenChange={setProdutoPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button type="button" variant="outline" className="w-full justify-between bg-transparent">
+                    Selecionar Produto
+                    <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[500px] p-0" align="start">
+                  <div className="p-2 border-b">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Buscar produto por nome ou código..."
+                        value={searchProduto}
+                        onChange={(e) => setSearchProduto(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <div className="max-h-[300px] overflow-y-auto">
+                    {filteredProdutos.length > 0 ? (
+                      filteredProdutos.map((produto) => (
+                        <Button
+                          key={produto.id}
+                          type="button"
+                          variant="ghost"
+                          className="w-full justify-start"
+                          onClick={() => addToCart(produto)}
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          {produto.name} - R$ {produto.price.toFixed(2)}
+                          {produto.product_code && (
+                            <span className="ml-2 text-muted-foreground">({produto.product_code})</span>
+                          )}
+                        </Button>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-sm text-muted-foreground">Nenhum produto encontrado</div>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
 
             {carrinho.length > 0 && (
