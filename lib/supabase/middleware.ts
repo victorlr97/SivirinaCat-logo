@@ -25,23 +25,62 @@ export async function updateSession(request: NextRequest) {
     },
   )
 
-  // IMPORTANTE: Não execute código entre createServerClient e supabase.auth.getUser()
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser()
 
-  // Protege rotas /admin - redireciona para login se não autenticado
-  if (request.nextUrl.pathname.startsWith("/admin") && request.nextUrl.pathname !== "/admin" && !user) {
+  // Se houver erro de JWT inválido, redirecionar para página de limpeza
+  if (error && error.message.includes("does not exist")) {
     const url = request.nextUrl.clone()
-    url.pathname = "/admin"
+    url.pathname = "/auth/clear-session"
     return NextResponse.redirect(url)
   }
 
-  // Se usuário autenticado tenta acessar /admin (página de login), redireciona para dashboard
+  if (request.nextUrl.pathname.startsWith("/perfil")) {
+    if (!user) {
+      // Not authenticated - redirect to login
+      const url = request.nextUrl.clone()
+      url.pathname = "/login"
+      return NextResponse.redirect(url)
+    }
+  }
+
+  if (request.nextUrl.pathname.startsWith("/admin") && request.nextUrl.pathname !== "/admin") {
+    if (!user) {
+      // Não autenticado - redireciona para login do admin
+      const url = request.nextUrl.clone()
+      url.pathname = "/admin"
+      return NextResponse.redirect(url)
+    }
+
+    // Verifica se usuário está na tabela admins
+    const { data: adminData } = await supabase.from("admins").select("id").eq("user_id", user.id).single()
+
+    if (!adminData) {
+      // Usuário autenticado mas NÃO é admin - redireciona para home
+      const url = request.nextUrl.clone()
+      url.pathname = "/"
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Se usuário autenticado tenta acessar /admin (página de login), verifica se é admin
   if (request.nextUrl.pathname === "/admin" && user) {
-    const url = request.nextUrl.clone()
-    url.pathname = "/admin/dashboard"
-    return NextResponse.redirect(url)
+    // Verifica se é admin
+    const { data: adminData } = await supabase.from("admins").select("id").eq("user_id", user.id).single()
+
+    if (adminData) {
+      // É admin - redireciona para dashboard
+      const url = request.nextUrl.clone()
+      url.pathname = "/admin/dashboard"
+      return NextResponse.redirect(url)
+    } else {
+      // Não é admin - redireciona para home
+      const url = request.nextUrl.clone()
+      url.pathname = "/"
+      return NextResponse.redirect(url)
+    }
   }
 
   return supabaseResponse
