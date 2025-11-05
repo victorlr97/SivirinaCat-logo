@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
 import { Pencil, Trash2, Search, Plus } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
@@ -36,6 +37,7 @@ type Product = {
   product_code: string | null
   created_at: string
   quantidade_estoque: number
+  visivel_catalogo: boolean // Added visibility field
 }
 
 export function ProductsList({ products }: { products: Product[] }) {
@@ -90,6 +92,27 @@ export function ProductsList({ products }: { products: Product[] }) {
     setEditModalOpen(false)
     setEditingProduct(null)
     router.refresh()
+  }
+
+  const handleToggleVisibility = async (productId: string, currentValue: boolean) => {
+    try {
+      const { error } = await supabase.from("products").update({ visivel_catalogo: !currentValue }).eq("id", productId)
+
+      if (error) throw error
+
+      toast({
+        title: "Visibilidade atualizada",
+        description: !currentValue ? "Produto agora está visível no catálogo" : "Produto foi ocultado do catálogo",
+      })
+
+      router.refresh()
+    } catch (error) {
+      toast({
+        title: "Erro ao atualizar",
+        description: "Não foi possível atualizar a visibilidade",
+        variant: "destructive",
+      })
+    }
   }
 
   const filteredProducts = products.filter((product) => {
@@ -169,13 +192,14 @@ export function ProductsList({ products }: { products: Product[] }) {
                 <TableHead>Preço</TableHead>
                 <TableHead>Estoque</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Visível</TableHead> {/* Added visibility column */}
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredProducts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                     Nenhum produto encontrado
                   </TableCell>
                 </TableRow>
@@ -226,6 +250,12 @@ export function ProductsList({ products }: { products: Product[] }) {
                       <Badge variant={product.available ? "default" : "secondary"}>
                         {product.available ? "Disponível" : "Indisponível"}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        checked={product.visivel_catalogo}
+                        onCheckedChange={() => handleToggleVisibility(product.id, product.visivel_catalogo)}
+                      />
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">

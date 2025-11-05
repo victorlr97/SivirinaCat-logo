@@ -57,7 +57,7 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
   }
 
   return (
-    <div className="sticky top-20 z-10 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:top-24">
+    <div className="border-b border-border bg-background">
       <div className="container mx-auto px-4">
         {/* Desktop: Horizontal bar */}
         <nav className="hidden items-center justify-center gap-2 py-4 md:flex">
