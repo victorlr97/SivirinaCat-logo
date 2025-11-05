@@ -28,16 +28,14 @@ import { ProductForm } from "./product-form"
 type Product = {
   id: string
   name: string
-  description: string | null
-  price: number
-  category: string | null
-  sizes: string[]
-  available: boolean
-  images: string[]
   product_code: string | null
-  created_at: string
+  category: string | null
+  price: number
+  sizes: string[]
+  images: string[]
+  available: boolean
   quantidade_estoque: number
-  visivel_catalogo: boolean // Added visibility field
+  visivel_catalogo: boolean
 }
 
 export function ProductsList({ products }: { products: Product[] }) {
@@ -192,7 +190,7 @@ export function ProductsList({ products }: { products: Product[] }) {
                 <TableHead>Preço</TableHead>
                 <TableHead>Estoque</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Visível</TableHead> {/* Added visibility column */}
+                <TableHead>Visível</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
