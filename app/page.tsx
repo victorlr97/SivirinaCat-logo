@@ -14,11 +14,17 @@ export default async function CatalogPage({
     .from("products")
     .select("category")
     .eq("available", true)
+    .eq("visivel_catalogo", true)
     .not("category", "is", null)
 
   const categories = Array.from(new Set(categoryData?.map((p) => p.category).filter(Boolean))).sort() as string[]
 
-  let query = supabase.from("products").select("*").eq("available", true).order("created_at", { ascending: false })
+  let query = supabase
+    .from("products")
+    .select("*")
+    .eq("available", true)
+    .eq("visivel_catalogo", true)
+    .order("created_at", { ascending: false })
 
   if (searchParams.categoria) {
     query = query.eq("category", searchParams.categoria)

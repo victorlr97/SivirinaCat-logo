@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Menu } from "lucide-react"
@@ -18,6 +18,16 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
   const router = useRouter()
   const currentCategory = searchParams.get("categoria")
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   const handleTodosClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -57,15 +67,21 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
   }
 
   return (
-    <div className="border-b border-border bg-background">
+    <div
+      className={`sticky top-12 z-40 border-b border-border bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/60 md:top-14 ${scrolled ? "" : ""}`}
+    >
       <div className="container mx-auto px-4">
         {/* Desktop: Horizontal bar */}
-        <nav className="hidden items-center justify-center gap-2 py-4 md:flex">
+        <nav
+          className={`hidden items-center justify-center gap-2 transition-all duration-300 md:flex ${scrolled ? "py-2" : "py-4"}`}
+        >
           <CategoryLinks />
         </nav>
 
         {/* Mobile: Hamburger menu */}
-        <div className="flex items-center justify-between py-4 md:hidden">
+        <div
+          className={`flex items-center justify-between transition-all duration-300 md:hidden ${scrolled ? "py-1" : "py-2"}`}
+        >
           <span className="text-sm font-medium">{currentCategory || "Todas as Categorias"}</span>
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>

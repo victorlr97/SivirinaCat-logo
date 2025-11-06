@@ -5,10 +5,14 @@ import Link from "next/link"
 import { createBrowserClient } from "@supabase/ssr"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+// import { Button } from "@/components/ui/button"
+// import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+// import { LogOut, User } from 'lucide-react'
 
 export function CatalogHeader() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState<string | null>(null)
+  const [scrolled, setScrolled] = useState(false)
   const router = useRouter()
 
   const supabase = createBrowserClient(
@@ -39,7 +43,6 @@ export function CatalogHeader() {
 
     checkUser()
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(() => {
@@ -48,6 +51,15 @@ export function CatalogHeader() {
 
     return () => subscription.unsubscribe()
   }, [supabase])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -58,9 +70,13 @@ export function CatalogHeader() {
   }
 
   return (
-    <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
-        <div className="flex h-20 items-center justify-between md:h-24">
+        <div
+          className={`flex items-center justify-between transition-all duration-300 ${
+            scrolled ? "h-12 md:h-14" : "h-20 md:h-24"
+          }`}
+        >
           <div className="w-24" />
 
           <Link href="/" className="transition-opacity hover:opacity-70">
@@ -69,7 +85,7 @@ export function CatalogHeader() {
               alt="SIVIRINA"
               width={180}
               height={40}
-              className="h-8 w-auto md:h-[135px]"
+              className={`w-auto transition-all duration-300 ${scrolled ? "h-5 md:h-12" : "h-8 md:h-[135px]"}`}
               priority
             />
           </Link>
