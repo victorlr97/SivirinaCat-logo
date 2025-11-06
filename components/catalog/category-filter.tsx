@@ -57,15 +57,15 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
   }
 
   return (
-    <div className="sticky top-14 z-40 border-b border-border bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/60 md:top-16">
+    <div className="sticky top-12 z-40 border-b border-border bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/60 md:top-14">
       <div className="container mx-auto px-4">
         {/* Desktop: Horizontal bar */}
-        <nav className="hidden items-center justify-center gap-2 py-4 md:flex">
+        <nav className="hidden items-center justify-center gap-2 py-2 md:flex md:py-3">
           <CategoryLinks />
         </nav>
 
         {/* Mobile: Hamburger menu */}
-        <div className="flex items-center justify-between py-4 md:hidden">
+        <div className="flex items-center justify-between py-2 md:hidden">
           <span className="text-sm font-medium">{currentCategory || "Todas as Categorias"}</span>
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>

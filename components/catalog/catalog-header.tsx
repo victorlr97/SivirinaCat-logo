@@ -74,7 +74,7 @@ export function CatalogHeader() {
       <div className="container mx-auto px-4">
         <div
           className={`flex items-center justify-between transition-all duration-300 ${
-            scrolled ? "h-14 md:h-16" : "h-20 md:h-24"
+            scrolled ? "h-12 md:h-14" : "h-20 md:h-24"
           }`}
         >
           <div className="w-24" />
@@ -85,7 +85,7 @@ export function CatalogHeader() {
               alt="SIVIRINA"
               width={180}
               height={40}
-              className={`w-auto transition-all duration-300 ${scrolled ? "h-6 md:h-16" : "h-8 md:h-[135px]"}`}
+              className={`w-auto transition-all duration-300 ${scrolled ? "h-5 md:h-12" : "h-8 md:h-[135px]"}`}
               priority
             />
           </Link>
