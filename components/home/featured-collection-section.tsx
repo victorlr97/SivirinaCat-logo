@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight } from "lucide-react"
@@ -20,10 +20,16 @@ interface FeaturedCollectionSectionProps {
 
 // Componente do card de produto individual
 function ProductCard({ product, emotionalContext, index }: { product: Product; emotionalContext: string; index: number }) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
   const [showSecondImage, setShowSecondImage] = useState(false)
-  const hasMultipleImages = product.images && product.images.length > 1
+  const touchStartX = useRef<number>(0)
+  const touchEndX = useRef<number>(0)
 
+  const hasMultipleImages = product.images && product.images.length > 1
+  const totalImages = product.images?.length || 0
+
+  // Hover timer para desktop
   useEffect(() => {
     let timer: NodeJS.Timeout
 
@@ -41,6 +47,35 @@ function ProductCard({ product, emotionalContext, index }: { product: Product; e
     }
   }, [isHovered, hasMultipleImages])
 
+  // Detecta swipe no mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX
+  }
+
+  const handleTouchEnd = () => {
+    if (!hasMultipleImages) return
+
+    const swipeDistance = touchStartX.current - touchEndX.current
+    const minSwipeDistance = 50 // mínimo de 50px para considerar um swipe
+
+    if (Math.abs(swipeDistance) > minSwipeDistance) {
+      if (swipeDistance > 0) {
+        // Swipe para esquerda - próxima imagem
+        setCurrentImageIndex((prev) => (prev + 1) % totalImages)
+      } else {
+        // Swipe para direita - imagem anterior
+        setCurrentImageIndex((prev) => (prev - 1 + totalImages) % totalImages)
+      }
+    }
+  }
+
+  // No desktop usa hover, no mobile usa currentImageIndex
+  const displayImageIndex = isHovered && showSecondImage && hasMultipleImages ? 1 : currentImageIndex
+
   return (
     <div
       className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
@@ -49,31 +84,43 @@ function ProductCard({ product, emotionalContext, index }: { product: Product; e
       onMouseLeave={() => setIsHovered(false)}
     >
       <Link href={`/produto/${product.id}`} className="block">
-        <div className="relative mb-4 aspect-[3/4] overflow-hidden rounded-sm bg-muted">
+        <div
+          className="relative mb-4 aspect-[3/4] overflow-hidden rounded-sm bg-muted touch-pan-y"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           {product.images && product.images.length > 0 ? (
             <>
-              {/* Primeira imagem */}
-              <Image
-                src={product.images[0]}
-                alt={product.name}
-                fill
-                className={`object-cover transition-all duration-500 group-hover:scale-105 ${
-                  showSecondImage && hasMultipleImages ? "opacity-0" : "opacity-100"
-                }`}
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              />
-
-              {/* Segunda imagem (aparece no hover após 500ms) */}
-              {hasMultipleImages && (
+              {/* Renderiza todas as imagens */}
+              {product.images.map((image, imgIndex) => (
                 <Image
-                  src={product.images[1]}
-                  alt={`${product.name} - vista alternativa`}
+                  key={imgIndex}
+                  src={image}
+                  alt={`${product.name}${imgIndex > 0 ? ` - vista ${imgIndex + 1}` : ''}`}
                   fill
-                  className={`absolute inset-0 object-cover transition-all duration-500 group-hover:scale-105 ${
-                    showSecondImage ? "opacity-100" : "opacity-0"
+                  className={`object-cover transition-all duration-500 group-hover:scale-105 ${
+                    imgIndex === displayImageIndex ? "opacity-100" : "opacity-0"
                   }`}
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  priority={imgIndex === 0}
                 />
+              ))}
+
+              {/* Indicadores de imagem (mobile) */}
+              {hasMultipleImages && (
+                <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 md:hidden">
+                  {product.images.map((_, imgIndex) => (
+                    <div
+                      key={imgIndex}
+                      className={`h-1.5 w-1.5 rounded-full transition-all ${
+                        imgIndex === currentImageIndex
+                          ? "w-4 bg-white"
+                          : "bg-white/50"
+                      }`}
+                    />
+                  ))}
+                </div>
               )}
             </>
           ) : (

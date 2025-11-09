@@ -44,7 +44,7 @@ export function CTASection() {
           </div>
 
           {/* Decorative quote */}
-          <div className="mt-20 border-t border-foreground/10 pt-12 animate-in fade-in duration-700 delay-700">
+          <div className="mt-20 border-t border-foreground/10 pt-12 animate-in fade-in duration-700 delay-600">
             <p className="text-sm font-light italic tracking-wider text-muted-foreground">
               "Para mulheres que se vestem para si mesmas"
             </p>

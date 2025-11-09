@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Instagram } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/lib/utils"
+import { ImageZoom } from "./image-zoom"
 
 interface Product {
   id: string
@@ -29,21 +30,21 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     <div className="grid gap-12 md:grid-cols-2 md:gap-16">
       {/* Galeria de Imagens */}
       <div className="space-y-4">
-        <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-muted shadow-md">
-          {images.length > 0 ? (
-            <Image
-              src={images[selectedImage] || "/placeholder.svg"}
-              alt={product.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center">
-              <span className="text-muted-foreground">Sem imagem</span>
-            </div>
-          )}
+        {/* Container sem overflow-hidden para permitir zoom aparecer fora */}
+        <div className="relative aspect-[3/4]">
+          <div className="absolute inset-0 overflow-hidden rounded-lg bg-muted shadow-md">
+            {images.length > 0 ? (
+              <ImageZoom
+                src={images[selectedImage] || "/placeholder.svg"}
+                alt={product.name}
+                zoomScale={2.5}
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <span className="text-muted-foreground">Sem imagem</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {images.length > 1 && (

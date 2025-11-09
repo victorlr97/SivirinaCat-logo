@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { formatCurrency } from "@/lib/utils"
-import { useState } from "react"
+import { useState, useRef } from "react"
 
 interface Product {
   id: string
@@ -36,8 +36,42 @@ export function ProductGrid({ products }: ProductGridProps) {
 }
 
 function ProductCard({ product }: { product: Product }) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
+  const touchStartX = useRef<number>(0)
+  const touchEndX = useRef<number>(0)
+
   const hasMultipleImages = product.images && product.images.length > 1
+  const totalImages = product.images?.length || 0
+
+  // Detecta swipe no mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX
+  }
+
+  const handleTouchEnd = () => {
+    if (!hasMultipleImages) return
+
+    const swipeDistance = touchStartX.current - touchEndX.current
+    const minSwipeDistance = 50 // mínimo de 50px para considerar um swipe
+
+    if (Math.abs(swipeDistance) > minSwipeDistance) {
+      if (swipeDistance > 0) {
+        // Swipe para esquerda - próxima imagem
+        setCurrentImageIndex((prev) => (prev + 1) % totalImages)
+      } else {
+        // Swipe para direita - imagem anterior
+        setCurrentImageIndex((prev) => (prev - 1 + totalImages) % totalImages)
+      }
+    }
+  }
+
+  // No desktop, mostra segunda imagem no hover
+  const displayImageIndex = isHovered && hasMultipleImages ? 1 : currentImageIndex
 
   return (
     <Link
@@ -47,31 +81,43 @@ function ProductCard({ product }: { product: Product }) {
       onMouseLeave={() => hasMultipleImages && setIsHovered(false)}
     >
       <article className="space-y-4">
-        <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-muted shadow-md">
+        <div
+          className="relative aspect-[3/4] overflow-hidden rounded-lg bg-muted shadow-md touch-pan-y"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           {product.images && product.images.length > 0 ? (
             <>
-              {/* Primeira imagem (visível por padrão, invisível no hover) */}
-              <Image
-                src={product.images[0] || "/placeholder.svg"}
-                alt={product.name}
-                fill
-                className={`object-cover transition-all duration-500 group-hover:scale-105 ${
-                  isHovered && hasMultipleImages ? "opacity-0" : "opacity-100"
-                }`}
-                sizes="(max-width: 768px) 100vw, 33vw"
-              />
-
-              {/* Segunda imagem (invisível por padrão, visível no hover) */}
-              {hasMultipleImages && (
+              {/* Imagens - renderiza todas mas mostra apenas a atual */}
+              {product.images.map((image, index) => (
                 <Image
-                  src={product.images[1] || "/placeholder.svg"}
-                  alt={`${product.name} - vista alternativa`}
+                  key={index}
+                  src={image || "/placeholder.svg"}
+                  alt={`${product.name}${index > 0 ? ` - vista ${index + 1}` : ''}`}
                   fill
-                  className={`absolute inset-0 object-cover transition-all duration-500 group-hover:scale-105 ${
-                    isHovered ? "opacity-100" : "opacity-0"
+                  className={`object-cover transition-all duration-500 group-hover:scale-105 ${
+                    index === displayImageIndex ? "opacity-100" : "opacity-0"
                   }`}
                   sizes="(max-width: 768px) 100vw, 33vw"
+                  priority={index === 0}
                 />
+              ))}
+
+              {/* Indicadores de imagem (mobile) */}
+              {hasMultipleImages && (
+                <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1.5 md:hidden">
+                  {product.images.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`h-1.5 w-1.5 rounded-full transition-all ${
+                        index === currentImageIndex
+                          ? "w-4 bg-white"
+                          : "bg-white/50"
+                      }`}
+                    />
+                  ))}
+                </div>
               )}
             </>
           ) : (
