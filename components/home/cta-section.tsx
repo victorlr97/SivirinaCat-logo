@@ -28,7 +28,7 @@ export function CTASection() {
             </Link>
 
             <Link
-              href="https://instagram.com/sivirina"
+              href="https://instagram.com/sivirinamoda"
               target="_blank"
               rel="noopener noreferrer"
             >

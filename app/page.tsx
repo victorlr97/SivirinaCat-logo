@@ -10,14 +10,13 @@ import { CTASection } from "@/components/home/cta-section"
 export default async function HomePage() {
   const supabase = await createServerClient()
 
-  // Buscar produtos em destaque para a seção de coleção
+  // Buscar todos os produtos para a seção de coleção
   const { data: products } = await supabase
     .from("products")
     .select("*")
     .eq("available", true)
     .eq("visivel_catalogo", true)
     .order("created_at", { ascending: false })
-    .limit(4)
 
   return (
     <div className="min-h-screen">

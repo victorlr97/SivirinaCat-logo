@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface Product {
@@ -156,6 +156,11 @@ function ProductCard({ product, emotionalContext, index }: { product: Product; e
 }
 
 export function FeaturedCollectionSection({ products }: FeaturedCollectionSectionProps) {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const carouselRef = useRef<HTMLDivElement>(null)
+  const touchStartX = useRef<number>(0)
+  const touchEndX = useRef<number>(0)
+
   // Conceitos emocionais para as peças
   const emotionalContext = [
     "A peça da decisão importante",
@@ -163,6 +168,65 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
     "A escolha do momento especial",
     "A expressão da sua essência",
   ]
+
+  // Número de produtos a mostrar por vez (responsivo)
+  const [itemsPerView, setItemsPerView] = useState(4)
+
+  useEffect(() => {
+    const getItemsPerView = () => {
+      if (window.innerWidth < 768) return 1
+      if (window.innerWidth < 1024) return 2
+      return 4
+    }
+
+    // Set initial value on mount
+    setItemsPerView(getItemsPerView())
+
+    const handleResize = () => {
+      setItemsPerView(getItemsPerView())
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const maxIndex = Math.max(0, products.length - itemsPerView)
+
+  const goToNext = () => {
+    setCurrentIndex((prev) => {
+      const isMobile = itemsPerView === 1
+      if (isMobile) {
+        return Math.min(prev + 1, products.length - 1)
+      }
+      return Math.min(prev + 1, maxIndex)
+    })
+  }
+
+  const goToPrev = () => {
+    setCurrentIndex((prev) => Math.max(prev - 1, 0))
+  }
+
+  // Swipe detection
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX
+  }
+
+  const handleTouchEnd = () => {
+    const swipeDistance = touchStartX.current - touchEndX.current
+    const minSwipeDistance = 50
+
+    if (Math.abs(swipeDistance) > minSwipeDistance) {
+      if (swipeDistance > 0) {
+        goToNext()
+      } else {
+        goToPrev()
+      }
+    }
+  }
 
   return (
     <section
@@ -179,16 +243,76 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
           </p>
         </div>
 
-        {/* Products grid */}
-        <div className="mb-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {products.slice(0, 4).map((product, index) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              emotionalContext={emotionalContext[index % emotionalContext.length]}
-              index={index}
-            />
-          ))}
+        {/* Carousel Container */}
+        <div className="relative mb-16">
+          {/* Navigation Buttons - Desktop */}
+          {currentIndex > 0 && (
+            <button
+              onClick={goToPrev}
+              className="absolute left-0 top-1/2 z-20 hidden -translate-x-4 -translate-y-1/2 rounded-full bg-background/90 p-3 shadow-lg backdrop-blur-sm transition-all hover:bg-background hover:scale-110 md:flex"
+              aria-label="Produto anterior"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+          )}
+
+          {currentIndex < maxIndex && (
+            <button
+              onClick={goToNext}
+              className="absolute right-0 top-1/2 z-20 hidden translate-x-4 -translate-y-1/2 rounded-full bg-background/90 p-3 shadow-lg backdrop-blur-sm transition-all hover:bg-background hover:scale-110 md:flex"
+              aria-label="Próximo produto"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+          )}
+
+          {/* Carousel Track */}
+          <div
+            ref={carouselRef}
+            className="overflow-visible md:overflow-hidden"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div
+              className="flex transition-transform duration-500 ease-out"
+              style={{
+                transform: itemsPerView === 1
+                  ? `translateX(calc(-${currentIndex * 80}% - ${currentIndex * 16}px + 10%))`
+                  : `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
+              }}
+            >
+              {products.map((product, index) => (
+                <div
+                  key={product.id}
+                  className="flex-shrink-0 px-2 md:px-4"
+                  style={{
+                    width: itemsPerView === 1 ? '80%' : itemsPerView === 2 ? '50%' : '25%',
+                  }}
+                >
+                  <ProductCard
+                    product={product}
+                    emotionalContext={emotionalContext[index % emotionalContext.length]}
+                    index={index}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Indicators - Mobile */}
+          <div className="mt-8 flex justify-center gap-2 md:hidden">
+            {products.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`h-2 rounded-full transition-all ${
+                  index === currentIndex ? "w-8 bg-foreground" : "w-2 bg-foreground/30"
+                }`}
+                aria-label={`Ir para produto ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
 
         {/* CTA */}
