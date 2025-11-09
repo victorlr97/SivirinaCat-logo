@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { createBrowserClient } from "@supabase/ssr"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 // import { Button } from "@/components/ui/button"
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 // import { LogOut, User } from 'lucide-react'
@@ -14,6 +14,7 @@ export function CatalogHeader() {
   const [userName, setUserName] = useState<string | null>(null)
   const [scrolled, setScrolled] = useState(false)
   const router = useRouter()
+  const pathname = usePathname()
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -77,11 +78,26 @@ export function CatalogHeader() {
             scrolled ? "h-12 md:h-14" : "h-20 md:h-24"
           }`}
         >
-          <div className="w-24" />
+          {/* Navigation Links - Left */}
+          <nav className="flex items-center gap-6 text-sm tracking-wider">
+            <Link
+              href="/"
+              className={`transition-opacity hover:opacity-70 ${pathname === '/' ? 'font-medium' : 'font-light text-muted-foreground'}`}
+            >
+              HOME
+            </Link>
+            <Link
+              href="/catalogo"
+              className={`transition-opacity hover:opacity-70 ${pathname === '/catalogo' ? 'font-medium' : 'font-light text-muted-foreground'}`}
+            >
+              CATÁLOGO
+            </Link>
+          </nav>
 
+          {/* Logo - Center */}
           <Link href="/" className="transition-opacity hover:opacity-70">
             <Image
-              src="/images/design-mode/SIVIRINA%20LOGO.png"
+              src="/images/design-mode/SIVIRINA-LOGO.png"
               alt="SIVIRINA"
               width={180}
               height={40}
@@ -90,6 +106,7 @@ export function CatalogHeader() {
             />
           </Link>
 
+          {/* User Menu - Right */}
           {/* <div className="flex items-center gap-2">
             {!isLoggedIn ? (
               <Button asChild variant="outline" size="sm">

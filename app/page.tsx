@@ -1,43 +1,34 @@
 import { createServerClient } from "@/lib/supabase/server"
 import { CatalogHeader } from "@/components/catalog/catalog-header"
-import { CategoryFilter } from "@/components/catalog/category-filter"
-import { ProductGrid } from "@/components/catalog/product-grid"
+import { HeroSection } from "@/components/home/hero-section"
+import { ManifestoSection } from "@/components/home/manifesto-section"
+import { BrandStorySection } from "@/components/home/brand-story-section"
+import { PhilosophySection } from "@/components/home/philosophy-section"
+import { FeaturedCollectionSection } from "@/components/home/featured-collection-section"
+import { CTASection } from "@/components/home/cta-section"
 
-export default async function CatalogPage({
-  searchParams,
-}: {
-  searchParams: { categoria?: string }
-}) {
+export default async function HomePage() {
   const supabase = await createServerClient()
 
-  const { data: categoryData } = await supabase
-    .from("products")
-    .select("category")
-    .eq("available", true)
-    .eq("visivel_catalogo", true)
-    .not("category", "is", null)
-
-  const categories = Array.from(new Set(categoryData?.map((p) => p.category).filter(Boolean))).sort() as string[]
-
-  let query = supabase
+  // Buscar produtos em destaque para a seção de coleção
+  const { data: products } = await supabase
     .from("products")
     .select("*")
     .eq("available", true)
     .eq("visivel_catalogo", true)
     .order("created_at", { ascending: false })
-
-  if (searchParams.categoria) {
-    query = query.eq("category", searchParams.categoria)
-  }
-
-  const { data: products } = await query
+    .limit(4)
 
   return (
     <div className="min-h-screen">
       <CatalogHeader />
-      <CategoryFilter categories={categories} />
-      <main className="container mx-auto px-4 py-12 md:py-16">
-        <ProductGrid products={products || []} />
+      <main>
+        <HeroSection />
+        <ManifestoSection />
+        <BrandStorySection />
+        <PhilosophySection />
+        <FeaturedCollectionSection products={products || []} />
+        <CTASection />
       </main>
     </div>
   )
