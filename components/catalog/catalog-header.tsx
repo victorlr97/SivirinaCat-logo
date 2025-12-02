@@ -118,9 +118,8 @@ export function CatalogHeader({ categories = [] }: CatalogHeaderProps) {
             scrolled ? "h-10 md:h-12" : "h-20 md:h-24"
           }`}
         >
-          <div className="w-24" />
-
-          <Link href="/" className="transition-opacity hover:opacity-70">
+          {/* Logo - Fixed to left */}
+          <Link href="/" className="flex-shrink-0 transition-opacity hover:opacity-70">
             <Image
               src="/images/design-mode/SIVIRINA%20LOGO.png"
               alt="SIVIRINA"
@@ -131,14 +130,16 @@ export function CatalogHeader({ categories = [] }: CatalogHeaderProps) {
             />
           </Link>
 
+          {/* Categories - Centered on desktop */}
           {categories.length > 0 && (
             <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 md:flex">
               <CategoryLinks />
             </nav>
           )}
 
+          {/* Mobile menu - Right side */}
           {categories.length > 0 && (
-            <div className="md:hidden">
+            <div className="ml-auto md:hidden">
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon">
@@ -153,8 +154,6 @@ export function CatalogHeader({ categories = [] }: CatalogHeaderProps) {
               </Sheet>
             </div>
           )}
-
-          <div className="w-24 md:w-0" />
         </div>
       </div>
     </header>
