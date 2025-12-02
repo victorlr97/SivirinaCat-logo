@@ -122,9 +122,9 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
             <Image
               src="/images/sivirina-20logo.png"
               alt="SIVIRINA"
-              width={80}
-              height={60}
-              className={`w-auto transition-all duration-300 ${scrolled ? "h-3 md:h-6" : "h-6 md:h-12"}`}
+              width={60}
+              height={45}
+              className={`w-auto transition-all duration-300 ${scrolled ? "h-3 md:h-5" : "h-5 md:h-10"}`}
               priority
             />
           </Link>
