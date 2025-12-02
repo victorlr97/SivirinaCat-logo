@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import Image from "next/image"
 import Link from "next/link"
 import { createBrowserClient } from "@supabase/ssr"
@@ -9,11 +11,18 @@ import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
-export function CatalogHeader() {
+interface CatalogHeaderProps {
+  categories?: string[]
+}
+
+export function CatalogHeader({ categories = [] }: CatalogHeaderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState<string | null>(null)
   const [scrolled, setScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const currentCategory = searchParams.get("categoria")
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -64,6 +73,13 @@ export function CatalogHeader() {
     await supabase.auth.signOut()
     setIsLoggedIn(false)
     setUserName(null)
+    router.push("/")
+    router.refresh()
+  }
+
+  const handleTodosClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setMobileMenuOpen(false)
     router.push("/")
     router.refresh()
   }
