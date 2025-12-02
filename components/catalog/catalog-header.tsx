@@ -121,8 +121,6 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
             scrolled ? "h-14 md:h-16" : "h-20 md:h-24"
           }`}
         >
-          <div className="w-24" />
-
           <Link href="/" className="flex-shrink-0 transition-opacity hover:opacity-70">
             <Image
               src="/images/design-mode/SIVIRINA%20LOGO.png"
@@ -135,7 +133,7 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
           </Link>
 
           {categories.length > 0 && (
-            <nav className="hidden items-center gap-2 md:flex">
+            <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 md:flex">
               <CategoryLinks />
             </nav>
           )}
@@ -187,7 +185,7 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
             )}
           </div> */}
 
-          <div className="w-24" />
+          <div className="w-24 md:w-0" />
         </div>
       </div>
     </header>
