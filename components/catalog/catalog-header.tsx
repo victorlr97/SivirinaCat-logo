@@ -10,8 +10,6 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-// import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-// import { LogOut, User } from 'lucide-react'
 
 interface CatalogHeaderProps {
   categories: string[]
@@ -40,7 +38,6 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
       if (user) {
         setIsLoggedIn(true)
 
-        // Get user name from clientes table
         const { data: clientData } = await supabase.from("clientes").select("nome").eq("user_id", user.id).single()
 
         if (clientData) {
@@ -91,9 +88,9 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
     <>
       <Link
         href="/"
-        className={`px-4 py-2 text-sm transition-colors hover:text-foreground ${
-          !currentCategory ? "font-medium text-foreground" : "text-muted-foreground"
-        }`}
+        className={`text-sm transition-colors hover:text-foreground ${
+          scrolled ? "px-3 py-1" : "px-4 py-2"
+        } ${!currentCategory ? "font-medium text-foreground" : "text-muted-foreground"}`}
         onClick={handleTodosClick}
       >
         Todos
@@ -102,9 +99,9 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
         <Link
           key={category}
           href={`/?categoria=${encodeURIComponent(category)}`}
-          className={`px-4 py-2 text-sm transition-colors hover:text-foreground ${
-            currentCategory === category ? "font-medium text-foreground" : "text-muted-foreground"
-          }`}
+          className={`text-sm transition-colors hover:text-foreground ${
+            scrolled ? "px-3 py-1" : "px-4 py-2"
+          } ${currentCategory === category ? "font-medium text-foreground" : "text-muted-foreground"}`}
           onClick={() => setMobileMenuOpen(false)}
         >
           {category}
@@ -118,7 +115,7 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
       <div className="container mx-auto px-4">
         <div
           className={`flex items-center justify-between transition-all duration-300 ${
-            scrolled ? "h-14 md:h-16" : "h-20 md:h-24"
+            scrolled ? "h-10 md:h-12" : "h-20 md:h-24"
           }`}
         >
           <Link href="/" className="flex-shrink-0 transition-opacity hover:opacity-70">
@@ -127,7 +124,7 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
               alt="SIVIRINA"
               width={80}
               height={60}
-              className={`w-auto transition-all duration-300 ${scrolled ? "h-4 md:h-8" : "h-6 md:h-12"}`}
+              className={`w-auto transition-all duration-300 ${scrolled ? "h-3 md:h-6" : "h-6 md:h-12"}`}
               priority
             />
           </Link>
@@ -154,36 +151,6 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
               </Sheet>
             </div>
           )}
-
-          {/* <div className="flex items-center gap-2">
-            {!isLoggedIn ? (
-              <Button asChild variant="outline" size="sm">
-                <Link href="/login">Entrar</Link>
-              </Button>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-                    <User className="h-4 w-4" />
-                    {userName || "Perfil"}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem asChild>
-                    <Link href="/perfil" className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      Meu Perfil
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sair
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div> */}
 
           <div className="w-24 md:w-0" />
         </div>
