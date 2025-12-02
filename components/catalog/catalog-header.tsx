@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import Image from "next/image"
 import Link from "next/link"
 import { createBrowserClient } from "@supabase/ssr"
@@ -11,18 +9,11 @@ import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
-interface CatalogHeaderProps {
-  categories: string[]
-}
-
-export function CatalogHeader({ categories }: CatalogHeaderProps) {
+export function CatalogHeader() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState<string | null>(null)
   const [scrolled, setScrolled] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const currentCategory = searchParams.get("categoria")
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -69,13 +60,6 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const handleTodosClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    setMobileMenuOpen(false)
-    router.push("/")
-    router.refresh()
-  }
-
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setIsLoggedIn(false)
@@ -118,9 +102,11 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
             scrolled ? "h-10 md:h-12" : "h-20 md:h-24"
           }`}
         >
-          <Link href="/" className="flex-shrink-0 transition-opacity hover:opacity-70">
+          <div className="w-24" />
+
+          <Link href="/" className="transition-opacity hover:opacity-70">
             <Image
-              src="/images/sivirina-20logo.png"
+              src="/images/design-mode/SIVIRINA%20LOGO.png"
               alt="SIVIRINA"
               width={60}
               height={45}
