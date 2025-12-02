@@ -123,7 +123,7 @@ export function CatalogHeader({ categories }: CatalogHeaderProps) {
         >
           <Link href="/" className="flex-shrink-0 transition-opacity hover:opacity-70">
             <Image
-              src="/images/design-mode/SIVIRINA%20LOGO.png"
+              src="/images/sivirina-20logo.png"
               alt="SIVIRINA"
               width={180}
               height={135}
