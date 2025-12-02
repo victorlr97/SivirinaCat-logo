@@ -1,19 +1,30 @@
 "use client"
 
+import type React from "react"
+
 import Image from "next/image"
 import Link from "next/link"
 import { createBrowserClient } from "@supabase/ssr"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-// import { Button } from "@/components/ui/button"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Menu } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 // import { LogOut, User } from 'lucide-react'
 
-export function CatalogHeader() {
+interface CatalogHeaderProps {
+  categories: string[]
+}
+
+export function CatalogHeader({ categories }: CatalogHeaderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState<string | null>(null)
   const [scrolled, setScrolled] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const currentCategory = searchParams.get("categoria")
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -61,6 +72,13 @@ export function CatalogHeader() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  const handleTodosClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setMobileMenuOpen(false)
+    router.push("/")
+    router.refresh()
+  }
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setIsLoggedIn(false)
@@ -69,26 +87,73 @@ export function CatalogHeader() {
     router.refresh()
   }
 
+  const CategoryLinks = () => (
+    <>
+      <Link
+        href="/"
+        className={`px-4 py-2 text-sm transition-colors hover:text-foreground ${
+          !currentCategory ? "font-medium text-foreground" : "text-muted-foreground"
+        }`}
+        onClick={handleTodosClick}
+      >
+        Todos
+      </Link>
+      {categories.map((category) => (
+        <Link
+          key={category}
+          href={`/?categoria=${encodeURIComponent(category)}`}
+          className={`px-4 py-2 text-sm transition-colors hover:text-foreground ${
+            currentCategory === category ? "font-medium text-foreground" : "text-muted-foreground"
+          }`}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          {category}
+        </Link>
+      ))}
+    </>
+  )
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div
           className={`flex items-center justify-between transition-all duration-300 ${
-            scrolled ? "h-12 md:h-14" : "h-20 md:h-24"
+            scrolled ? "h-14 md:h-16" : "h-20 md:h-24"
           }`}
         >
-          <div className="w-24" />
-
-          <Link href="/" className="transition-opacity hover:opacity-70">
+          <Link href="/" className="flex-shrink-0 transition-opacity hover:opacity-70">
             <Image
-              src="/images/design-mode/SIVIRINA%20LOGO.png"
+              src="/images/sivirina-20logo.png"
               alt="SIVIRINA"
-              width={180}
-              height={40}
-              className={`w-auto transition-all duration-300 ${scrolled ? "h-5 md:h-12" : "h-8 md:h-[135px]"}`}
+              width={80}
+              height={60}
+              className={`w-auto transition-all duration-300 ${scrolled ? "h-4 md:h-8" : "h-6 md:h-12"}`}
               priority
             />
           </Link>
+
+          {categories.length > 0 && (
+            <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 md:flex">
+              <CategoryLinks />
+            </nav>
+          )}
+
+          {categories.length > 0 && (
+            <div className="md:hidden">
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[280px]">
+                  <div className="flex flex-col gap-1 pt-8">
+                    <CategoryLinks />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          )}
 
           {/* <div className="flex items-center gap-2">
             {!isLoggedIn ? (
@@ -120,7 +185,7 @@ export function CatalogHeader() {
             )}
           </div> */}
 
-          <div className="w-24" />
+          <div className="w-24 md:w-0" />
         </div>
       </div>
     </header>
