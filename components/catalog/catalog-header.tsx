@@ -63,6 +63,23 @@ export function CatalogHeader({ categories = [], onSearch }: CatalogHeaderProps)
     return () => subscription.unsubscribe()
   }, [supabase])
 
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && searchOpen) {
+        setSearchOpen(false)
+        setSearchTerm("")
+        onSearch?.("")
+      }
+    }
+
+    window.addEventListener("keydown", handleEscape)
+    return () => window.removeEventListener("keydown", handleEscape)
+  }, [searchOpen, onSearch])
+
+  useEffect(() => {
+    onSearch?.(searchTerm)
+  }, [searchTerm, onSearch])
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setIsLoggedIn(false)
@@ -78,26 +95,14 @@ export function CatalogHeader({ categories = [], onSearch }: CatalogHeaderProps)
     router.refresh()
   }
 
-  const handleSearchToggle = () => {
-    setSearchOpen(!searchOpen)
-    if (searchOpen) {
-      setSearchTerm("")
-      onSearch?.("")
-    }
+  const handleSearchClick = () => {
+    setSearchOpen(true)
   }
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setSearchTerm(value)
-    onSearch?.(value)
-  }
-
-  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") {
-      setSearchOpen(false)
-      setSearchTerm("")
-      onSearch?.("")
-    }
+  const handleCloseSearch = () => {
+    setSearchOpen(false)
+    setSearchTerm("")
+    onSearch?.("")
   }
 
   const CategoryLinks = () => (
@@ -124,6 +129,25 @@ export function CatalogHeader({ categories = [], onSearch }: CatalogHeaderProps)
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {searchOpen && (
+        <div className="absolute inset-0 z-50 bg-background/98 backdrop-blur-sm">
+          <div className="container mx-auto px-4 h-10 md:h-12 flex items-center gap-2">
+            <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <Input
+              type="text"
+              placeholder="Buscar produtos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+              autoFocus
+            />
+            <Button variant="ghost" size="icon" onClick={handleCloseSearch} className="flex-shrink-0">
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-10 md:h-12">
           <Link href="/" className="flex-shrink-0 transition-opacity hover:opacity-70">
@@ -137,14 +161,14 @@ export function CatalogHeader({ categories = [], onSearch }: CatalogHeaderProps)
             />
           </Link>
 
-          {categories.length > 0 && !searchOpen && (
+          {categories.length > 0 && (
             <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 md:flex">
               <CategoryLinks />
             </nav>
           )}
 
           <div className="ml-auto flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={handleSearchToggle} className="h-8 w-8">
+            <Button variant="ghost" size="icon" onClick={handleSearchClick}>
               <Search className="h-4 w-4" />
             </Button>
 
@@ -152,7 +176,7 @@ export function CatalogHeader({ categories = [], onSearch }: CatalogHeaderProps)
               <div className="md:hidden">
                 <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                   <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button variant="ghost" size="icon">
                       <Menu className="h-5 w-5" />
                     </Button>
                   </SheetTrigger>
@@ -167,28 +191,6 @@ export function CatalogHeader({ categories = [], onSearch }: CatalogHeaderProps)
           </div>
         </div>
       </div>
-
-      {searchOpen && (
-        <div className="absolute inset-0 z-50 bg-background/98 backdrop-blur-sm">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center gap-3 h-10 md:h-12">
-              <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <Input
-                type="text"
-                placeholder="Buscar produtos..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                onKeyDown={handleSearchKeyDown}
-                className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
-                autoFocus
-              />
-              <Button variant="ghost" size="icon" onClick={handleSearchToggle} className="h-8 w-8 flex-shrink-0">
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   )
 }
