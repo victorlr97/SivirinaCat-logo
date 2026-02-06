@@ -7,14 +7,19 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    formats: ['image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**.public.blob.vercel-storage.com',
+        hostname: 'avbqlvwld8wfjalv.public.blob.vercel-storage.com',
       },
       {
         protocol: 'https',
-        hostname: '**.supabase.co',
+        hostname: 'hebbkx1anhila5yf.public.blob.vercel-storage.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
       },
     ],
   },
