@@ -5,6 +5,10 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+
+gsap.registerPlugin(ScrollTrigger)
 
 interface Product {
   id: string
@@ -78,8 +82,7 @@ function ProductCard({ product, emotionalContext, index }: { product: Product; e
 
   return (
     <div
-      className="group animate-in fade-in slide-in-from-bottom-4 duration-700"
-      style={{ animationDelay: `${200 + index * 100}ms` }}
+      className="group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -160,6 +163,8 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
   const carouselRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef<number>(0)
   const touchEndX = useRef<number>(0)
+  const titleRef = useRef<HTMLDivElement>(null)
+  const ctaRef = useRef<HTMLDivElement>(null)
 
   // Conceitos emocionais para as peças
   const emotionalContext = [
@@ -171,6 +176,48 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
 
   // Número de produtos a mostrar por vez (responsivo)
   const [itemsPerView, setItemsPerView] = useState(4)
+
+  // GSAP Animations
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Title animation
+      gsap.fromTo(
+        titleRef.current,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          scrollTrigger: {
+            trigger: titleRef.current,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      )
+
+      // CTA animation
+      gsap.fromTo(
+        ctaRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          delay: 0.4,
+          scrollTrigger: {
+            trigger: ctaRef.current,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      )
+    })
+
+    return () => ctx.revert()
+  }, [])
 
   useEffect(() => {
     const getItemsPerView = () => {
@@ -234,7 +281,7 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
       className="relative min-h-screen w-full overflow-hidden bg-muted/30 py-24 md:py-32 lg:py-40"
     >
       <div className="container mx-auto px-4">
-        <div className="mb-16 text-center animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div ref={titleRef} className="mb-16 text-center">
           <h2 className="mb-6 text-4xl font-light tracking-wide md:text-5xl lg:text-6xl">
             A Coleção
           </h2>
@@ -316,7 +363,7 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
         </div>
 
         {/* CTA */}
-        <div className="text-center animate-in fade-in duration-700 delay-700">
+        <div ref={ctaRef} className="text-center">
           <Link href="/catalogo">
             <Button
               size="lg"
