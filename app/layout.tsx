@@ -4,6 +4,7 @@ import { Montserrat_Alternates, Montserrat } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/toaster"
 import { SmoothScroll } from "@/components/smooth-scroll"
+import { CatalogHeader } from "@/components/catalog/catalog-header"
 import "./globals.css"
 
 const montserratAlternates = Montserrat_Alternates({ 
@@ -34,6 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${montserratAlternates.variable} ${montserrat.variable} font-sans antialiased`}>
+        <CatalogHeader />
         <SmoothScroll>
           {children}
         </SmoothScroll>
