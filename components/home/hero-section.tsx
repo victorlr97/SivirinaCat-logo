@@ -29,7 +29,7 @@ export function HeroSection() {
             trigger: logoRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            scrub: true,
+            toggleActions: "play none none reverse",
           },
         }
       )
