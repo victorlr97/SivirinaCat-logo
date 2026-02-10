@@ -12,7 +12,6 @@ import { useRouter, usePathname } from "next/navigation"
 export function CatalogHeader() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState<string | null>(null)
-  const [scrolled, setScrolled] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
 
@@ -53,15 +52,6 @@ export function CatalogHeader() {
     return () => subscription.unsubscribe()
   }, [supabase])
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setIsLoggedIn(false)
@@ -73,11 +63,7 @@ export function CatalogHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
-        <div
-          className={`relative flex items-center justify-between transition-all duration-300 ${
-            scrolled ? "h-12 md:h-14" : "h-20 md:h-24"
-          }`}
-        >
+        <div className="relative flex h-14 items-center justify-between">
           {/* Logo - Left */}
           <Link href="/" className="transition-opacity hover:opacity-70">
             <Image
@@ -85,7 +71,7 @@ export function CatalogHeader() {
               alt="SIVIRINA"
               width={120}
               height={30}
-              className={`w-auto transition-all duration-300 ${scrolled ? "h-5 md:h-6" : "h-6 md:h-8"}`}
+              className="h-6 w-auto"
               priority
             />
           </Link>
