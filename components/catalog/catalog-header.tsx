@@ -74,12 +74,24 @@ export function CatalogHeader() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div
-          className={`flex items-center justify-between transition-all duration-300 ${
+          className={`relative flex items-center justify-between transition-all duration-300 ${
             scrolled ? "h-12 md:h-14" : "h-20 md:h-24"
           }`}
         >
-          {/* Navigation Links - Left */}
-          <nav className="font-display flex items-center gap-6 text-sm tracking-wider">
+          {/* Logo - Left */}
+          <Link href="/" className="transition-opacity hover:opacity-70">
+            <Image
+              src="/sivirina-logo.svg"
+              alt="SIVIRINA"
+              width={120}
+              height={30}
+              className={`w-auto transition-all duration-300 ${scrolled ? "h-5 md:h-6" : "h-6 md:h-8"}`}
+              priority
+            />
+          </Link>
+
+          {/* Navigation Links - Center */}
+          <nav className="font-display absolute left-1/2 flex -translate-x-1/2 items-center gap-6 text-sm tracking-wider">
             <Link
               href="/"
               className={`transition-opacity hover:opacity-70 ${pathname === '/' ? 'font-medium' : 'font-light text-muted-foreground'}`}
@@ -94,49 +106,7 @@ export function CatalogHeader() {
             </Link>
           </nav>
 
-          {/* Logo - Center */}
-          <Link href="/" className="transition-opacity hover:opacity-70">
-            <Image
-              src="/images/design-mode/SIVIRINA-LOGO.png"
-              alt="SIVIRINA"
-              width={180}
-              height={40}
-              className={`w-auto transition-all duration-300 ${scrolled ? "h-5 md:h-12" : "h-8 md:h-[135px]"}`}
-              priority
-            />
-          </Link>
-
-          {/* User Menu - Right */}
-          {/* <div className="flex items-center gap-2">
-            {!isLoggedIn ? (
-              <Button asChild variant="outline" size="sm">
-                <Link href="/login">Entrar</Link>
-              </Button>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-                    <User className="h-4 w-4" />
-                    {userName || "Perfil"}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem asChild>
-                    <Link href="/perfil" className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      Meu Perfil
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sair
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div> */}
-
+          {/* Right Spacer */}
           <div className="w-24" />
         </div>
       </div>
