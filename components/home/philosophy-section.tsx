@@ -72,7 +72,7 @@ export function PhilosophySection() {
             <p className="mb-4 text-2xl font-light italic leading-relaxed text-muted-foreground md:text-3xl">
               "Visto Sivirina quando preciso lembrar quem eu sou."
             </p>
-            <p className="text-sm tracking-wider text-muted-foreground/70">
+            <p className="font-display text-sm tracking-wider text-muted-foreground/70">
               — A MULHER SIVIRINA
             </p>
           </div>

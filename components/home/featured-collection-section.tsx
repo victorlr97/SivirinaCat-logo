@@ -321,7 +321,7 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
             <Button
               size="lg"
               variant="outline"
-              className="group gap-2 text-base tracking-wider transition-all hover:gap-4"
+              className="font-display group gap-2 text-base tracking-wider transition-all hover:gap-4"
             >
               EXPLORAR CATÁLOGO COMPLETO
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

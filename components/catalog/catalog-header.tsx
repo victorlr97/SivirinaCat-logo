@@ -79,7 +79,7 @@ export function CatalogHeader() {
           }`}
         >
           {/* Navigation Links - Left */}
-          <nav className="flex items-center gap-6 text-sm tracking-wider">
+          <nav className="font-display flex items-center gap-6 text-sm tracking-wider">
             <Link
               href="/"
               className={`transition-opacity hover:opacity-70 ${pathname === '/' ? 'font-medium' : 'font-light text-muted-foreground'}`}

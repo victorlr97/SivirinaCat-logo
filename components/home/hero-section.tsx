@@ -30,7 +30,7 @@ export function HeroSection() {
           <div className="animate-in fade-in duration-1000 delay-1000">
             <Link
               href="#manifesto"
-              className="inline-flex items-center gap-2 text-sm font-medium tracking-wider transition-opacity hover:opacity-70"
+              className="font-display inline-flex items-center gap-2 text-sm font-medium tracking-wider transition-opacity hover:opacity-70"
             >
               DESCUBRA
               <ArrowDown className="h-4 w-4 animate-bounce" />
