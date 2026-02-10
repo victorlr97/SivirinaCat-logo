@@ -1,41 +1,36 @@
 "use client"
 
-import { useEffect, useLayoutEffect, useRef } from "react"
+import { useEffect } from "react"
 import { gsap } from "gsap"
-import { ScrollSmoother } from "gsap/ScrollSmoother"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
 // Register GSAP plugins
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollSmoother, ScrollTrigger)
+  gsap.registerPlugin(ScrollTrigger)
 }
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
-  const smoother = useRef<ScrollSmoother | null>(null)
-
-  useLayoutEffect(() => {
+  useEffect(() => {
     // Only run on client side
     if (typeof window === "undefined") return
 
-    // Create ScrollSmoother instance
-    smoother.current = ScrollSmoother.create({
-      smooth: 1.5,
-      effects: true,
-      normalizeScroll: false,
-    })
+    // Simple smooth scroll with CSS
+    const style = document.createElement("style")
+    style.textContent = `
+      html {
+        scroll-behavior: smooth;
+      }
+    `
+    document.head.appendChild(style)
 
-    console.log("[v0] ScrollSmoother initialized with smooth: 1.5")
+    console.log("[v0] Smooth scroll enabled with CSS")
 
     // Cleanup
     return () => {
-      smoother.current?.kill()
-      console.log("[v0] ScrollSmoother destroyed")
+      document.head.removeChild(style)
+      console.log("[v0] Smooth scroll removed")
     }
   }, [])
 
-  return (
-    <div id="smooth-wrapper">
-      <div id="smooth-content">{children}</div>
-    </div>
-  )
+  return <>{children}</>
 }
