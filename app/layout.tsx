@@ -1,12 +1,24 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Montserrat_Alternates, Montserrat } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/toaster"
+import { SmoothScroll } from "@/components/smooth-scroll"
 import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const montserratAlternates = Montserrat_Alternates({ 
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
+  variable: "--font-sans"
+})
+
+const montserrat = Montserrat({ 
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
+  variable: "--font-display"
+})
 
 export const metadata: Metadata = {
   title: "SIVIRINA",
@@ -21,8 +33,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased`}>
-        {children}
+      <body className={`${montserratAlternates.variable} ${montserrat.variable} font-sans antialiased`}>
+        <SmoothScroll>
+          {children}
+        </SmoothScroll>
         <Toaster />
         <Analytics />
       </body>

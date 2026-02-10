@@ -1,28 +1,126 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowDown } from "lucide-react"
+import { gsap } from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+
+gsap.registerPlugin(ScrollTrigger)
 
 export function HeroSection() {
+  const logoRef = useRef<HTMLDivElement>(null)
+  const subtitleRef = useRef<HTMLParagraphElement>(null)
+  const ctaRef = useRef<HTMLDivElement>(null)
+  const indicatorRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Logo animation
+      gsap.fromTo(
+        logoRef.current,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          scrollTrigger: {
+            trigger: logoRef.current,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      )
+
+      // Subtitle animation
+      gsap.fromTo(
+        subtitleRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          delay: 0.3,
+          scrollTrigger: {
+            trigger: subtitleRef.current,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      )
+
+      // CTA animation
+      gsap.fromTo(
+        ctaRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          delay: 0.5,
+          scrollTrigger: {
+            trigger: ctaRef.current,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      )
+
+      // Indicator animation
+      gsap.fromTo(
+        indicatorRef.current,
+        { opacity: 0, y: -20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          delay: 0.7,
+          scrollTrigger: {
+            trigger: indicatorRef.current,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleActions: "play none none reverse",
+          },
+        }
+      )
+    })
+
+    return () => ctx.revert()
+  }, [])
+
   return (
     <section className="relative h-screen w-full overflow-hidden bg-gradient-to-b from-background via-background to-muted/30">
       {/* Background image - você pode adicionar uma imagem de fundo aqui */}
       <div className="absolute inset-0 bg-[url('/images/hero-bg.jpg')] bg-cover bg-center opacity-10" />
 
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
-        <div className="max-w-4xl animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          <h1 className="mb-6 text-6xl font-light tracking-[0.2em] md:text-8xl lg:text-9xl">
-            SIVIRINA
-          </h1>
+        <div className="max-w-4xl">
+          <div ref={logoRef} className="mb-6 flex justify-center">
+            <Image
+              src="/sivirina-logo.svg"
+              alt="SIVIRINA"
+              width={700}
+              height={200}
+              priority
+              className="h-auto w-[280px] md:w-[500px] lg:w-[700px]"
+            />
+          </div>
 
-          <p className="mb-12 text-xl font-light tracking-wide text-muted-foreground animate-in fade-in duration-1000 delay-500 md:text-2xl lg:text-3xl">
+          <p
+            ref={subtitleRef}
+            className="mb-12 text-xl font-light tracking-wide text-muted-foreground md:text-2xl lg:text-3xl"
+          >
             Onde o clássico encontra o contemporâneo
           </p>
 
-          <div className="animate-in fade-in duration-1000 delay-1000">
+          <div ref={ctaRef}>
             <Link
               href="#manifesto"
-              className="inline-flex items-center gap-2 text-sm font-medium tracking-wider transition-opacity hover:opacity-70"
+              className="font-display inline-flex items-center gap-2 text-sm font-medium tracking-wider transition-opacity hover:opacity-70"
             >
               DESCUBRA
               <ArrowDown className="h-4 w-4 animate-bounce" />
@@ -32,7 +130,7 @@ export function HeroSection() {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-in fade-in duration-1000 delay-[1500ms]">
+      <div ref={indicatorRef} className="absolute bottom-8 left-1/2 -translate-x-1/2">
         <div className="h-12 w-px bg-gradient-to-b from-foreground/50 to-transparent" />
       </div>
     </section>
