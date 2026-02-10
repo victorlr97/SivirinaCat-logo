@@ -46,7 +46,7 @@ export function PhilosophySection() {
             trigger: titleRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: true,
           },
         }
       )
@@ -67,7 +67,7 @@ export function PhilosophySection() {
               trigger: ref,
               start: "top 80%",
               end: "bottom 20%",
-              toggleActions: "play none none reverse",
+              scrub: true,
             },
           }
         )
@@ -86,7 +86,7 @@ export function PhilosophySection() {
             trigger: quoteRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: true,
           },
         }
       )

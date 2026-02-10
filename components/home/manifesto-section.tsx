@@ -27,7 +27,7 @@ export function ManifestoSection() {
             trigger: titleRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: true,
           },
         }
       )
@@ -48,7 +48,7 @@ export function ManifestoSection() {
               trigger: p,
               start: "top 80%",
               end: "bottom 20%",
-              toggleActions: "play none none reverse",
+              scrub: true,
             },
           }
         )

@@ -192,7 +192,7 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
             trigger: titleRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: true,
           },
         }
       )
@@ -210,7 +210,7 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
             trigger: ctaRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: true,
           },
         }
       )
