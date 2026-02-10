@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowDown } from "lucide-react"
 
 export function HeroSection() {
@@ -11,9 +12,16 @@ export function HeroSection() {
 
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
         <div className="max-w-4xl animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          <h1 className="mb-6 text-6xl font-light tracking-[0.2em] md:text-8xl lg:text-9xl">
-            SIVIRINA
-          </h1>
+          <div className="mb-6 flex justify-center">
+            <Image
+              src="/sivirina-logo.svg"
+              alt="SIVIRINA"
+              width={700}
+              height={200}
+              priority
+              className="w-[280px] md:w-[500px] lg:w-[700px] h-auto"
+            />
+          </div>
 
           <p className="mb-12 text-xl font-light tracking-wide text-muted-foreground animate-in fade-in duration-1000 delay-500 md:text-2xl lg:text-3xl">
             Onde o clássico encontra o contemporâneo
