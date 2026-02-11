@@ -47,6 +47,7 @@ export function PhilosophySection() {
             start: "top 80%",
             end: "bottom 20%",
             scrub: 1,
+            markers: true,
           },
         }
       )
@@ -85,6 +86,7 @@ export function PhilosophySection() {
             start: "top 80%",
             end: "bottom 20%",
             scrub: 1,
+            markers: true,
           },
         }
       )

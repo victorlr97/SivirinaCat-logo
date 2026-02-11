@@ -193,6 +193,7 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
             start: "top 80%",
             end: "bottom 20%",
             scrub: 1,
+            markers: true,
           },
         }
       )
@@ -210,6 +211,7 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
             start: "top 80%",
             end: "bottom 20%",
             scrub: 1,
+            markers: true,
           },
         }
       )
