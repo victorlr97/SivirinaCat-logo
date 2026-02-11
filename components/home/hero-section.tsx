@@ -1,53 +1,10 @@
 "use client"
 
-import { useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowDown } from "lucide-react"
-import { gsap } from "gsap"
 
 export function HeroSection() {
-  const logoRef = useRef<HTMLDivElement>(null)
-  const subtitleRef = useRef<HTMLParagraphElement>(null)
-  const ctaRef = useRef<HTMLDivElement>(null)
-  const indicatorRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Logo animation
-      gsap.from(logoRef.current, {
-        opacity: 0,
-        duration: 0.6,
-        y: 20,
-      })
-
-      // Subtitle animation
-      gsap.from(subtitleRef.current, {
-        opacity: 0,
-        duration: 0.6,
-        y: 20,
-        delay: 0.2,
-      })
-
-      // CTA animation
-      gsap.from(ctaRef.current, {
-        opacity: 0,
-        duration: 0.6,
-        y: 20,
-        delay: 0.4,
-      })
-
-      // Indicator animation
-      gsap.from(indicatorRef.current, {
-        opacity: 0,
-        duration: 0.6,
-        y: 20,
-        delay: 0.6,
-      })
-    })
-
-    return () => ctx.revert()
-  }, [])
 
   return (
     <section className="relative h-screen w-full overflow-hidden bg-gradient-to-b from-background via-background to-muted/30">
@@ -56,7 +13,7 @@ export function HeroSection() {
 
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
         <div className="max-w-4xl">
-          <div ref={logoRef} className="mb-6 flex justify-center">
+          <div className="mb-6 flex justify-center">
             <Image
               src="/sivirina-logo.svg"
               alt="SIVIRINA"
@@ -67,14 +24,11 @@ export function HeroSection() {
             />
           </div>
 
-          <p
-            ref={subtitleRef}
-            className="mb-12 text-xl font-light tracking-wide text-muted-foreground md:text-2xl lg:text-3xl"
-          >
+          <p className="mb-12 text-xl font-light tracking-wide text-muted-foreground md:text-2xl lg:text-3xl">
             Onde o clássico encontra o contemporâneo
           </p>
 
-          <div ref={ctaRef}>
+          <div>
             <Link
               href="#manifesto"
               className="font-display inline-flex items-center gap-2 text-sm font-medium tracking-wider transition-opacity hover:opacity-70"
@@ -87,7 +41,7 @@ export function HeroSection() {
       </div>
 
       {/* Scroll indicator */}
-      <div ref={indicatorRef} className="absolute bottom-8 left-1/2 -translate-x-1/2">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
         <div className="h-12 w-px bg-gradient-to-b from-foreground/50 to-transparent" />
       </div>
     </section>
