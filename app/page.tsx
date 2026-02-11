@@ -1,4 +1,5 @@
 import { createServerClient } from "@/lib/supabase/server"
+import { CatalogHeader } from "@/components/catalog/catalog-header"
 import { HeroSection } from "@/components/home/hero-section"
 import { ManifestoSection } from "@/components/home/manifesto-section"
 import { BrandStorySection } from "@/components/home/brand-story-section"
@@ -19,6 +20,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen">
+      <CatalogHeader />
       <main>
         <HeroSection />
         <ManifestoSection />
