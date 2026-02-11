@@ -41,12 +41,13 @@ export function PhilosophySection() {
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: titleRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: 1,
+            markers: true,
           },
         }
       )
@@ -54,20 +55,19 @@ export function PhilosophySection() {
       // Values stagger
       const valueRefs = [value1Ref.current, value2Ref.current, value3Ref.current]
       
-      valueRefs.forEach((ref, index) => {
+      valueRefs.forEach((ref) => {
         gsap.fromTo(
           ref,
           { opacity: 0, y: 40 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.7,
-            delay: 0.3 + index * 0.2,
+            ease: "power2.out",
             scrollTrigger: {
               trigger: ref,
               start: "top 80%",
               end: "bottom 20%",
-              toggleActions: "play none none reverse",
+              scrub: 1,
             },
           }
         )
@@ -80,13 +80,13 @@ export function PhilosophySection() {
         {
           opacity: 1,
           x: 0,
-          duration: 0.8,
-          delay: 0.5,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: quoteRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: 1,
+            markers: true,
           },
         }
       )

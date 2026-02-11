@@ -187,12 +187,13 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: titleRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: 1,
+            markers: true,
           },
         }
       )
@@ -204,13 +205,13 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
-          delay: 0.4,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: ctaRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: 1,
+            markers: true,
           },
         }
       )

@@ -5,9 +5,6 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowDown } from "lucide-react"
 import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
-
-gsap.registerPlugin(ScrollTrigger)
 
 export function HeroSection() {
   const logoRef = useRef<HTMLDivElement>(null)
@@ -18,75 +15,35 @@ export function HeroSection() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Logo animation
-      gsap.fromTo(
-        logoRef.current,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          scrollTrigger: {
-            trigger: logoRef.current,
-            start: "top 80%",
-            end: "bottom 20%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      )
+      gsap.from(logoRef.current, {
+        opacity: 0,
+        duration: 0.6,
+        y: 20,
+      })
 
       // Subtitle animation
-      gsap.fromTo(
-        subtitleRef.current,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          delay: 0.3,
-          scrollTrigger: {
-            trigger: subtitleRef.current,
-            start: "top 80%",
-            end: "bottom 20%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      )
+      gsap.from(subtitleRef.current, {
+        opacity: 0,
+        duration: 0.6,
+        y: 20,
+        delay: 0.2,
+      })
 
       // CTA animation
-      gsap.fromTo(
-        ctaRef.current,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          delay: 0.5,
-          scrollTrigger: {
-            trigger: ctaRef.current,
-            start: "top 80%",
-            end: "bottom 20%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      )
+      gsap.from(ctaRef.current, {
+        opacity: 0,
+        duration: 0.6,
+        y: 20,
+        delay: 0.4,
+      })
 
       // Indicator animation
-      gsap.fromTo(
-        indicatorRef.current,
-        { opacity: 0, y: -20 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          delay: 0.7,
-          scrollTrigger: {
-            trigger: indicatorRef.current,
-            start: "top 80%",
-            end: "bottom 20%",
-            toggleActions: "play none none reverse",
-          },
-        }
-      )
+      gsap.from(indicatorRef.current, {
+        opacity: 0,
+        duration: 0.6,
+        y: 20,
+        delay: 0.6,
+      })
     })
 
     return () => ctx.revert()
