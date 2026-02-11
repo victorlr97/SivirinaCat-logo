@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation"
 import { createServerClient } from "@/lib/supabase/server"
-import { CatalogHeader } from "@/components/catalog/catalog-header"
 import { ProductDetails } from "@/components/catalog/product-details"
 
 interface ProductPageProps {
@@ -19,7 +18,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <div className="min-h-screen">
-      <CatalogHeader />
       <main className="container mx-auto px-4 py-12 md:py-16">
         <ProductDetails product={product} />
       </main>
