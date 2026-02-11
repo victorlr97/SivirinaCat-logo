@@ -218,12 +218,12 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
         // Se RPC não existir, busca o produto e atualiza manualmente
         if (stockError) {
           console.log("[v0] RPC não existe, atualizando manualmente o estoque...")
-          const { data: produto } = await supabase
+          const { data: produtoData } = await supabase
             .from("products")
             .select("quantidade_estoque")
             .eq("id", item.produto_id)
-            .single()
 
+          const produto = produtoData?.[0]
           if (produto) {
             const novoEstoque = produto.quantidade_estoque - item.quantidade
             const { error: updateError } = await supabase
