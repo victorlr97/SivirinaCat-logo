@@ -102,9 +102,8 @@ function ProductCard({ product, emotionalContext, index }: { product: Product; e
                   src={image}
                   alt={`${product.name}${imgIndex > 0 ? ` - vista ${imgIndex + 1}` : ''}`}
                   fill
-                  className={`object-cover transition-all duration-500 group-hover:scale-105 ${
-                    imgIndex === displayImageIndex ? "opacity-100" : "opacity-0"
-                  }`}
+                  className={`object-cover transition-all duration-500 group-hover:scale-105 ${imgIndex === displayImageIndex ? "opacity-100" : "opacity-0"
+                    }`}
                   sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   priority={imgIndex === 0}
                 />
@@ -116,11 +115,10 @@ function ProductCard({ product, emotionalContext, index }: { product: Product; e
                   {product.images.map((_, imgIndex) => (
                     <div
                       key={imgIndex}
-                      className={`h-1.5 w-1.5 rounded-full transition-all ${
-                        imgIndex === currentImageIndex
+                      className={`h-1.5 w-1.5 rounded-full transition-all ${imgIndex === currentImageIndex
                           ? "w-4 bg-white"
                           : "bg-white/50"
-                      }`}
+                        }`}
                     />
                   ))}
                 </div>
@@ -193,7 +191,6 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
             start: "top 80%",
             end: "bottom 20%",
             scrub: 1,
-            markers: true,
           },
         }
       )
@@ -211,7 +208,6 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
             start: "top 80%",
             end: "bottom 20%",
             scrub: 1,
-            markers: true,
           },
         }
       )
@@ -354,9 +350,8 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`h-2 rounded-full transition-all ${
-                  index === currentIndex ? "w-8 bg-foreground" : "w-2 bg-foreground/30"
-                }`}
+                className={`h-2 rounded-full transition-all ${index === currentIndex ? "w-8 bg-foreground" : "w-2 bg-foreground/30"
+                  }`}
                 aria-label={`Ir para produto ${index + 1}`}
               />
             ))}

@@ -47,14 +47,13 @@ export function PhilosophySection() {
             start: "top 80%",
             end: "bottom 20%",
             scrub: 1,
-            markers: true,
           },
         }
       )
 
       // Values stagger
       const valueRefs = [value1Ref.current, value2Ref.current, value3Ref.current]
-      
+
       valueRefs.forEach((ref) => {
         gsap.fromTo(
           ref,
@@ -86,7 +85,6 @@ export function PhilosophySection() {
             start: "top 80%",
             end: "bottom 20%",
             scrub: 1,
-            markers: true,
           },
         }
       )
@@ -130,18 +128,18 @@ export function PhilosophySection() {
                   ref={ref}
                   className="group text-center"
                 >
-                <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-sm bg-muted transition-colors group-hover:bg-accent/20">
-                  <value.icon className="h-8 w-8 text-foreground/70" strokeWidth={1.5} />
+                  <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-sm bg-muted transition-colors group-hover:bg-accent/20">
+                    <value.icon className="h-8 w-8 text-foreground/70" strokeWidth={1.5} />
+                  </div>
+
+                  <h3 className="mb-4 text-2xl font-light tracking-wide">
+                    {value.title}
+                  </h3>
+
+                  <p className="leading-relaxed text-muted-foreground">
+                    {value.description}
+                  </p>
                 </div>
-
-                <h3 className="mb-4 text-2xl font-light tracking-wide">
-                  {value.title}
-                </h3>
-
-                <p className="leading-relaxed text-muted-foreground">
-                  {value.description}
-                </p>
-              </div>
               )
             })}
           </div>

@@ -28,14 +28,13 @@ export function ManifestoSection() {
             start: "top 80%",
             end: "bottom 20%",
             scrub: 1,
-            markers: true,
           },
         }
       )
 
       // Stagger paragraphs
       const paragraphs = [p1Ref.current, p2Ref.current, p3Ref.current, p4Ref.current]
-      
+
       paragraphs.forEach((p) => {
         gsap.fromTo(
           p,
@@ -49,7 +48,6 @@ export function ManifestoSection() {
               start: "top 80%",
               end: "bottom 20%",
               scrub: 1,
-              markers: true,
             },
           }
         )
