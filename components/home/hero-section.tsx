@@ -17,36 +17,32 @@ export function HeroSection() {
       // Logo animation
       gsap.from(logoRef.current, {
         opacity: 0,
-        duration: 2,
+        duration: 0.6,
         y: 20,
-        clearProps: "opacity",
       })
 
       // Subtitle animation
       gsap.from(subtitleRef.current, {
         opacity: 0,
-        duration: 2,
+        duration: 0.6,
         y: 20,
         delay: 0.2,
-        clearProps: "opacity",
       })
 
       // CTA animation
       gsap.from(ctaRef.current, {
         opacity: 0,
-        duration: 2,
+        duration: 0.6,
         y: 20,
         delay: 0.4,
-        clearProps: "opacity",
       })
 
       // Indicator animation
       gsap.from(indicatorRef.current, {
         opacity: 0,
-        duration: 2,
+        duration: 0.6,
         y: 20,
         delay: 0.6,
-        clearProps: "opacity",
       })
     })
 
@@ -60,7 +56,7 @@ export function HeroSection() {
 
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
         <div className="max-w-4xl">
-          <div ref={logoRef} className="mb-6 flex justify-center opacity-0">
+          <div ref={logoRef} className="mb-6 flex justify-center">
             <Image
               src="/sivirina-logo.svg"
               alt="SIVIRINA"
@@ -73,12 +69,12 @@ export function HeroSection() {
 
           <p
             ref={subtitleRef}
-            className="mb-12 text-xl font-light tracking-wide text-muted-foreground opacity-0 md:text-2xl lg:text-3xl"
+            className="mb-12 text-xl font-light tracking-wide text-muted-foreground md:text-2xl lg:text-3xl"
           >
             Onde o clássico encontra o contemporâneo
           </p>
 
-          <div ref={ctaRef} className="opacity-0">
+          <div ref={ctaRef}>
             <Link
               href="#manifesto"
               className="font-display inline-flex items-center gap-2 text-sm font-medium tracking-wider transition-opacity hover:opacity-70"
@@ -91,7 +87,7 @@ export function HeroSection() {
       </div>
 
       {/* Scroll indicator */}
-      <div ref={indicatorRef} className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0">
+      <div ref={indicatorRef} className="absolute bottom-8 left-1/2 -translate-x-1/2">
         <div className="h-12 w-px bg-gradient-to-b from-foreground/50 to-transparent" />
       </div>
     </section>
