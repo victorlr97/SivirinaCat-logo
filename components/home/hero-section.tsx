@@ -19,6 +19,7 @@ export function HeroSection() {
         opacity: 0,
         duration: 2,
         y: 20,
+        clearProps: "opacity",
       })
 
       // Subtitle animation
@@ -27,6 +28,7 @@ export function HeroSection() {
         duration: 2,
         y: 20,
         delay: 0.2,
+        clearProps: "opacity",
       })
 
       // CTA animation
@@ -35,6 +37,7 @@ export function HeroSection() {
         duration: 2,
         y: 20,
         delay: 0.4,
+        clearProps: "opacity",
       })
 
       // Indicator animation
@@ -43,6 +46,7 @@ export function HeroSection() {
         duration: 2,
         y: 20,
         delay: 0.6,
+        clearProps: "opacity",
       })
     })
 
