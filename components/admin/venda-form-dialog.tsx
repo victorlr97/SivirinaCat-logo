@@ -164,7 +164,7 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
       const subtotal = carrinho.reduce((sum, item) => sum + item.subtotal, 0)
       const descontoValor = (subtotal * Number.parseFloat(descontoPercentual || "0")) / 100
 
-      const { data: venda, error: vendaError } = await supabase
+      const { data: vendaData, error: vendaError } = await supabase
         .from("vendas")
         .insert({
           cliente_id: clienteId,
@@ -175,9 +175,11 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
           observacoes: observacoes || null,
         })
         .select()
-        .single()
 
       if (vendaError) throw vendaError
+      
+      const venda = vendaData[0]
+      if (!venda) throw new Error("Erro ao criar venda")
 
       const itens = carrinho.map((item) => ({
         venda_id: venda.id,
