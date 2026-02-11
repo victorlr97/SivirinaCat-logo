@@ -24,12 +24,12 @@ export function HeroSection() {
         {
           opacity: 1,
           y: 0,
-          duration: 1,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: logoRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: 1,
           },
         }
       )
@@ -41,13 +41,12 @@ export function HeroSection() {
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
-          delay: 0.3,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: subtitleRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: 1,
           },
         }
       )
@@ -59,13 +58,12 @@ export function HeroSection() {
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
-          delay: 0.5,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: ctaRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: 1,
           },
         }
       )
@@ -77,13 +75,12 @@ export function HeroSection() {
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
-          delay: 0.7,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: indicatorRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: 1,
           },
         }
       )

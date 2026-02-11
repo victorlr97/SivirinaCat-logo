@@ -22,12 +22,12 @@ export function ManifestoSection() {
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: titleRef.current,
             start: "top 80%",
             end: "bottom 20%",
-            toggleActions: "play none none reverse",
+            scrub: 1,
           },
         }
       )
@@ -35,20 +35,19 @@ export function ManifestoSection() {
       // Stagger paragraphs
       const paragraphs = [p1Ref.current, p2Ref.current, p3Ref.current, p4Ref.current]
       
-      paragraphs.forEach((p, index) => {
+      paragraphs.forEach((p) => {
         gsap.fromTo(
           p,
           { opacity: 0, y: 30 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.7,
-            delay: 0.2 + index * 0.15,
+            ease: "power2.out",
             scrollTrigger: {
               trigger: p,
               start: "top 80%",
               end: "bottom 20%",
-              toggleActions: "play none none reverse",
+              scrub: 1,
             },
           }
         )
