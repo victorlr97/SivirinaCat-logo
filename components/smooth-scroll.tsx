@@ -17,19 +17,24 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
     // Only run on client side
     if (typeof window === "undefined") return
 
-    // Create ScrollSmoother instance
-    smoother.current = ScrollSmoother.create({
-      smooth: 1.5,
-      effects: true,
-      normalizeScroll: true,
-    })
+    // Detectar se é desktop (768px ou maior - breakpoint md do Tailwind)
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches
 
-    console.log("[v0] ScrollSmoother initialized with smooth: 1.5")
+    // Só criar ScrollSmoother em desktop
+    if (isDesktop) {
+      smoother.current = ScrollSmoother.create({
+        smooth: 1.5,
+        effects: true,
+        normalizeScroll: true,
+      })
+      console.log("[v0] ScrollSmoother ativado (Desktop)")
+    } else {
+      console.log("[v0] ScrollSmoother desabilitado (Mobile - usando scroll nativo)")
+    }
 
     // Cleanup
     return () => {
       smoother.current?.kill()
-      console.log("[v0] ScrollSmoother destroyed")
     }
   }, [])
 
