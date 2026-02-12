@@ -32,14 +32,14 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
   const handleTodosClick = (e: React.MouseEvent) => {
     e.preventDefault()
     setMobileMenuOpen(false)
-    router.push("/")
+    router.push("/catalogo")
     router.refresh()
   }
 
   const CategoryLinks = () => (
     <>
       <Link
-        href="/"
+        href="/catalogo"
         className={`px-4 py-2 text-sm transition-colors hover:text-foreground ${
           !currentCategory ? "font-medium text-foreground" : "text-muted-foreground"
         }`}
@@ -50,7 +50,7 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
       {categories.map((category) => (
         <Link
           key={category}
-          href={`/?categoria=${encodeURIComponent(category)}`}
+          href={`/catalogo?categoria=${encodeURIComponent(category)}`}
           className={`px-4 py-2 text-sm transition-colors hover:text-foreground ${
             currentCategory === category ? "font-medium text-foreground" : "text-muted-foreground"
           }`}

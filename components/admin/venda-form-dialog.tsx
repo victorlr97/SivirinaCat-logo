@@ -160,11 +160,13 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
     setSaving(true)
 
     try {
+      console.log("[v0] Iniciando criação da venda...")
       const total = calculateTotal()
       const subtotal = carrinho.reduce((sum, item) => sum + item.subtotal, 0)
       const descontoValor = (subtotal * Number.parseFloat(descontoPercentual || "0")) / 100
 
-      const { data: venda, error: vendaError } = await supabase
+      console.log("[v0] Inserindo venda no banco...")
+      const { data: vendaData, error: vendaError } = await supabase
         .from("vendas")
         .insert({
           cliente_id: clienteId,
@@ -175,10 +177,20 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
           observacoes: observacoes || null,
         })
         .select()
-        .single()
 
-      if (vendaError) throw vendaError
+      if (vendaError) {
+        console.log("[v0] Erro ao inserir venda:", vendaError)
+        throw vendaError
+      }
+      
+      const venda = vendaData[0]
+      if (!venda) {
+        console.log("[v0] Venda não retornada após insert")
+        throw new Error("Erro ao criar venda")
+      }
+      console.log("[v0] Venda criada com sucesso:", venda.id)
 
+      console.log("[v0] Inserindo itens da venda...")
       const itens = carrinho.map((item) => ({
         venda_id: venda.id,
         produto_id: item.produto_id,
@@ -189,27 +201,41 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
 
       const { error: itensError } = await supabase.from("itens_venda").insert(itens)
 
-      if (itensError) throw itensError
+      if (itensError) {
+        console.log("[v0] Erro ao inserir itens:", itensError)
+        throw itensError
+      }
+      console.log("[v0] Itens inseridos com sucesso")
 
+      console.log("[v0] Atualizando estoque dos produtos...")
       for (const item of carrinho) {
-        const { error: stockError } = await supabase.rpc("decrement_product_stock", {
-          product_id: item.produto_id,
-          quantity: item.quantidade,
-        })
+        console.log(`[v0] Atualizando estoque do produto ${item.produto_id}...`)
+        const { data: produtoData } = await supabase
+          .from("products")
+          .select("quantidade_estoque")
+          .eq("id", item.produto_id)
 
-        // If RPC doesn't exist, use direct update
-        if (stockError) {
+        const produto = produtoData?.[0]
+        if (produto) {
+          const novoEstoque = produto.quantidade_estoque - item.quantidade
           const { error: updateError } = await supabase
             .from("products")
-            .update({
-              quantidade_estoque: supabase.raw(`quantidade_estoque - ${item.quantidade}`),
-            })
+            .update({ quantidade_estoque: novoEstoque })
             .eq("id", item.produto_id)
 
-          if (updateError) throw updateError
+          if (updateError) {
+            console.log("[v0] Erro ao atualizar estoque:", updateError)
+            throw updateError
+          }
+          console.log(`[v0] Estoque do produto ${item.produto_id} atualizado de ${produto.quantidade_estoque} para ${novoEstoque}`)
+        } else {
+          console.log(`[v0] AVISO: Produto ${item.produto_id} não encontrado, estoque não será atualizado`)
         }
       }
+      console.log("[v0] Estoque atualizado com sucesso")
 
+      console.log("[v0] Venda concluída com sucesso! Limpando formulário...")
+      
       toast({
         title: "Venda registrada",
         description: "A venda foi salva com sucesso e o estoque foi atualizado",
@@ -226,9 +252,10 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
       onOpenChange(false)
       router.refresh()
     } catch (error) {
+      console.log("[v0] Erro ao processar venda:", error)
       toast({
         title: "Erro ao salvar",
-        description: "Não foi possível registrar a venda",
+        description: error instanceof Error ? error.message : "Não foi possível registrar a venda",
         variant: "destructive",
       })
     } finally {

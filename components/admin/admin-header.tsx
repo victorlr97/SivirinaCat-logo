@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 export function AdminHeader() {
@@ -34,8 +35,13 @@ export function AdminHeader() {
   return (
     <header className="border-b bg-card">
       <div className="container mx-auto px-4 py-4 max-w-7xl flex items-center justify-between">
-        <div className="flex items-center gap-8">
-          <h1 className="text-xl font-light tracking-wide">SIVIRINA</h1>
+        <div className="flex items-center gap-6">
+          <Image 
+            src="/sivirina-logo.svg" 
+            alt="SIVIRINA" 
+            width={120} 
+            height={40}
+          />
           <span className="text-sm text-muted-foreground">Admin</span>
         </div>
         <Button variant="ghost" size="sm" onClick={handleLogout}>
