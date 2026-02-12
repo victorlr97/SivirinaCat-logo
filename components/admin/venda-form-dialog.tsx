@@ -21,6 +21,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 type Cliente = {
   id: string
   nome: string
+  cpf: string
 }
 
 type Product = {
@@ -66,7 +67,7 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
   }, [open])
 
   const loadClientes = async () => {
-    const { data } = await supabase.from("clientes").select("id, nome").order("nome")
+    const { data } = await supabase.from("clientes").select("id, nome, cpf").order("nome")
     setClientes(data || [])
   }
 
@@ -294,7 +295,14 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                 <Popover open={clientePopoverOpen} onOpenChange={setClientePopoverOpen}>
                   <PopoverTrigger asChild>
                     <Button type="button" variant="outline" className="flex-1 justify-between bg-transparent">
-                      {selectedCliente ? selectedCliente.nome : "Selecionar Cliente"}
+                      {selectedCliente ? (
+                        <span className="flex items-center gap-2">
+                          {selectedCliente.nome}
+                          <span className="text-xs text-muted-foreground">({selectedCliente.cpf})</span>
+                        </span>
+                      ) : (
+                        "Selecionar Cliente"
+                      )}
                       <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                     </Button>
                   </PopoverTrigger>
@@ -324,7 +332,10 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                               setSearchCliente("")
                             }}
                           >
-                            {cliente.nome}
+                            <span className="flex items-center gap-2">
+                              {cliente.nome}
+                              <span className="text-xs text-muted-foreground">({cliente.cpf})</span>
+                            </span>
                           </Button>
                         ))
                       ) : (
