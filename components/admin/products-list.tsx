@@ -149,7 +149,10 @@ export function ProductsList({ products }: { products: Product[] }) {
         </Card>
 
         <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent 
+            className="max-w-3xl max-h-[90vh] overflow-y-auto"
+            onWheel={(e) => e.stopPropagation()}
+          >
             <DialogHeader>
               <DialogTitle>Adicionar Produto</DialogTitle>
               <DialogDescription>Preencha os dados do novo produto</DialogDescription>
@@ -274,7 +277,10 @@ export function ProductsList({ products }: { products: Product[] }) {
       </Card>
 
       <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent 
+          className="max-w-3xl max-h-[90vh] overflow-y-auto"
+          onWheel={(e) => e.stopPropagation()}
+        >
           <DialogHeader>
             <DialogTitle>Adicionar Produto</DialogTitle>
             <DialogDescription>Preencha os dados do novo produto</DialogDescription>
@@ -284,7 +290,10 @@ export function ProductsList({ products }: { products: Product[] }) {
       </Dialog>
 
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent 
+          className="max-w-3xl max-h-[90vh] overflow-y-auto"
+          onWheel={(e) => e.stopPropagation()}
+        >
           <DialogHeader>
             <DialogTitle>Editar Produto</DialogTitle>
             <DialogDescription>Atualize os dados do produto</DialogDescription>
