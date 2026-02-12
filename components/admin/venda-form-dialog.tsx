@@ -209,33 +209,27 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
 
       console.log("[v0] Atualizando estoque dos produtos...")
       for (const item of carrinho) {
-        // Primeiro tenta usar a função RPC se existir
-        const { error: stockError } = await supabase.rpc("decrement_product_stock", {
-          product_id: item.produto_id,
-          quantity: item.quantidade,
-        })
+        console.log(`[v0] Atualizando estoque do produto ${item.produto_id}...`)
+        const { data: produtoData } = await supabase
+          .from("products")
+          .select("quantidade_estoque")
+          .eq("id", item.produto_id)
 
-        // Se RPC não existir, busca o produto e atualiza manualmente
-        if (stockError) {
-          console.log("[v0] RPC não existe, atualizando manualmente o estoque...")
-          const { data: produtoData } = await supabase
+        const produto = produtoData?.[0]
+        if (produto) {
+          const novoEstoque = produto.quantidade_estoque - item.quantidade
+          const { error: updateError } = await supabase
             .from("products")
-            .select("quantidade_estoque")
+            .update({ quantidade_estoque: novoEstoque })
             .eq("id", item.produto_id)
 
-          const produto = produtoData?.[0]
-          if (produto) {
-            const novoEstoque = produto.quantidade_estoque - item.quantidade
-            const { error: updateError } = await supabase
-              .from("products")
-              .update({ quantidade_estoque: novoEstoque })
-              .eq("id", item.produto_id)
-
-            if (updateError) {
-              console.log("[v0] Erro ao atualizar estoque:", updateError)
-              throw updateError
-            }
+          if (updateError) {
+            console.log("[v0] Erro ao atualizar estoque:", updateError)
+            throw updateError
           }
+          console.log(`[v0] Estoque do produto ${item.produto_id} atualizado de ${produto.quantidade_estoque} para ${novoEstoque}`)
+        } else {
+          console.log(`[v0] AVISO: Produto ${item.produto_id} não encontrado, estoque não será atualizado`)
         }
       }
       console.log("[v0] Estoque atualizado com sucesso")
