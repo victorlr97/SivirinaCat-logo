@@ -282,13 +282,13 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
   return (
     <>
       <Dialog open={open && !showClienteForm} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto">
+          <DialogHeader className="pb-3">
             <DialogTitle>Nova Venda</DialogTitle>
             <DialogDescription>Registre uma nova venda</DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label>Cliente *</Label>
               <div className="flex gap-2">
@@ -493,20 +493,19 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                 value={observacoes}
                 onChange={(e) => setObservacoes(e.target.value)}
                 placeholder="Observações sobre a venda..."
-                rows={3}
+                rows={2}
+                className="resize-none"
               />
             </div>
 
             {carrinho.length > 0 && (
-              <div className="flex justify-end">
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Total</p>
-                  <p className="text-2xl font-bold">R$ {calculateTotal().toFixed(2)}</p>
-                </div>
+              <div className="flex justify-end items-baseline gap-2">
+                <p className="text-sm text-muted-foreground">Total</p>
+                <p className="text-xl font-bold">R$ {calculateTotal().toFixed(2)}</p>
               </div>
             )}
 
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4">
               <Button
                 type="button"
                 variant="outline"
