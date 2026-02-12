@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { VendaFormDialog } from "./venda-form-dialog"
+import { VendaDetailsDialog } from "./venda-details-dialog"
 
 type Venda = {
   id: string
@@ -42,9 +43,16 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [inspectVendaId, setInspectVendaId] = useState<string | null>(null)
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createBrowserClient()
+
+  const handleInspect = (vendaId: string) => {
+    setInspectVendaId(vendaId)
+    setDetailsDialogOpen(true)
+  }
 
   const handleDelete = async () => {
     if (!deleteId) return
@@ -188,7 +196,7 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="sm" title="Ver detalhes">
+                        <Button variant="ghost" size="sm" onClick={() => handleInspect(venda.id)} title="Ver detalhes">
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="sm" title="Imprimir">
@@ -208,6 +216,12 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
       </Card>
 
       <VendaFormDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+
+      <VendaDetailsDialog 
+        vendaId={inspectVendaId} 
+        open={detailsDialogOpen} 
+        onOpenChange={setDetailsDialogOpen}
+      />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
