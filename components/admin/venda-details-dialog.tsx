@@ -25,6 +25,7 @@ type VendaDetails = {
   clientes: {
     id: string
     nome: string
+    cpf: string
   }
 }
 
@@ -68,7 +69,7 @@ export function VendaDetailsDialog({ vendaId, open, onOpenChange }: VendaDetails
       // Buscar dados da venda
       const { data: vendaData, error: vendaError } = await supabase
         .from("vendas")
-        .select("*, clientes(id, nome)")
+        .select("*, clientes(id, nome, cpf)")
         .eq("id", vendaId)
         .single()
 
@@ -146,6 +147,10 @@ export function VendaDetailsDialog({ vendaId, open, onOpenChange }: VendaDetails
                   <p className="font-medium">{venda.clientes.nome}</p>
                 </div>
                 <div>
+                  <p className="text-sm text-muted-foreground">CPF</p>
+                  <p className="font-medium">{venda.clientes.cpf || "Não informado"}</p>
+                </div>
+                <div>
                   <p className="text-sm text-muted-foreground">Data</p>
                   <p className="font-medium">{formatDate(venda.data_venda)}</p>
                 </div>
@@ -156,7 +161,7 @@ export function VendaDetailsDialog({ vendaId, open, onOpenChange }: VendaDetails
                     {venda.parcelas && venda.parcelas > 1 && ` (${venda.parcelas}x)`}
                   </Badge>
                 </div>
-                <div>
+                <div className="col-span-2">
                   <p className="text-sm text-muted-foreground">ID da Venda</p>
                   <p className="font-mono text-xs mt-1 break-all">{venda.id}</p>
                 </div>
