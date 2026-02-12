@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, Plus, Eye, Printer, Trash2 } from "lucide-react"
+import { Search, Plus, Eye, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   AlertDialog,
@@ -198,9 +198,6 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
                       <div className="flex justify-end gap-2">
                         <Button variant="ghost" size="sm" onClick={() => handleInspect(venda.id)} title="Ver detalhes">
                           <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" title="Imprimir">
-                          <Printer className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => setDeleteId(venda.id)} title="Deletar">
                           <Trash2 className="h-4 w-4" />
