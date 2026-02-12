@@ -21,6 +21,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 type Cliente = {
   id: string
   nome: string
+  cpf: string
 }
 
 type Product = {
@@ -66,7 +67,7 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
   }, [open])
 
   const loadClientes = async () => {
-    const { data } = await supabase.from("clientes").select("id, nome").order("nome")
+    const { data } = await supabase.from("clientes").select("id, nome, cpf").order("nome")
     setClientes(data || [])
   }
 
@@ -281,20 +282,27 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
   return (
     <>
       <Dialog open={open && !showClienteForm} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto">
+          <DialogHeader className="pb-3">
             <DialogTitle>Nova Venda</DialogTitle>
             <DialogDescription>Registre uma nova venda</DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label>Cliente *</Label>
               <div className="flex gap-2">
                 <Popover open={clientePopoverOpen} onOpenChange={setClientePopoverOpen}>
                   <PopoverTrigger asChild>
                     <Button type="button" variant="outline" className="flex-1 justify-between bg-transparent">
-                      {selectedCliente ? selectedCliente.nome : "Selecionar Cliente"}
+                      {selectedCliente ? (
+                        <span className="flex items-center gap-2">
+                          {selectedCliente.nome}
+                          <span className="text-xs text-muted-foreground">({selectedCliente.cpf})</span>
+                        </span>
+                      ) : (
+                        "Selecionar Cliente"
+                      )}
                       <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                     </Button>
                   </PopoverTrigger>
@@ -324,7 +332,10 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                               setSearchCliente("")
                             }}
                           >
-                            {cliente.nome}
+                            <span className="flex items-center gap-2">
+                              {cliente.nome}
+                              <span className="text-xs text-muted-foreground">({cliente.cpf})</span>
+                            </span>
                           </Button>
                         ))
                       ) : (
@@ -482,20 +493,19 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                 value={observacoes}
                 onChange={(e) => setObservacoes(e.target.value)}
                 placeholder="Observações sobre a venda..."
-                rows={3}
+                rows={2}
+                className="resize-none"
               />
             </div>
 
             {carrinho.length > 0 && (
-              <div className="flex justify-end">
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Total</p>
-                  <p className="text-2xl font-bold">R$ {calculateTotal().toFixed(2)}</p>
-                </div>
+              <div className="flex justify-end items-baseline gap-2">
+                <p className="text-sm text-muted-foreground">Total</p>
+                <p className="text-xl font-bold">R$ {calculateTotal().toFixed(2)}</p>
               </div>
             )}
 
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4">
               <Button
                 type="button"
                 variant="outline"
