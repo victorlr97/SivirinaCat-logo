@@ -38,6 +38,7 @@ type CartItem = {
   quantidade: number
   preco_unitario: number
   subtotal: number
+  quantidade_estoque: number
 }
 
 export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
@@ -102,6 +103,7 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
           quantidade: 1,
           preco_unitario: produto.price,
           subtotal: produto.price,
+          quantidade_estoque: produto.quantidade_estoque,
         },
       ])
     }
@@ -406,6 +408,7 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                         <TableRow>
                           <TableHead>Produto</TableHead>
                           <TableHead>Qtd</TableHead>
+                          <TableHead>Estoque</TableHead>
                           <TableHead>Preço Unit.</TableHead>
                           <TableHead>Subtotal</TableHead>
                           <TableHead className="w-[50px]"></TableHead>
@@ -423,6 +426,9 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                                 onChange={(e) => updateQuantity(item.produto_id, Number.parseInt(e.target.value))}
                                 className="w-20"
                               />
+                            </TableCell>
+                            <TableCell>
+                              <span className="text-sm text-muted-foreground">{item.quantidade_estoque} un.</span>
                             </TableCell>
                             <TableCell>R$ {item.preco_unitario.toFixed(2)}</TableCell>
                             <TableCell>R$ {item.subtotal.toFixed(2)}</TableCell>
