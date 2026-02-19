@@ -68,7 +68,7 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
 
   return (
     <div
-      className={`sticky top-14 z-40 border-b border-border bg-background backdrop-blur-sm transition-all duration-300 ${scrolled ? "" : ""}`}
+      className={`sticky top-12 z-40 border-b border-border bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/60 md:top-14 ${scrolled ? "" : ""}`}
     >
       <div className="container mx-auto px-4">
         {/* Desktop: Horizontal bar */}
