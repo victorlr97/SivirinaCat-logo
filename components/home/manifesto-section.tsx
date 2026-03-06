@@ -10,6 +10,8 @@ export function ManifestoSection() {
   const titleRef = useRef<HTMLHeadingElement>(null)
   const p1Ref = useRef<HTMLParagraphElement>(null)
   const p2Ref = useRef<HTMLParagraphElement>(null)
+  const p3Ref = useRef<HTMLParagraphElement>(null)
+  const p4Ref = useRef<HTMLParagraphElement>(null)
   const closing1Ref = useRef<HTMLHeadingElement>(null)
   const closing2Ref = useRef<HTMLHeadingElement>(null)
 
@@ -33,7 +35,7 @@ export function ManifestoSection() {
       )
 
       // Stagger paragraphs
-      const paragraphs = [p1Ref.current, p2Ref.current]
+      const paragraphs = [p1Ref.current, p2Ref.current, p3Ref.current, p4Ref.current]
 
       paragraphs.forEach((p) => {
         gsap.fromTo(
@@ -92,10 +94,14 @@ export function ManifestoSection() {
 
           <div className="space-y-10 text-lg font-light leading-relaxed text-muted-foreground md:text-xl lg:text-2xl">
             <p ref={p1Ref}>Alto astral. Prática. Refinada. Especial.</p>
-            <p ref={p2Ref} className="space-y-6 [&>span]:block">
-              <span>Uso a moda ao meu favor presando pelo bem estar, conformo e estilo de vida.</span>
-              <span>Rica de personalidade e de criatividade, palavra essa que nos move todos os dias.</span>
-              <span>Sou uma marca de afeto, transito do clássico ao contemporâneo, sou o que você quiser.</span>
+            <p ref={p2Ref}>
+              Uso a moda ao meu favor presando pelo bem estar,<br className="hidden md:block" /> conformo e estilo de vida.
+            </p>
+            <p ref={p3Ref}>
+              Rica de personalidade e de criatividade,<br className="hidden md:block" /> palavra essa que nos move todos os dias.
+            </p>
+            <p ref={p4Ref}>
+              Sou uma marca de afeto, transito do clássico ao contemporâneo,<br className="hidden md:block" /> sou o que você quiser.
             </p>
           </div>
 
