@@ -106,15 +106,15 @@ export function ManifestoSection() {
           </div>
 
           <div className="mt-24 space-y-4">
-            <h2
+            <p
               ref={closing1Ref}
-              className="text-4xl font-light leading-relaxed tracking-wide text-muted-foreground/60 md:text-5xl lg:text-6xl"
+              className="text-[2rem] font-normal leading-relaxed tracking-wide text-muted-foreground/60"
             >
               Porque somos únicas.
-            </h2>
+            </p>
             <p
               ref={closing2Ref}
-              className="text-4xl font-bold leading-relaxed tracking-wide text-foreground md:text-5xl lg:text-6xl"
+              className="text-[2rem] font-normal leading-relaxed tracking-wide text-foreground"
             >
               somos Sivirina.
             </p>
