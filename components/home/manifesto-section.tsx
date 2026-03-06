@@ -112,12 +112,12 @@ export function ManifestoSection() {
             >
               Porque somos únicas.
             </h2>
-            <h2
+            <p
               ref={closing2Ref}
-              className="text-4xl font-light leading-relaxed tracking-wide text-muted-foreground/60 md:text-5xl lg:text-6xl"
+              className="text-4xl font-bold leading-relaxed tracking-wide text-foreground md:text-5xl lg:text-6xl"
             >
               somos Sivirina.
-            </h2>
+            </p>
           </div>
         </div>
       </div>
