@@ -25,7 +25,7 @@ export function HeroSection() {
           </div>
 
           <p className="mb-12 text-xl font-light tracking-wide text-muted-foreground md:text-2xl lg:text-3xl">
-            Onde o clássico encontra o contemporâneo
+            Viva a sua personalidade
           </p>
 
           <div>

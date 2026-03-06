@@ -12,6 +12,8 @@ export function ManifestoSection() {
   const p2Ref = useRef<HTMLParagraphElement>(null)
   const p3Ref = useRef<HTMLParagraphElement>(null)
   const p4Ref = useRef<HTMLParagraphElement>(null)
+  const closing1Ref = useRef<HTMLHeadingElement>(null)
+  const closing2Ref = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -52,6 +54,25 @@ export function ManifestoSection() {
           }
         )
       })
+
+      // Closing titles animation
+      ;[closing1Ref.current, closing2Ref.current].forEach((el) => {
+        gsap.fromTo(
+          el,
+          { opacity: 0, y: 50 },
+          {
+            opacity: 1,
+            y: 0,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 85%",
+              end: "bottom 20%",
+              scrub: 1,
+            },
+          }
+        )
+      })
     })
 
     return () => ctx.revert()
@@ -66,25 +87,37 @@ export function ManifestoSection() {
         <div className="mx-auto max-w-4xl text-center">
           <h2
             ref={titleRef}
-            className="mb-12 text-4xl font-light leading-relaxed tracking-wide md:text-5xl lg:text-6xl"
+            className="mb-16 text-4xl font-light leading-relaxed tracking-wide md:text-5xl lg:text-6xl"
           >
-            Sou a mulher que se faz.
+            Sou uma marca viva.
           </h2>
 
-          <div className="space-y-8 text-lg font-light leading-relaxed text-muted-foreground md:text-xl lg:text-2xl">
-            <p ref={p1Ref}>Decidida. Independente. Refinada.</p>
-            <p ref={p2Ref}>Minhas escolhas não são acidentais.</p>
+          <div className="space-y-10 text-lg font-light leading-relaxed text-muted-foreground md:text-xl lg:text-2xl">
+            <p ref={p1Ref}>Alto astral. Prática. Refinada. Especial.</p>
+            <p ref={p2Ref}>
+              Uso a moda ao meu favor presando pelo bem estar,<br className="hidden md:block" /> conformo e estilo de vida.
+            </p>
             <p ref={p3Ref}>
-              Transito entre reuniões importantes e jantares memoráveis.
-              <br />
-              Entre o trabalho que construo e a vida que celebro.
+              Rica de personalidade e de criatividade,<br className="hidden md:block" /> palavra essa que nos move todos os dias.
             </p>
-            <p
-              ref={p4Ref}
-              className="pt-8 text-2xl font-medium text-foreground md:text-3xl lg:text-4xl"
+            <p ref={p4Ref}>
+              Sou uma marca de afeto, transito do clássico ao contemporâneo,<br className="hidden md:block" /> sou o que você quiser.
+            </p>
+          </div>
+
+          <div className="mt-24 space-y-4">
+            <h2
+              ref={closing1Ref}
+              className="text-4xl font-light leading-relaxed tracking-wide text-muted-foreground/60 md:text-5xl lg:text-6xl"
             >
-              Sou clássica. Sou moderna. Sou Sivirina.
-            </p>
+              Porque somos únicas.
+            </h2>
+            <h2
+              ref={closing2Ref}
+              className="text-4xl font-light leading-relaxed tracking-wide text-muted-foreground/60 md:text-5xl lg:text-6xl"
+            >
+              somos Sivirina.
+            </h2>
           </div>
         </div>
       </div>
