@@ -55,24 +55,24 @@ export function ManifestoSection() {
         )
       })
 
-      // Closing titles animation
-      ;[closing1Ref.current, closing2Ref.current].forEach((el) => {
-        gsap.fromTo(
-          el,
-          { opacity: 0, y: 50 },
-          {
-            opacity: 1,
-            y: 0,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 85%",
-              end: "bottom 20%",
-              scrub: 1,
-            },
-          }
-        )
-      })
+        // Closing titles animation
+        ;[closing1Ref.current, closing2Ref.current].forEach((el) => {
+          gsap.fromTo(
+            el,
+            { opacity: 0, y: 50 },
+            {
+              opacity: 1,
+              y: 0,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: el,
+                start: "top 85%",
+                end: "bottom 20%",
+                scrub: 1,
+              },
+            }
+          )
+        })
     })
 
     return () => ctx.revert()
@@ -108,15 +108,9 @@ export function ManifestoSection() {
           <div className="mt-24 space-y-4">
             <p
               ref={closing1Ref}
-              className="text-[2rem] font-normal leading-relaxed tracking-wide text-muted-foreground/60"
+              className="text-[2rem] font-medium leading-relaxed tracking-wide text-foreground"
             >
-              Porque somos únicas.
-            </p>
-            <p
-              ref={closing2Ref}
-              className="text-[2rem] font-normal leading-relaxed tracking-wide text-foreground"
-            >
-              somos Sivirina.
+              Porque somos únicas. Somos Sivirina
             </p>
           </div>
         </div>
