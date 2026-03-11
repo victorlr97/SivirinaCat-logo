@@ -5,6 +5,14 @@ import { Instagram } from "lucide-react"
 export function CTASection() {
   return (
     <section className="relative min-h-[80vh] w-full overflow-hidden bg-background py-24 md:py-32 lg:py-40">
+      {/* Background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Footer-6SsP6PPRPaDrlDPyiQSJbLOrEELtaF.webp')",
+          opacity: 0.4,
+        }}
+      />
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-3xl text-center animate-in fade-in slide-in-from-bottom-8 duration-700">
           <h2 className="mb-8 text-4xl font-light leading-tight tracking-wide md:text-5xl lg:text-6xl">
@@ -53,7 +61,7 @@ export function CTASection() {
       </div>
 
       {/* Background decorative element */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-muted/50 via-transparent to-transparent" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-background via-transparent to-transparent" />
     </section>
   )
 }
