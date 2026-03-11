@@ -11,9 +11,7 @@ export function ManifestoSection() {
   const p1Ref = useRef<HTMLParagraphElement>(null)
   const p2Ref = useRef<HTMLParagraphElement>(null)
   const p3Ref = useRef<HTMLParagraphElement>(null)
-  const p4Ref = useRef<HTMLParagraphElement>(null)
   const closing1Ref = useRef<HTMLHeadingElement>(null)
-  const closing2Ref = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -35,7 +33,7 @@ export function ManifestoSection() {
       )
 
       // Stagger paragraphs
-      const paragraphs = [p1Ref.current, p2Ref.current, p3Ref.current, p4Ref.current]
+      const paragraphs = [p1Ref.current, p2Ref.current, p3Ref.current].filter(Boolean)
 
       paragraphs.forEach((p) => {
         gsap.fromTo(
@@ -55,24 +53,22 @@ export function ManifestoSection() {
         )
       })
 
-        // Closing titles animation
-        ;[closing1Ref.current, closing2Ref.current].forEach((el) => {
-          gsap.fromTo(
-            el,
-            { opacity: 0, y: 50 },
-            {
-              opacity: 1,
-              y: 0,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: el,
-                start: "top 90%",
-                end: "top 50%",
-                scrub: 1.5,
-              },
-            }
-          )
-        })
+        // Closing title animation
+        gsap.fromTo(
+          closing1Ref.current,
+          { opacity: 0, y: 50 },
+          {
+            opacity: 1,
+            y: 0,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: closing1Ref.current,
+              start: "top 90%",
+              end: "top 50%",
+              scrub: 1.5,
+            },
+          }
+        )
     })
 
     return () => ctx.revert()
