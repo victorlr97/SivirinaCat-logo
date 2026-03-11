@@ -8,12 +8,11 @@ export function BrandStorySection() {
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
           {/* Image side */}
           <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-muted animate-in fade-in slide-in-from-left-8 duration-700">
-            {/* Placeholder - adicione uma imagem real aqui */}
-            <div className="flex h-full items-center justify-center bg-gradient-to-br from-accent/20 to-muted">
-              <span className="text-sm text-muted-foreground">
-                Imagem da história da marca
-              </span>
-            </div>
+            <img
+              src="https://avbqlvwld8wfjalv.public.blob.vercel-storage.com/brand-story/IMG_8391.webp"
+              alt="Tecido branco com botões artesanais e carretel de linha mostarda, representando o artesanato da marca Sivirina"
+              className="h-full w-full object-cover"
+            />
           </div>
 
           {/* Content side */}
@@ -24,26 +23,21 @@ export function BrandStorySection() {
 
             <div className="space-y-6 text-base leading-relaxed text-muted-foreground md:text-lg">
               <p>
-                Sivirina nasceu da observação de uma mulher contemporânea: aquela
-                que constrói sua própria narrativa, que se recusa a escolher entre
-                profissional e feminina, entre clássica e atual.
+                Nasci para atender as demandas das mulheres contemporâneas, que em meio às rotinas corridas e diversas querem se sentir bem, elegantes e especiais.
               </p>
 
               <p>
-                Cada peça é pensada para a mulher que sabe exatamente quem é.
-                Que valoriza a qualidade, a atemporalidade e o refinamento.
-                Que entende moda como expressão, não como imposição.
+                Com todo o cuidado na seleção das modelagens, tecidos e acabamentos, trago os detalhes: desde os croquis aos bordados, tudo pensado e feito artesanalmente. Com o apoio de bordadeiras locais do interior de Minas Gerais e inspirações da natureza onde surgi, na fazenda em Carlos Alves - MG, tudo se encaixa para produzir peças selecionadas e com a exclusividade que cada Sivirina merece.
               </p>
 
               <p>
-                Não criamos tendências passageiras. Construímos um guarda-roupa
-                que atravessa estações, que acompanha conquistas, que testemunha
-                momentos importantes.
+                Prezo muito pelo conforto, atemporalidade e versatilidade de minhas peças, afinal a moda consciente, como forma de expressão e cheia de personalidade é o que quero poder proporcionar.
               </p>
 
-              <p className="pt-4 text-lg font-medium text-foreground md:text-xl">
-                Sivirina é para a mulher que se veste para si mesma.
+              <p>
+                Não criamos tendências passageiras, mas sim construímos coleções que atravessam estações e renascem a cada forma de usar.
               </p>
+
             </div>
 
             <div className="grid grid-cols-3 gap-8 pt-8">

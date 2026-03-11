@@ -17,18 +17,18 @@ export function PhilosophySection() {
   const values = [
     {
       icon: Crown,
-      title: "Refinamento",
-      description: "Cada detalhe é pensado. Cada costura, uma assinatura de qualidade.",
+      title: "Detalhes",
+      description: "Idealizados com carinho, artesanalmente e cheios de significado.",
     },
     {
       icon: Heart,
       title: "Sentimento",
-      description: "Não vendemos roupas. Materializamos a confiança, a elegância, o poder.",
+      description: "Histórias, pessoas, valores e amor por cada peça produzida.",
     },
     {
       icon: Sparkles,
       title: "Atemporalidade",
-      description: "Peças que transcendem estações. Clássicas hoje, clássicas sempre.",
+      description: "Confeccionar peças que transcendem estações é a nossa missão.",
     },
   ]
 
@@ -103,18 +103,18 @@ export function PhilosophySection() {
           {/* Main philosophy statement */}
           <div ref={titleRef} className="mb-20 text-center">
             <h2 className="mb-8 text-4xl font-light leading-tight tracking-wide md:text-5xl lg:text-6xl">
-              Não vendemos roupas.
+              Ofereço mais que roupas.
               <br />
               <span className="text-muted-foreground">
-                Materializamos sentimentos.
+                Proporciono sentimento.
               </span>
             </h2>
 
             <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-              Cada peça Sivirina é criada para ser mais do que vestir.
-              É a armadura para aquela reunião decisiva. O abraço de confiança
-              antes de um momento importante. A declaração silenciosa de quem
-              você é.
+              Ofereço artesanato, história, um pedacinho da natureza e um pedacinho da dedicação exclusiva de pessoas incríveis que ali, manualmente, todos os dias se empenham para me tornar uma peça linda e cheia de significado.
+            </p>
+            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+              Sou cuidado, detalhe e sentimento em cada etapa da produção.
             </p>
           </div>
 

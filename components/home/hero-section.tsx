@@ -7,9 +7,17 @@ import { ArrowDown } from "lucide-react"
 export function HeroSection() {
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-gradient-to-b from-background via-background to-muted/30">
-      {/* Background image - você pode adicionar uma imagem de fundo aqui */}
-      <div className="absolute inset-0 bg-[url('/images/hero-bg.jpg')] bg-cover bg-center opacity-10" />
+    <section className="relative h-screen w-full overflow-hidden bg-background">
+      {/* Background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: "url('https://avbqlvwld8wfjalv.public.blob.vercel-storage.com/hero/foto_bg.webp')",
+          opacity: 0.6,
+        }}
+      />
+      {/* Gradient overlay para continuidade com o site */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
 
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
         <div className="max-w-4xl">
@@ -25,7 +33,7 @@ export function HeroSection() {
           </div>
 
           <p className="mb-12 text-xl font-light tracking-wide text-muted-foreground md:text-2xl lg:text-3xl">
-            Onde o clássico encontra o contemporâneo
+            Viva a sua personalidade
           </p>
 
           <div>
