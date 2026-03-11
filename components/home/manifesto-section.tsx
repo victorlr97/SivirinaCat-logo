@@ -53,22 +53,22 @@ export function ManifestoSection() {
         )
       })
 
-        // Closing title animation
-        gsap.fromTo(
-          closing1Ref.current,
-          { opacity: 0, y: 50 },
-          {
-            opacity: 1,
-            y: 0,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: closing1Ref.current,
-              start: "top 90%",
-              end: "top 50%",
-              scrub: 1.5,
-            },
-          }
-        )
+      // Closing title animation
+      gsap.fromTo(
+        closing1Ref.current,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: closing1Ref.current,
+            start: "top 90%",
+            end: "top 50%",
+            scrub: 1.5,
+          },
+        }
+      )
     })
 
     return () => ctx.revert()
@@ -91,7 +91,7 @@ export function ManifestoSection() {
           <div className="space-y-10 text-lg font-light leading-relaxed text-muted-foreground md:text-xl lg:text-2xl">
             <p ref={p1Ref}>Alto astral. Prática. Refinada. Especial.</p>
             <p ref={p2Ref}>
-              Uso a moda ao meu favor presando pelo bem estar,<br className="hidden md:block" /> conformo e estilo de vida. Rica de personalidade e de criatividade,<br className="hidden md:block" /> palavra essa que nos move todos os dias.
+              Uso a moda ao meu favor presando pelo bem estar,<br className="hidden md:block" /> conforto e estilo de vida. Rica de personalidade e de criatividade,<br className="hidden md:block" /> palavra essa que nos move todos os dias.
             </p>
             <p ref={p3Ref}>
               Sou uma marca de afeto, transito do clássico ao contemporâneo,<br className="hidden md:block" /> sou o que você quiser.
