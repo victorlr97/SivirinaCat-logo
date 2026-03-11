@@ -12,7 +12,6 @@ export function PhilosophySection() {
   const value1Ref = useRef<HTMLDivElement>(null)
   const value2Ref = useRef<HTMLDivElement>(null)
   const value3Ref = useRef<HTMLDivElement>(null)
-  const quoteRef = useRef<HTMLDivElement>(null)
 
   const values = [
     {
@@ -71,23 +70,6 @@ export function PhilosophySection() {
           }
         )
       })
-
-      // Quote animation
-      gsap.fromTo(
-        quoteRef.current,
-        { opacity: 0, x: -30 },
-        {
-          opacity: 1,
-          x: 0,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: quoteRef.current,
-            start: "top 80%",
-            end: "bottom 20%",
-            scrub: 1,
-          },
-        }
-      )
     })
 
     return () => ctx.revert()
@@ -142,16 +124,6 @@ export function PhilosophySection() {
                 </div>
               )
             })}
-          </div>
-
-          {/* Quote */}
-          <div ref={quoteRef} className="mt-20 border-l-2 border-foreground/10 pl-8 text-center md:text-left">
-            <p className="mb-4 text-2xl font-light italic leading-relaxed text-muted-foreground md:text-3xl">
-              "Visto Sivirina quando preciso lembrar quem eu sou."
-            </p>
-            <p className="font-display text-sm tracking-wider text-muted-foreground/70">
-              — A MULHER SIVIRINA
-            </p>
           </div>
         </div>
       </div>
