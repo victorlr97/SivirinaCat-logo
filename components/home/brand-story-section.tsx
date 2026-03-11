@@ -40,18 +40,18 @@ export function BrandStorySection() {
 
             </div>
 
-            <div className="grid grid-cols-3 gap-8 pt-8">
-              <div className="space-y-2 animate-in fade-in zoom-in-50 duration-500 delay-500">
-                <p className="text-3xl font-light">2020</p>
-                <p className="text-sm text-muted-foreground">Fundação</p>
+            <div className="grid grid-cols-3 gap-4 pt-8 border-t border-border">
+              <div className="flex flex-col items-center text-center space-y-1 animate-in fade-in zoom-in-50 duration-500 delay-500">
+                <p className="text-2xl font-light md:text-3xl">2020</p>
+                <p className="text-xs text-muted-foreground md:text-sm">Fundação</p>
               </div>
-              <div className="space-y-2 animate-in fade-in zoom-in-50 duration-500 delay-700">
-                <p className="text-3xl font-light">∞</p>
-                <p className="text-sm text-muted-foreground">Atemporalidade</p>
+              <div className="flex flex-col items-center text-center space-y-1 animate-in fade-in zoom-in-50 duration-500 delay-700 border-x border-border">
+                <p className="text-2xl font-light md:text-3xl">∞</p>
+                <p className="text-xs text-muted-foreground md:text-sm">Atemporalidade</p>
               </div>
-              <div className="space-y-2 animate-in fade-in zoom-in-50 duration-500 delay-1000">
-                <p className="text-3xl font-light">100%</p>
-                <p className="text-sm text-muted-foreground">Autenticidade</p>
+              <div className="flex flex-col items-center text-center space-y-1 animate-in fade-in zoom-in-50 duration-500 delay-1000">
+                <p className="text-2xl font-light md:text-3xl">100%</p>
+                <p className="text-xs text-muted-foreground md:text-sm">Autenticidade</p>
               </div>
             </div>
           </div>
