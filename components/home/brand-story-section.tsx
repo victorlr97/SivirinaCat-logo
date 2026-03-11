@@ -8,12 +8,11 @@ export function BrandStorySection() {
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
           {/* Image side */}
           <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-muted animate-in fade-in slide-in-from-left-8 duration-700">
-            {/* Placeholder - adicione uma imagem real aqui */}
-            <div className="flex h-full items-center justify-center bg-gradient-to-br from-accent/20 to-muted">
-              <span className="text-sm text-muted-foreground">
-                Imagem da história da marca
-              </span>
-            </div>
+            <img
+              src="https://avbqlvwld8wfjalv.public.blob.vercel-storage.com/brand-story/IMG_8391.webp"
+              alt="Tecido branco com botões artesanais e carretel de linha mostarda, representando o artesanato da marca Sivirina"
+              className="h-full w-full object-cover"
+            />
           </div>
 
           {/* Content side */}
