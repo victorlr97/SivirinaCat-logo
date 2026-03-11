@@ -10,7 +10,7 @@ export function CTASection() {
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Footer-6SsP6PPRPaDrlDPyiQSJbLOrEELtaF.webp')",
-          opacity: 0.1,
+          opacity: 0.4,
         }}
       />
       <div className="container mx-auto px-4">
@@ -61,7 +61,7 @@ export function CTASection() {
       </div>
 
       {/* Background decorative element */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-background via-transparent to-transparent" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-transparent to-transparent" />
     </section>
   )
 }
