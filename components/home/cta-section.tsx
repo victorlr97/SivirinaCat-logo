@@ -13,7 +13,12 @@ export function CTASection() {
           opacity: 0.4,
         }}
       />
-      <div className="container mx-auto px-4">
+
+      {/* Gradient: topo (cor do site) → transparente */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-b from-background via-transparent to-transparent" />
+
+      {/* Conteúdo acima do gradiente */}
+      <div className="relative z-20 container mx-auto px-4">
         <div className="mx-auto max-w-3xl text-center animate-in fade-in slide-in-from-bottom-8 duration-700">
           <h2 className="mb-8 text-4xl font-light leading-tight tracking-wide md:text-5xl lg:text-6xl">
             Descubra sua Sivirina
@@ -27,10 +32,7 @@ export function CTASection() {
 
           <div className="flex flex-col items-center justify-center gap-4 animate-in fade-in duration-700 delay-300 sm:flex-row">
             <Link href="/catalogo">
-              <Button
-                size="lg"
-                className="min-w-[200px] text-base tracking-wider"
-              >
+              <Button size="lg" className="min-w-[200px] text-base tracking-wider">
                 VER COLEÇÃO
               </Button>
             </Link>
@@ -59,9 +61,6 @@ export function CTASection() {
           </div>
         </div>
       </div>
-
-      {/* Background decorative element */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-transparent to-transparent" />
     </section>
   )
 }
