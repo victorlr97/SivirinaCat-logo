@@ -41,6 +41,7 @@ export function AdminHeader() {
             alt="SIVIRINA" 
             width={120} 
             height={40}
+            className="h-auto w-[120px]"
           />
           <span className="text-sm text-muted-foreground">Admin</span>
         </div>

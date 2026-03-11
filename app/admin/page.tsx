@@ -26,6 +26,7 @@ export default async function AdminLoginPage() {
               width={180} 
               height={60}
               priority
+              className="h-auto w-[180px]"
             />
           </div>
           <p className="text-sm text-muted-foreground">Painel Administrativo</p>
