@@ -93,7 +93,7 @@ export function ManifestoSection() {
             <p ref={p2Ref}>
               Uso a moda ao meu favor presando pelo bem estar,<br className="hidden md:block" /> conformo e estilo de vida. Rica de personalidade e de criatividade,<br className="hidden md:block" /> palavra essa que nos move todos os dias.
             </p>
-            <p ref={p4Ref}>
+            <p ref={p3Ref}>
               Sou uma marca de afeto, transito do clássico ao contemporâneo,<br className="hidden md:block" /> sou o que você quiser.
             </p>
           </div>
