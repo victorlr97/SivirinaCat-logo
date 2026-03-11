@@ -13,7 +13,7 @@ export function HeroSection() {
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: "url('https://avbqlvwld8wfjalv.public.blob.vercel-storage.com/hero/foto_bg.webp')",
-          opacity: 0.4,
+          opacity: 0.6,
         }}
       />
       {/* Gradient overlay para continuidade com o site */}
