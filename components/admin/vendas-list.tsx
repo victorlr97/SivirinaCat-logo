@@ -157,60 +157,95 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
         </Button>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Data</TableHead>
-                <TableHead>Forma de Pagamento</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredVendas.length === 0 ? (
+      {/* Mobile list */}
+      <div className="md:hidden">
+        <Card>
+          <CardContent className="p-0 divide-y divide-border">
+            {filteredVendas.length === 0 ? (
+              <p className="text-center py-8 text-sm text-muted-foreground">Nenhuma venda encontrada</p>
+            ) : (
+              filteredVendas.map((venda) => (
+                <div key={venda.id} className="flex items-center gap-3 px-4 py-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{venda.clientes.nome}</p>
+                    <p className="text-xs text-muted-foreground">{formatDate(venda.data_venda)} · {formatCurrency(venda.total)}</p>
+                    <Badge variant="outline" className="mt-1 text-[10px] px-1.5 py-0">
+                      {getPaymentLabel(venda.forma_pagamento)}
+                      {venda.parcelas && venda.parcelas > 1 && ` (${venda.parcelas}x)`}
+                    </Badge>
+                  </div>
+                  <div className="flex gap-1 flex-shrink-0">
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleInspect(venda.id)}>
+                      <Eye className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setDeleteId(venda.id)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block">
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    Nenhuma venda encontrada
-                  </TableCell>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Forma de Pagamento</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
-              ) : (
-                filteredVendas.map((venda) => (
-                  <TableRow key={venda.id}>
-                    <TableCell>
-                      <span className="font-medium">{venda.clientes.nome}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm">{formatDate(venda.data_venda)}</span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {getPaymentLabel(venda.forma_pagamento)}
-                        {venda.parcelas && venda.parcelas > 1 && ` (${venda.parcelas}x)`}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm font-medium">{formatCurrency(venda.total)}</span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleInspect(venda.id)} title="Ver detalhes">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setDeleteId(venda.id)} title="Deletar">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+              </TableHeader>
+              <TableBody>
+                {filteredVendas.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                      Nenhuma venda encontrada
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                ) : (
+                  filteredVendas.map((venda) => (
+                    <TableRow key={venda.id}>
+                      <TableCell>
+                        <span className="font-medium">{venda.clientes.nome}</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm">{formatDate(venda.data_venda)}</span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {getPaymentLabel(venda.forma_pagamento)}
+                          {venda.parcelas && venda.parcelas > 1 && ` (${venda.parcelas}x)`}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm font-medium">{formatCurrency(venda.total)}</span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => handleInspect(venda.id)}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => setDeleteId(venda.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
 
       <VendaFormDialog open={dialogOpen} onOpenChange={setDialogOpen} />
 

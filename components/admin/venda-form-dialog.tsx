@@ -282,27 +282,81 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
   return (
     <>
       <Dialog open={open && !showClienteForm} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto">
-          <DialogHeader className="pb-3">
+        <DialogContent className="max-w-4xl h-[92vh] flex flex-col p-0">
+          <DialogHeader className="px-6 pt-6 pb-3 flex-shrink-0">
             <DialogTitle>Nova Venda</DialogTitle>
             <DialogDescription>Registre uma nova venda</DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label>Cliente *</Label>
-              <div className="flex gap-2">
-                <Popover open={clientePopoverOpen} onOpenChange={setClientePopoverOpen}>
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+            <div className="flex-1 overflow-y-auto px-6 space-y-4">
+              <div className="space-y-2">
+                <Label>Cliente *</Label>
+                <div className="flex gap-2">
+                  <Popover open={clientePopoverOpen} onOpenChange={setClientePopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button type="button" variant="outline" className="flex-1 justify-between bg-transparent overflow-hidden">
+                        {selectedCliente ? (
+                          <span className="flex items-center gap-1 min-w-0 overflow-hidden">
+                            <span className="truncate">{selectedCliente.nome}</span>
+                            <span className="text-xs text-muted-foreground flex-shrink-0">({selectedCliente.cpf})</span>
+                          </span>
+                        ) : (
+                          "Selecionar Cliente"
+                        )}
+                        <ChevronDown className="ml-2 h-4 w-4 opacity-50 flex-shrink-0" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[400px] p-0" align="start">
+                      <div className="p-2 border-b">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            placeholder="Buscar cliente..."
+                            value={searchCliente}
+                            onChange={(e) => setSearchCliente(e.target.value)}
+                            className="pl-10"
+                          />
+                        </div>
+                      </div>
+                      <div className="max-h-[300px] overflow-y-auto" onWheel={(e) => e.stopPropagation()}>
+                        {filteredClientes.length > 0 ? (
+                          filteredClientes.map((cliente) => (
+                            <Button
+                              key={cliente.id}
+                              type="button"
+                              variant="ghost"
+                              className="w-full justify-start"
+                              onClick={() => {
+                                setClienteId(cliente.id)
+                                setClientePopoverOpen(false)
+                                setSearchCliente("")
+                              }}
+                            >
+                              <span className="flex items-center gap-2">
+                                {cliente.nome}
+                                <span className="text-xs text-muted-foreground">({cliente.cpf})</span>
+                              </span>
+                            </Button>
+                          ))
+                        ) : (
+                          <div className="p-4 text-center text-sm text-muted-foreground">Nenhum cliente encontrado</div>
+                        )}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  <Button type="button" variant="outline" onClick={() => setShowClienteForm(true)}>
+                    <UserPlus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Adicionar Produtos</Label>
+                <Popover open={produtoPopoverOpen} onOpenChange={setProdutoPopoverOpen}>
                   <PopoverTrigger asChild>
-                    <Button type="button" variant="outline" className="flex-1 justify-between bg-transparent">
-                      {selectedCliente ? (
-                        <span className="flex items-center gap-2">
-                          {selectedCliente.nome}
-                          <span className="text-xs text-muted-foreground">({selectedCliente.cpf})</span>
-                        </span>
-                      ) : (
-                        "Selecionar Cliente"
-                      )}
+                    <Button type="button" variant="outline" className="w-full justify-between bg-transparent">
+                      Selecionar Produto
                       <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                     </Button>
                   </PopoverTrigger>
@@ -311,201 +365,134 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                          placeholder="Buscar cliente..."
-                          value={searchCliente}
-                          onChange={(e) => setSearchCliente(e.target.value)}
+                          placeholder="Buscar produto por nome ou código..."
+                          value={searchProduto}
+                          onChange={(e) => setSearchProduto(e.target.value)}
                           className="pl-10"
                         />
                       </div>
                     </div>
                     <div className="max-h-[300px] overflow-y-auto" onWheel={(e) => e.stopPropagation()}>
-                      {filteredClientes.length > 0 ? (
-                        filteredClientes.map((cliente) => (
+                      {filteredProdutos.length > 0 ? (
+                        filteredProdutos.map((produto) => (
                           <Button
-                            key={cliente.id}
+                            key={produto.id}
                             type="button"
                             variant="ghost"
                             className="w-full justify-start"
-                            onClick={() => {
-                              setClienteId(cliente.id)
-                              setClientePopoverOpen(false)
-                              setSearchCliente("")
-                            }}
+                            onClick={() => addToCart(produto)}
                           >
-                            <span className="flex items-center gap-2">
-                              {cliente.nome}
-                              <span className="text-xs text-muted-foreground">({cliente.cpf})</span>
-                            </span>
+                            <Plus className="mr-2 h-4 w-4" />
+                            {produto.name} - R$ {produto.price.toFixed(2)}
+                            {produto.product_code && (
+                              <span className="ml-2 text-muted-foreground">({produto.product_code})</span>
+                            )}
                           </Button>
                         ))
                       ) : (
-                        <div className="p-4 text-center text-sm text-muted-foreground">Nenhum cliente encontrado</div>
+                        <div className="p-4 text-center text-sm text-muted-foreground">Nenhum produto encontrado</div>
                       )}
                     </div>
                   </PopoverContent>
                 </Popover>
-                <Button type="button" variant="outline" onClick={() => setShowClienteForm(true)}>
-                  <UserPlus className="h-4 w-4" />
-                </Button>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label>Adicionar Produtos</Label>
-              <Popover open={produtoPopoverOpen} onOpenChange={setProdutoPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <Button type="button" variant="outline" className="w-full justify-between bg-transparent">
-                    Selecionar Produto
-                    <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[400px] p-0" align="start">
-                  <div className="p-2 border-b">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Buscar produto por nome ou código..."
-                        value={searchProduto}
-                        onChange={(e) => setSearchProduto(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-                  <div className="max-h-[300px] overflow-y-auto" onWheel={(e) => e.stopPropagation()}>
-                    {filteredProdutos.length > 0 ? (
-                      filteredProdutos.map((produto) => (
+              {carrinho.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Carrinho</Label>
+                  <div className="rounded-md border divide-y">
+                    {carrinho.map((item) => (
+                      <div key={item.produto_id} className="flex items-center gap-3 px-4 py-4">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{item.name}</p>
+                          <p className="text-sm text-muted-foreground mt-0.5">
+                            Unitário: R$ {item.preco_unitario.toFixed(2)} · Subtotal: R$ {item.subtotal.toFixed(2)}
+                          </p>
+                        </div>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={item.quantidade}
+                          onChange={(e) => updateQuantity(item.produto_id, Number.parseInt(e.target.value))}
+                          className="w-16 h-9 text-sm text-center flex-shrink-0"
+                        />
                         <Button
-                          key={produto.id}
                           type="button"
                           variant="ghost"
-                          className="w-full justify-start"
-                          onClick={() => addToCart(produto)}
+                          size="sm"
+                          className="h-9 w-9 p-0 flex-shrink-0"
+                          onClick={() => removeFromCart(item.produto_id)}
                         >
-                          <Plus className="mr-2 h-4 w-4" />
-                          {produto.name} - R$ {produto.price.toFixed(2)}
-                          {produto.product_code && (
-                            <span className="ml-2 text-muted-foreground">({produto.product_code})</span>
-                          )}
+                          <Trash2 className="h-4 w-4" />
                         </Button>
-                      ))
-                    ) : (
-                      <div className="p-4 text-center text-sm text-muted-foreground">Nenhum produto encontrado</div>
-                    )}
+                      </div>
+                    ))}
                   </div>
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            {carrinho.length > 0 && (
-              <div className="space-y-2">
-                <Label>Carrinho</Label>
-                <Card>
-                  <CardContent className="p-0">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Produto</TableHead>
-                          <TableHead>Qtd</TableHead>
-                          <TableHead>Preço Unit.</TableHead>
-                          <TableHead>Subtotal</TableHead>
-                          <TableHead className="w-[50px]"></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {carrinho.map((item) => (
-                          <TableRow key={item.produto_id}>
-                            <TableCell>{item.name}</TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                min="1"
-                                value={item.quantidade}
-                                onChange={(e) => updateQuantity(item.produto_id, Number.parseInt(e.target.value))}
-                                className="w-20"
-                              />
-                            </TableCell>
-                            <TableCell>R$ {item.preco_unitario.toFixed(2)}</TableCell>
-                            <TableCell>R$ {item.subtotal.toFixed(2)}</TableCell>
-                            <TableCell>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeFromCart(item.produto_id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Forma de Pagamento *</Label>
-                <Select value={formaPagamento} onValueChange={setFormaPagamento}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                    <SelectItem value="pix">PIX</SelectItem>
-                    <SelectItem value="credito">Crédito</SelectItem>
-                    <SelectItem value="debito">Débito</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {formaPagamento === "credito" && (
-                <div className="space-y-2">
-                  <Label>Parcelas</Label>
-                  <Input
-                    type="number"
-                    min="1"
-                    max="12"
-                    value={parcelas}
-                    onChange={(e) => setParcelas(e.target.value)}
-                  />
                 </div>
               )}
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Forma de Pagamento *</Label>
+                  <Select value={formaPagamento} onValueChange={setFormaPagamento}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                      <SelectItem value="pix">PIX</SelectItem>
+                      <SelectItem value="credito">Crédito</SelectItem>
+                      <SelectItem value="debito">Débito</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {formaPagamento === "credito" && (
+                  <div className="space-y-2">
+                    <Label>Parcelas</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="12"
+                      value={parcelas}
+                      onChange={(e) => setParcelas(e.target.value)}
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label>Desconto (%)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={descontoPercentual}
+                    onChange={(e) => setDescontoPercentual(e.target.value)}
+                  />
+                </div>
+              </div>
+
               <div className="space-y-2">
-                <Label>Desconto (%)</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.01"
-                  value={descontoPercentual}
-                  onChange={(e) => setDescontoPercentual(e.target.value)}
+                <Label>Observações</Label>
+                <Textarea
+                  value={observacoes}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                  placeholder="Observações sobre a venda..."
+                  rows={2}
+                  className="resize-none"
                 />
               </div>
+
+              {carrinho.length > 0 && (
+                <div className="flex justify-end items-baseline gap-2">
+                  <p className="text-sm text-muted-foreground">Total</p>
+                  <p className="text-xl font-bold">R$ {calculateTotal().toFixed(2)}</p>
+                </div>
+              )}
             </div>
 
-            <div className="space-y-2">
-              <Label>Observações</Label>
-              <Textarea
-                value={observacoes}
-                onChange={(e) => setObservacoes(e.target.value)}
-                placeholder="Observações sobre a venda..."
-                rows={2}
-                className="resize-none"
-              />
-            </div>
-
-            {carrinho.length > 0 && (
-              <div className="flex justify-end items-baseline gap-2">
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-xl font-bold">R$ {calculateTotal().toFixed(2)}</p>
-              </div>
-            )}
-
-            <div className="flex gap-4">
+            <div className="flex gap-4 px-6 py-4 border-t flex-shrink-0">
               <Button
                 type="button"
                 variant="outline"

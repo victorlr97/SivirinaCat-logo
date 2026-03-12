@@ -181,30 +181,49 @@ export function VendaDetailsDialog({ vendaId, open, onOpenChange }: VendaDetails
               {itens.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Nenhum produto encontrado</p>
               ) : (
-                <div className="border rounded-lg overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-muted">
-                      <tr>
-                        <th className="text-left p-3 text-sm font-medium">Produto</th>
-                        <th className="text-center p-3 text-sm font-medium">Código</th>
-                        <th className="text-center p-3 text-sm font-medium">Qtd</th>
-                        <th className="text-right p-3 text-sm font-medium">Preço Unit.</th>
-                        <th className="text-right p-3 text-sm font-medium">Subtotal</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {itens.map((item) => (
-                        <tr key={item.id} className="border-t">
-                          <td className="p-3 text-sm">{item.products.name}</td>
-                          <td className="p-3 text-sm text-center font-mono">{item.products.product_code}</td>
-                          <td className="p-3 text-sm text-center">{item.quantidade}</td>
-                          <td className="p-3 text-sm text-right">{formatCurrency(item.preco_unitario)}</td>
-                          <td className="p-3 text-sm text-right font-medium">{formatCurrency(item.subtotal)}</td>
+                <>
+                  {/* Mobile list */}
+                  <div className="md:hidden rounded-lg border divide-y">
+                    {itens.map((item) => (
+                      <div key={item.id} className="flex items-center gap-3 px-4 py-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{item.products.name}</p>
+                          <p className="text-xs text-muted-foreground font-mono">{item.products.product_code}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {item.quantidade}x {formatCurrency(item.preco_unitario)}
+                          </p>
+                        </div>
+                        <p className="text-sm font-medium flex-shrink-0">{formatCurrency(item.subtotal)}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop table */}
+                  <div className="hidden md:block border rounded-lg overflow-hidden">
+                    <table className="w-full">
+                      <thead className="bg-muted">
+                        <tr>
+                          <th className="text-left p-3 text-sm font-medium">Produto</th>
+                          <th className="text-center p-3 text-sm font-medium">Código</th>
+                          <th className="text-center p-3 text-sm font-medium">Qtd</th>
+                          <th className="text-right p-3 text-sm font-medium">Preço Unit.</th>
+                          <th className="text-right p-3 text-sm font-medium">Subtotal</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {itens.map((item) => (
+                          <tr key={item.id} className="border-t">
+                            <td className="p-3 text-sm">{item.products.name}</td>
+                            <td className="p-3 text-sm text-center font-mono">{item.products.product_code}</td>
+                            <td className="p-3 text-sm text-center">{item.quantidade}</td>
+                            <td className="p-3 text-sm text-right">{formatCurrency(item.preco_unitario)}</td>
+                            <td className="p-3 text-sm text-right font-medium">{formatCurrency(item.subtotal)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </div>
 
