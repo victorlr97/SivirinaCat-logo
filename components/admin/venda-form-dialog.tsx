@@ -400,49 +400,34 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
               {carrinho.length > 0 && (
                 <div className="space-y-2">
                   <Label>Carrinho</Label>
-                  <Card>
-                    <CardContent className="p-0">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Produto</TableHead>
-                            <TableHead>Qtd</TableHead>
-                            <TableHead>Preço Unit.</TableHead>
-                            <TableHead>Subtotal</TableHead>
-                            <TableHead className="w-[50px]"></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {carrinho.map((item) => (
-                            <TableRow key={item.produto_id}>
-                              <TableCell>{item.name}</TableCell>
-                              <TableCell>
-                                <Input
-                                  type="number"
-                                  min="1"
-                                  value={item.quantidade}
-                                  onChange={(e) => updateQuantity(item.produto_id, Number.parseInt(e.target.value))}
-                                  className="w-20"
-                                />
-                              </TableCell>
-                              <TableCell>R$ {item.preco_unitario.toFixed(2)}</TableCell>
-                              <TableCell>R$ {item.subtotal.toFixed(2)}</TableCell>
-                              <TableCell>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => removeFromCart(item.produto_id)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
+                  <div className="rounded-md border divide-y">
+                    {carrinho.map((item) => (
+                      <div key={item.produto_id} className="flex items-center gap-3 px-3 py-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{item.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            R$ {item.preco_unitario.toFixed(2)} · Sub: R$ {item.subtotal.toFixed(2)}
+                          </p>
+                        </div>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={item.quantidade}
+                          onChange={(e) => updateQuantity(item.produto_id, Number.parseInt(e.target.value))}
+                          className="w-16 h-8 text-sm text-center"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 flex-shrink-0"
+                          onClick={() => removeFromCart(item.produto_id)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
