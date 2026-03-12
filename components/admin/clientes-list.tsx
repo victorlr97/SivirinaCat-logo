@@ -186,74 +186,102 @@ export function ClientesList({ clientes }: { clientes: Cliente[] }) {
         </Button>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Telefone</TableHead>
-                <TableHead>Cidade</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredClientes.length === 0 ? (
+      {/* Mobile list */}
+      <div className="md:hidden">
+        <Card>
+          <CardContent className="p-0 divide-y divide-border">
+            {filteredClientes.length === 0 ? (
+              <p className="text-center py-8 text-sm text-muted-foreground">Nenhum cliente encontrado</p>
+            ) : (
+              filteredClientes.map((cliente) => (
+                <div key={cliente.id} className="flex items-center gap-3 px-4 py-3">
+                  <Avatar className="h-9 w-9 flex-shrink-0">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                      {getInitials(cliente.nome)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{cliente.nome}</p>
+                    <p className="text-xs text-muted-foreground truncate">{cliente.email || "-"}</p>
+                    <p className="text-xs text-muted-foreground">{cliente.telefone || cliente.cpf || "-"}</p>
+                  </div>
+                  <div className="flex gap-1 flex-shrink-0">
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleViewDetails(cliente)}>
+                      <Eye className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleEdit(cliente)}>
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setDeleteId(cliente.id)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block">
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    Nenhum cliente encontrado
-                  </TableCell>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Telefone</TableHead>
+                  <TableHead>Cidade</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
-              ) : (
-                filteredClientes.map((cliente) => (
-                  <TableRow key={cliente.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                            {getInitials(cliente.nome)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{cliente.nome}</p>
-                          {cliente.cpf && <p className="text-xs text-muted-foreground">{cliente.cpf}</p>}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm">{cliente.email || "-"}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm">{cliente.telefone || "-"}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm">
-                        {cliente.cidade && cliente.estado
-                          ? `${cliente.cidade}, ${cliente.estado}`
-                          : cliente.cidade || cliente.estado || "-"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleViewDetails(cliente)}>
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(cliente)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setDeleteId(cliente.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+              </TableHeader>
+              <TableBody>
+                {filteredClientes.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                      Nenhum cliente encontrado
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                ) : (
+                  filteredClientes.map((cliente) => (
+                    <TableRow key={cliente.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                              {getInitials(cliente.nome)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">{cliente.nome}</p>
+                            {cliente.cpf && <p className="text-xs text-muted-foreground">{cliente.cpf}</p>}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell><span className="text-sm">{cliente.email || "-"}</span></TableCell>
+                      <TableCell><span className="text-sm">{cliente.telefone || "-"}</span></TableCell>
+                      <TableCell>
+                        <span className="text-sm">
+                          {cliente.cidade && cliente.estado ? `${cliente.cidade}, ${cliente.estado}` : cliente.cidade || cliente.estado || "-"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => handleViewDetails(cliente)}><Eye className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(cliente)}><Pencil className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="sm" onClick={() => setDeleteId(cliente.id)}><Trash2 className="h-4 w-4" /></Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
 
       <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">

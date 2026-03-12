@@ -182,99 +182,131 @@ export function ProductsList({ products }: { products: Product[] }) {
         </Button>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Produto</TableHead>
-                <TableHead>Código</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Preço</TableHead>
-                <TableHead>Estoque</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Visível</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredProducts.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                    Nenhum produto encontrado
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredProducts.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="relative w-20 h-24 bg-muted rounded overflow-hidden flex-shrink-0">
-                          {product.images && product.images.length > 0 ? (
-                            <Image
-                              src={product.images[0] || "/placeholder.svg"}
-                              alt={product.name}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                              Sem foto
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium">{product.name}</p>
-                          {product.sizes.length > 0 && (
-                            <p className="text-xs text-muted-foreground">Tamanhos: {product.sizes.join(", ")}</p>
-                          )}
-                        </div>
+      {/* Mobile list */}
+      <div className="md:hidden">
+        <Card>
+          <CardContent className="p-0 divide-y divide-border">
+            {filteredProducts.length === 0 ? (
+              <p className="text-center py-8 text-sm text-muted-foreground">Nenhum produto encontrado</p>
+            ) : (
+              filteredProducts.map((product) => (
+                <div key={product.id} className="flex items-center gap-3 px-4 py-3">
+                  <div className="relative w-10 h-12 bg-muted rounded overflow-hidden flex-shrink-0">
+                    {product.images && product.images.length > 0 ? (
+                      <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground">
+                        Sem foto
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm">{product.product_code || "-"}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm">{product.category || "-"}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm font-medium">R$ {product.price.toFixed(2)}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`text-sm font-medium ${product.quantidade_estoque === 0 ? "text-destructive" : ""}`}
-                      >
-                        {product.quantidade_estoque} {product.quantidade_estoque === 1 ? "unidade" : "unidades"}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={product.available ? "default" : "secondary"}>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{product.name}</p>
+                    <p className="text-xs text-muted-foreground">{product.product_code || "-"} · R$ {product.price.toFixed(2)}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <Badge variant={product.available ? "default" : "secondary"} className="text-[10px] px-1.5 py-0">
                         {product.available ? "Disponível" : "Indisponível"}
                       </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Switch
-                        checked={product.visivel_catalogo}
-                        onCheckedChange={() => handleToggleVisibility(product.id, product.visivel_catalogo)}
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(product)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setDeleteId(product.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <span className={`text-[10px] ${product.quantidade_estoque === 0 ? "text-destructive" : "text-muted-foreground"}`}>
+                        {product.quantidade_estoque} un.
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                    <Switch
+                      checked={product.visivel_catalogo}
+                      onCheckedChange={() => handleToggleVisibility(product.id, product.visivel_catalogo)}
+                    />
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => handleEdit(product)}>
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => setDeleteId(product.id)}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block">
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Produto</TableHead>
+                  <TableHead>Código</TableHead>
+                  <TableHead>Categoria</TableHead>
+                  <TableHead>Preço</TableHead>
+                  <TableHead>Estoque</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Visível</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredProducts.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                      Nenhum produto encontrado
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                ) : (
+                  filteredProducts.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="relative w-20 h-24 bg-muted rounded overflow-hidden flex-shrink-0">
+                            {product.images && product.images.length > 0 ? (
+                              <Image src={product.images[0] || "/placeholder.svg"} alt={product.name} fill className="object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">Sem foto</div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium">{product.name}</p>
+                            {product.sizes.length > 0 && (
+                              <p className="text-xs text-muted-foreground">Tamanhos: {product.sizes.join(", ")}</p>
+                            )}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell><span className="text-sm">{product.product_code || "-"}</span></TableCell>
+                      <TableCell><span className="text-sm">{product.category || "-"}</span></TableCell>
+                      <TableCell><span className="text-sm font-medium">R$ {product.price.toFixed(2)}</span></TableCell>
+                      <TableCell>
+                        <span className={`text-sm font-medium ${product.quantidade_estoque === 0 ? "text-destructive" : ""}`}>
+                          {product.quantidade_estoque} {product.quantidade_estoque === 1 ? "unidade" : "unidades"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={product.available ? "default" : "secondary"}>
+                          {product.available ? "Disponível" : "Indisponível"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Switch checked={product.visivel_catalogo} onCheckedChange={() => handleToggleVisibility(product.id, product.visivel_catalogo)} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(product)}><Pencil className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="sm" onClick={() => setDeleteId(product.id)}><Trash2 className="h-4 w-4" /></Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
 
       <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
         <DialogContent 
