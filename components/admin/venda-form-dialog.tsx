@@ -295,16 +295,16 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                 <div className="flex gap-2">
                   <Popover open={clientePopoverOpen} onOpenChange={setClientePopoverOpen}>
                     <PopoverTrigger asChild>
-                      <Button type="button" variant="outline" className="flex-1 justify-between bg-transparent">
+                      <Button type="button" variant="outline" className="flex-1 justify-between bg-transparent overflow-hidden">
                         {selectedCliente ? (
-                          <span className="flex items-center gap-2">
-                            {selectedCliente.nome}
-                            <span className="text-xs text-muted-foreground">({selectedCliente.cpf})</span>
+                          <span className="flex items-center gap-1 min-w-0 overflow-hidden">
+                            <span className="truncate">{selectedCliente.nome}</span>
+                            <span className="text-xs text-muted-foreground flex-shrink-0">({selectedCliente.cpf})</span>
                           </span>
                         ) : (
                           "Selecionar Cliente"
                         )}
-                        <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                        <ChevronDown className="ml-2 h-4 w-4 opacity-50 flex-shrink-0" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[400px] p-0" align="start">
@@ -402,11 +402,11 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                   <Label>Carrinho</Label>
                   <div className="rounded-md border divide-y">
                     {carrinho.map((item) => (
-                      <div key={item.produto_id} className="flex items-center gap-3 px-3 py-2">
+                      <div key={item.produto_id} className="flex items-center gap-3 px-4 py-4">
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{item.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            R$ {item.preco_unitario.toFixed(2)} · Sub: R$ {item.subtotal.toFixed(2)}
+                          <p className="text-sm text-muted-foreground mt-0.5">
+                            Unitário: R$ {item.preco_unitario.toFixed(2)} · Subtotal: R$ {item.subtotal.toFixed(2)}
                           </p>
                         </div>
                         <Input
@@ -414,16 +414,16 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                           min="1"
                           value={item.quantidade}
                           onChange={(e) => updateQuantity(item.produto_id, Number.parseInt(e.target.value))}
-                          className="w-16 h-8 text-sm text-center"
+                          className="w-16 h-9 text-sm text-center flex-shrink-0"
                         />
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="h-8 w-8 p-0 flex-shrink-0"
+                          className="h-9 w-9 p-0 flex-shrink-0"
                           onClick={() => removeFromCart(item.produto_id)}
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     ))}
