@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createBrowserClient } from "@/lib/supabase/client"
@@ -15,8 +14,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useToast } from "@/hooks/use-toast"
 import { Plus, Search, Trash2, UserPlus, ChevronDown } from "lucide-react"
 import { ClienteForm } from "./cliente-form"
-import { Card, CardContent } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 type Cliente = {
   id: string
@@ -40,7 +37,32 @@ type CartItem = {
   subtotal: number
 }
 
-export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+type VendaExistente = {
+  id: string
+  cliente_id: string
+  forma_pagamento: string
+  parcelas: number | null
+  desconto: number
+  total: number
+  observacoes: string | null
+  itens: {
+    produto_id: string
+    name: string
+    quantidade: number
+    preco_unitario: number
+    subtotal: number
+  }[]
+}
+
+type Props = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  venda?: VendaExistente | null
+}
+
+export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
+  const isEditing = !!venda
+
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [produtos, setProdutos] = useState<Product[]>([])
   const [clienteId, setClienteId] = useState("")
@@ -66,6 +88,39 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
     }
   }, [open])
 
+  // Preenche o formulário ao editar
+  useEffect(() => {
+    if (open && venda) {
+      setClienteId(venda.cliente_id)
+      setFormaPagamento(venda.forma_pagamento)
+      setParcelas(String(venda.parcelas ?? 1))
+      setObservacoes(venda.observacoes ?? "")
+      setCarrinho(venda.itens.map((item) => ({
+        produto_id: item.produto_id,
+        name: item.name,
+        quantidade: item.quantidade,
+        preco_unitario: item.preco_unitario,
+        subtotal: item.subtotal,
+      })))
+      // Recalcula desconto percentual a partir do valor
+      const subtotal = venda.itens.reduce((s, i) => s + i.subtotal, 0)
+      const pct = subtotal > 0 ? ((venda.desconto / subtotal) * 100).toFixed(2) : "0"
+      setDescontoPercentual(pct)
+    } else if (open && !venda) {
+      resetForm()
+    }
+  }, [open, venda])
+
+  const resetForm = () => {
+    setClienteId("")
+    setSearchCliente("")
+    setCarrinho([])
+    setFormaPagamento("dinheiro")
+    setParcelas("1")
+    setDescontoPercentual("0")
+    setObservacoes("")
+  }
+
   const loadClientes = async () => {
     const { data } = await supabase.from("clientes").select("id, nome, cpf").order("nome")
     setClientes(data || [])
@@ -85,46 +140,30 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
       setCarrinho(
         carrinho.map((item) =>
           item.produto_id === produto.id
-            ? {
-                ...item,
-                quantidade: item.quantidade + 1,
-                subtotal: (item.quantidade + 1) * item.preco_unitario,
-              }
+            ? { ...item, quantidade: item.quantidade + 1, subtotal: (item.quantidade + 1) * item.preco_unitario }
             : item,
         ),
       )
     } else {
-      setCarrinho([
-        ...carrinho,
-        {
-          produto_id: produto.id,
-          name: produto.name,
-          quantidade: 1,
-          preco_unitario: produto.price,
-          subtotal: produto.price,
-        },
-      ])
+      setCarrinho([...carrinho, {
+        produto_id: produto.id,
+        name: produto.name,
+        quantidade: 1,
+        preco_unitario: produto.price,
+        subtotal: produto.price,
+      }])
     }
     setSearchProduto("")
     setProdutoPopoverOpen(false)
   }
 
   const updateQuantity = (produto_id: string, quantidade: number) => {
-    if (quantidade <= 0) {
-      removeFromCart(produto_id)
-      return
-    }
-    setCarrinho(
-      carrinho.map((item) =>
-        item.produto_id === produto_id
-          ? {
-              ...item,
-              quantidade,
-              subtotal: quantidade * item.preco_unitario,
-            }
-          : item,
-      ),
-    )
+    if (quantidade <= 0) { removeFromCart(produto_id); return }
+    setCarrinho(carrinho.map((item) =>
+      item.produto_id === produto_id
+        ? { ...item, quantidade, subtotal: quantidade * item.preco_unitario }
+        : item,
+    ))
   }
 
   const removeFromCart = (produto_id: string) => {
@@ -141,122 +180,133 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
     e.preventDefault()
 
     if (!clienteId) {
-      toast({
-        title: "Cliente não selecionado",
-        description: "Selecione um cliente para continuar",
-        variant: "destructive",
-      })
+      toast({ title: "Cliente não selecionado", description: "Selecione um cliente para continuar", variant: "destructive" })
       return
     }
-
     if (carrinho.length === 0) {
-      toast({
-        title: "Carrinho vazio",
-        description: "Adicione pelo menos um produto",
-        variant: "destructive",
-      })
+      toast({ title: "Carrinho vazio", description: "Adicione pelo menos um produto", variant: "destructive" })
       return
     }
 
     setSaving(true)
 
     try {
-      console.log("[v0] Iniciando criação da venda...")
       const total = calculateTotal()
       const subtotal = carrinho.reduce((sum, item) => sum + item.subtotal, 0)
       const descontoValor = (subtotal * Number.parseFloat(descontoPercentual || "0")) / 100
 
-      console.log("[v0] Inserindo venda no banco...")
-      const { data: vendaData, error: vendaError } = await supabase
-        .from("vendas")
-        .insert({
-          cliente_id: clienteId,
-          forma_pagamento: formaPagamento,
-          parcelas: formaPagamento === "credito" ? Number.parseInt(parcelas) : null,
-          desconto: descontoValor,
-          total,
-          observacoes: observacoes || null,
-        })
-        .select()
+      if (isEditing && venda) {
+        // UPDATE venda existente
+        const { error: vendaError } = await supabase
+          .from("vendas")
+          .update({
+            cliente_id: clienteId,
+            forma_pagamento: formaPagamento,
+            parcelas: formaPagamento === "credito" ? Number.parseInt(parcelas) : null,
+            desconto: descontoValor,
+            total,
+            observacoes: observacoes || null,
+          })
+          .eq("id", venda.id)
 
-      if (vendaError) {
-        console.log("[v0] Erro ao inserir venda:", vendaError)
-        throw vendaError
-      }
-      
-      const venda = vendaData[0]
-      if (!venda) {
-        console.log("[v0] Venda não retornada após insert")
-        throw new Error("Erro ao criar venda")
-      }
-      console.log("[v0] Venda criada com sucesso:", venda.id)
+        if (vendaError) throw vendaError
 
-      console.log("[v0] Inserindo itens da venda...")
-      const itens = carrinho.map((item) => ({
-        venda_id: venda.id,
-        produto_id: item.produto_id,
-        quantidade: item.quantidade,
-        preco_unitario: item.preco_unitario,
-        subtotal: item.subtotal,
-      }))
-
-      const { error: itensError } = await supabase.from("itens_venda").insert(itens)
-
-      if (itensError) {
-        console.log("[v0] Erro ao inserir itens:", itensError)
-        throw itensError
-      }
-      console.log("[v0] Itens inseridos com sucesso")
-
-      console.log("[v0] Atualizando estoque dos produtos...")
-      for (const item of carrinho) {
-        console.log(`[v0] Atualizando estoque do produto ${item.produto_id}...`)
-        const { data: produtoData } = await supabase
-          .from("products")
-          .select("quantidade_estoque")
-          .eq("id", item.produto_id)
-
-        const produto = produtoData?.[0]
-        if (produto) {
-          const novoEstoque = produto.quantidade_estoque - item.quantidade
-          const { error: updateError } = await supabase
+        // Restaura estoque dos itens antigos
+        for (const itemAntigo of venda.itens) {
+          const { data: prodData } = await supabase
             .from("products")
-            .update({ quantidade_estoque: novoEstoque })
-            .eq("id", item.produto_id)
-
-          if (updateError) {
-            console.log("[v0] Erro ao atualizar estoque:", updateError)
-            throw updateError
+            .select("quantidade_estoque")
+            .eq("id", itemAntigo.produto_id)
+            .single()
+          if (prodData) {
+            await supabase
+              .from("products")
+              .update({ quantidade_estoque: prodData.quantidade_estoque + itemAntigo.quantidade })
+              .eq("id", itemAntigo.produto_id)
           }
-          console.log(`[v0] Estoque do produto ${item.produto_id} atualizado de ${produto.quantidade_estoque} para ${novoEstoque}`)
-        } else {
-          console.log(`[v0] AVISO: Produto ${item.produto_id} não encontrado, estoque não será atualizado`)
         }
+
+        // Remove itens antigos e insere novos
+        await supabase.from("itens_venda").delete().eq("venda_id", venda.id)
+        const novosItens = carrinho.map((item) => ({
+          venda_id: venda.id,
+          produto_id: item.produto_id,
+          quantidade: item.quantidade,
+          preco_unitario: item.preco_unitario,
+          subtotal: item.subtotal,
+        }))
+        const { error: itensError } = await supabase.from("itens_venda").insert(novosItens)
+        if (itensError) throw itensError
+
+        // Deduz estoque dos novos itens
+        for (const item of carrinho) {
+          const { data: prodData } = await supabase
+            .from("products")
+            .select("quantidade_estoque")
+            .eq("id", item.produto_id)
+            .single()
+          if (prodData) {
+            await supabase
+              .from("products")
+              .update({ quantidade_estoque: prodData.quantidade_estoque - item.quantidade })
+              .eq("id", item.produto_id)
+          }
+        }
+
+        toast({ title: "Venda atualizada", description: "A venda foi editada com sucesso" })
+
+      } else {
+        // INSERT nova venda
+        const { data: vendaData, error: vendaError } = await supabase
+          .from("vendas")
+          .insert({
+            cliente_id: clienteId,
+            forma_pagamento: formaPagamento,
+            parcelas: formaPagamento === "credito" ? Number.parseInt(parcelas) : null,
+            desconto: descontoValor,
+            total,
+            observacoes: observacoes || null,
+          })
+          .select()
+
+        if (vendaError) throw vendaError
+        const novaVenda = vendaData[0]
+        if (!novaVenda) throw new Error("Erro ao criar venda")
+
+        const itens = carrinho.map((item) => ({
+          venda_id: novaVenda.id,
+          produto_id: item.produto_id,
+          quantidade: item.quantidade,
+          preco_unitario: item.preco_unitario,
+          subtotal: item.subtotal,
+        }))
+        const { error: itensError } = await supabase.from("itens_venda").insert(itens)
+        if (itensError) throw itensError
+
+        for (const item of carrinho) {
+          const { data: prodData } = await supabase
+            .from("products")
+            .select("quantidade_estoque")
+            .eq("id", item.produto_id)
+            .single()
+          if (prodData) {
+            await supabase
+              .from("products")
+              .update({ quantidade_estoque: prodData.quantidade_estoque - item.quantidade })
+              .eq("id", item.produto_id)
+          }
+        }
+
+        toast({ title: "Venda registrada", description: "A venda foi salva com sucesso e o estoque foi atualizado" })
       }
-      console.log("[v0] Estoque atualizado com sucesso")
 
-      console.log("[v0] Venda concluída com sucesso! Limpando formulário...")
-      
-      toast({
-        title: "Venda registrada",
-        description: "A venda foi salva com sucesso e o estoque foi atualizado",
-      })
-
-      setClienteId("")
-      setSearchCliente("")
-      setCarrinho([])
-      setFormaPagamento("dinheiro")
-      setParcelas("1")
-      setDescontoPercentual("0")
-      setObservacoes("")
-
+      resetForm()
       onOpenChange(false)
       router.refresh()
     } catch (error) {
-      console.log("[v0] Erro ao processar venda:", error)
       toast({
         title: "Erro ao salvar",
-        description: error instanceof Error ? error.message : "Não foi possível registrar a venda",
+        description: error instanceof Error ? error.message : "Não foi possível salvar a venda",
         variant: "destructive",
       })
     } finally {
@@ -270,13 +320,11 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
   }
 
   const filteredClientes = clientes.filter((c) => c.nome.toLowerCase().includes(searchCliente.toLowerCase()))
-
   const filteredProdutos = produtos.filter(
     (p) =>
       p.name.toLowerCase().includes(searchProduto.toLowerCase()) ||
       p.product_code?.toLowerCase().includes(searchProduto.toLowerCase()),
   )
-
   const selectedCliente = clientes.find((c) => c.id === clienteId)
 
   return (
@@ -284,12 +332,14 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
       <Dialog open={open && !showClienteForm} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-4xl h-[92vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-3 flex-shrink-0">
-            <DialogTitle>Nova Venda</DialogTitle>
-            <DialogDescription>Registre uma nova venda</DialogDescription>
+            <DialogTitle>{isEditing ? "Editar Venda" : "Nova Venda"}</DialogTitle>
+            <DialogDescription>{isEditing ? "Edite os dados da venda" : "Registre uma nova venda"}</DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
             <div className="flex-1 overflow-y-auto px-6 space-y-4">
+
+              {/* Cliente */}
               <div className="space-y-2">
                 <Label>Cliente *</Label>
                 <div className="flex gap-2">
@@ -327,11 +377,7 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                               type="button"
                               variant="ghost"
                               className="w-full justify-start"
-                              onClick={() => {
-                                setClienteId(cliente.id)
-                                setClientePopoverOpen(false)
-                                setSearchCliente("")
-                              }}
+                              onClick={() => { setClienteId(cliente.id); setClientePopoverOpen(false); setSearchCliente("") }}
                             >
                               <span className="flex items-center gap-2">
                                 {cliente.nome}
@@ -351,6 +397,7 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                 </div>
               </div>
 
+              {/* Produtos */}
               <div className="space-y-2">
                 <Label>Adicionar Produtos</Label>
                 <Popover open={produtoPopoverOpen} onOpenChange={setProdutoPopoverOpen}>
@@ -397,6 +444,7 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                 </Popover>
               </div>
 
+              {/* Carrinho */}
               {carrinho.length > 0 && (
                 <div className="space-y-2">
                   <Label>Carrinho</Label>
@@ -431,13 +479,12 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                 </div>
               )}
 
+              {/* Pagamento */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Forma de Pagamento *</Label>
                   <Select value={formaPagamento} onValueChange={setFormaPagamento}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="dinheiro">Dinheiro</SelectItem>
                       <SelectItem value="pix">PIX</SelectItem>
@@ -450,23 +497,14 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
                 {formaPagamento === "credito" && (
                   <div className="space-y-2">
                     <Label>Parcelas</Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="12"
-                      value={parcelas}
-                      onChange={(e) => setParcelas(e.target.value)}
-                    />
+                    <Input type="number" min="1" max="12" value={parcelas} onChange={(e) => setParcelas(e.target.value)} />
                   </div>
                 )}
 
                 <div className="space-y-2">
                   <Label>Desconto (%)</Label>
                   <Input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.01"
+                    type="number" min="0" max="100" step="0.01"
                     value={descontoPercentual}
                     onChange={(e) => setDescontoPercentual(e.target.value)}
                   />
@@ -485,7 +523,7 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
               </div>
 
               {carrinho.length > 0 && (
-                <div className="flex justify-end items-baseline gap-2">
+                <div className="flex justify-end items-baseline gap-2 pb-2">
                   <p className="text-sm text-muted-foreground">Total</p>
                   <p className="text-xl font-bold">R$ {calculateTotal().toFixed(2)}</p>
                 </div>
@@ -493,17 +531,11 @@ export function VendaFormDialog({ open, onOpenChange }: { open: boolean; onOpenC
             </div>
 
             <div className="flex gap-4 px-6 py-4 border-t flex-shrink-0">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={saving}
-                className="flex-1"
-              >
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={saving} className="flex-1">
                 Cancelar
               </Button>
               <Button type="submit" disabled={saving} className="flex-1">
-                {saving ? "Salvando..." : "Registrar Venda"}
+                {saving ? "Salvando..." : isEditing ? "Salvar Alterações" : "Registrar Venda"}
               </Button>
             </div>
           </form>

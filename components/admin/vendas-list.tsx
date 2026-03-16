@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, Plus, Eye, Trash2 } from "lucide-react"
+import { Search, Plus, Eye, Trash2, Pencil } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   AlertDialog,
@@ -42,6 +42,7 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
   const [searchTerm, setSearchTerm] = useState("")
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [editVenda, setEditVenda] = useState<any | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [inspectVendaId, setInspectVendaId] = useState<string | null>(null)
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
@@ -52,6 +53,34 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
   const handleInspect = (vendaId: string) => {
     setInspectVendaId(vendaId)
     setDetailsDialogOpen(true)
+  }
+
+  const handleEdit = async (vendaId: string) => {
+    const { data } = await supabase
+      .from("vendas")
+      .select("*, itens_venda(produto_id, quantidade, preco_unitario, subtotal, products(name))")
+      .eq("id", vendaId)
+      .single()
+
+    if (data) {
+      setEditVenda({
+        id: data.id,
+        cliente_id: data.cliente_id,
+        forma_pagamento: data.forma_pagamento,
+        parcelas: data.parcelas,
+        desconto: data.desconto,
+        total: data.total,
+        observacoes: data.observacoes,
+        itens: data.itens_venda.map((item: any) => ({
+          produto_id: item.produto_id,
+          name: item.products?.name ?? "",
+          quantidade: item.quantidade,
+          preco_unitario: item.preco_unitario,
+          subtotal: item.subtotal,
+        })),
+      })
+      setDialogOpen(true)
+    }
   }
 
   const handleDelete = async () => {
@@ -134,7 +163,11 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
           </CardContent>
         </Card>
 
-        <VendaFormDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      <VendaFormDialog
+        open={dialogOpen}
+        onOpenChange={(v) => { setDialogOpen(v); if (!v) setEditVenda(null) }}
+        venda={editVenda}
+      />
       </>
     )
   }
@@ -177,6 +210,9 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
                   <div className="flex gap-1 flex-shrink-0">
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleInspect(venda.id)}>
                       <Eye className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleEdit(venda.id)}>
+                      <Pencil className="h-3.5 w-3.5" />
                     </Button>
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setDeleteId(venda.id)}>
                       <Trash2 className="h-3.5 w-3.5" />
@@ -233,6 +269,9 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
                           <Button variant="ghost" size="sm" onClick={() => handleInspect(venda.id)}>
                             <Eye className="h-4 w-4" />
                           </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(venda.id)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
                           <Button variant="ghost" size="sm" onClick={() => setDeleteId(venda.id)}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -247,7 +286,11 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
         </Card>
       </div>
 
-      <VendaFormDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+        <VendaFormDialog
+          open={dialogOpen}
+          onOpenChange={(v) => { setDialogOpen(v); if (!v) setEditVenda(null) }}
+          venda={editVenda}
+        />
 
       <VendaDetailsDialog 
         vendaId={inspectVendaId} 
