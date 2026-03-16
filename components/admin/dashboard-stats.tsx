@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { TrendingUp, TrendingDown, Minus, ShoppingBag, Users, Package, AlertTriangle, ArrowRight } from "lucide-react"
+import { TrendingUp, TrendingDown, Minus, ShoppingBag, Users, Package, AlertTriangle, ArrowRight, Clock, XCircle } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -27,9 +27,12 @@ interface DashboardData {
     total: number
     data: string
     forma_pagamento: string
+    status: string | null
   }[]
   // Alertas
   produtosBaixoEstoque: { name: string; quantidade_estoque: number }[]
+  vendasPendentes: number
+  vendasCanceladasMes: number
 }
 
 function calcVariacao(atual: number, anterior: number) {
@@ -189,7 +192,31 @@ export function DashboardStats({ data }: { data: DashboardData }) {
               </div>
             )}
 
-            {data.produtosBaixoEstoque.length === 0 && data.novosClientesMes === 0 && (
+            {data.vendasPendentes > 0 && (
+              <div className="flex items-start gap-3 py-3 border-b">
+                <Clock className="h-4 w-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium">
+                    {data.vendasPendentes} venda{data.vendasPendentes > 1 ? "s" : ""} pendente{data.vendasPendentes > 1 ? "s" : ""}
+                  </p>
+                  <p className="text-xs text-muted-foreground">aguardando pagamento</p>
+                </div>
+              </div>
+            )}
+
+            {data.vendasCanceladasMes > 0 && (
+              <div className="flex items-start gap-3 py-3 border-b">
+                <XCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium">
+                    {data.vendasCanceladasMes} cancelamento{data.vendasCanceladasMes > 1 ? "s" : ""} ou devolução
+                  </p>
+                  <p className="text-xs text-muted-foreground">neste mês</p>
+                </div>
+              </div>
+            )}
+
+            {data.produtosBaixoEstoque.length === 0 && data.novosClientesMes === 0 && data.vendasPendentes === 0 && data.vendasCanceladasMes === 0 && (
               <p className="text-sm text-muted-foreground text-center py-6">Nenhum alerta no momento</p>
             )}
 
