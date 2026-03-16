@@ -29,6 +29,8 @@ export default async function AdminDashboardPage() {
     clientesMesAnteriorResult,
     produtosResult,
     vendasRecentesResult,
+    vendasPendentesResult,
+    vendasCanceladasMesResult,
   ] = await Promise.all([
     // Vendas do mês atual
     supabase
@@ -65,9 +67,22 @@ export default async function AdminDashboardPage() {
     // Vendas recentes com cliente
     supabase
       .from("vendas")
-      .select("id, total, data_venda, forma_pagamento, clientes(nome)")
+      .select("id, total, data_venda, forma_pagamento, status, clientes(nome)")
       .order("data_venda", { ascending: false })
       .limit(5),
+
+    // Vendas pendentes
+    supabase
+      .from("vendas")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "pendente"),
+
+    // Vendas canceladas/devolução este mês
+    supabase
+      .from("vendas")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["cancelada", "devolucao"])
+      .gte("data_venda", inicioMesAtual),
   ])
 
   // Processar dados
@@ -91,6 +106,7 @@ export default async function AdminDashboardPage() {
     total: Number(v.total),
     data: v.data_venda,
     forma_pagamento: v.forma_pagamento,
+    status: v.status,
   }))
 
   const dashData = {
@@ -105,6 +121,8 @@ export default async function AdminDashboardPage() {
     produtosSemEstoque,
     vendasRecentes,
     produtosBaixoEstoque,
+    vendasPendentes: vendasPendentesResult.count ?? 0,
+    vendasCanceladasMes: vendasCanceladasMesResult.count ?? 0,
   }
 
   return (
