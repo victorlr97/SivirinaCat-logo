@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 // import { LogOut, User } from 'lucide-react'
 
@@ -101,6 +101,7 @@ export function CatalogHeader({ categories = [] }: CatalogHeaderProps) {
               </Button>
               <SheetContent side="right" className="w-[280px]">
                 <SheetTitle className="sr-only">Menu</SheetTitle>
+                <SheetDescription className="sr-only">Navegação e categorias do catálogo</SheetDescription>
                 <div className="flex flex-col gap-6 pt-8">
                   {/* Navegação */}
                   <div>

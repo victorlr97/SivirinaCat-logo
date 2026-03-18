@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
-import { Menu, Search, X } from "lucide-react"
+import { Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface CategoryFilterProps {
@@ -54,7 +54,6 @@ export function CategoryFilter({ categories, searchQuery = "", onSearchChange }:
 
   const handleTodosClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    setMobileMenuOpen(false)
     router.push("/catalogo")
     router.refresh()
   }
@@ -77,7 +76,6 @@ export function CategoryFilter({ categories, searchQuery = "", onSearchChange }:
           className={`px-4 py-2 text-sm transition-colors hover:text-foreground ${
             currentCategory === category ? "font-medium text-foreground" : "text-muted-foreground"
           }`}
-          onClick={() => setMobileMenuOpen(false)}
         >
           {category}
         </Link>
