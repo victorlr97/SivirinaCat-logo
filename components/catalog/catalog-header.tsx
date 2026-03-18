@@ -7,7 +7,8 @@ import { useEffect, useState } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { Separator } from "@/components/ui/separator"
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 // import { LogOut, User } from 'lucide-react'
 
@@ -99,44 +100,61 @@ export function CatalogHeader({ categories = [] }: CatalogHeaderProps) {
               >
                 <Menu className="h-5 w-5" />
               </Button>
-              <SheetContent side="right" className="w-[280px]">
-                <SheetTitle className="sr-only">Menu</SheetTitle>
-                <SheetDescription className="sr-only">Navegação e categorias do catálogo</SheetDescription>
-                <div className="flex flex-col gap-6 pt-8">
-                  {/* Navegação */}
-                  <div>
-                    <p className="mb-2 px-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                      Navegação
-                    </p>
-                    <nav className="font-display flex flex-col">
-                      <Link
-                        href="/"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={`px-4 py-2 text-sm tracking-wider transition-opacity hover:opacity-70 ${pathname === "/" ? "font-medium" : "font-light text-muted-foreground"}`}
-                      >
-                        HOME
-                      </Link>
-                      <Link
-                        href="/catalogo"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={`px-4 py-2 text-sm tracking-wider transition-opacity hover:opacity-70 ${pathname === "/catalogo" ? "font-medium" : "font-light text-muted-foreground"}`}
-                      >
-                        CATÁLOGO
-                      </Link>
-                    </nav>
-                  </div>
+              <SheetContent side="right" className="w-[280px] px-0">
+                <SheetHeader className="px-6 pb-4 pt-6">
+                  <SheetTitle className="text-base font-medium tracking-wide">Menu</SheetTitle>
+                  <SheetDescription className="sr-only">Navegação e categorias do catálogo</SheetDescription>
+                </SheetHeader>
 
-                  {/* Categorias */}
-                  {categories.length > 0 && (
-                    <div>
-                      <p className="mb-2 px-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                <Separator />
+
+                <div className="flex flex-col gap-1 py-4">
+                  {/* Navegação */}
+                  <p className="px-6 pb-1 pt-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                    Navegação
+                  </p>
+                  <nav className="flex flex-col">
+                    <Link
+                      href="/"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`border-l-2 px-6 py-3 text-sm tracking-wider transition-all hover:bg-muted ${
+                        pathname === "/"
+                          ? "border-foreground font-medium text-foreground"
+                          : "border-transparent font-light text-muted-foreground"
+                      }`}
+                    >
+                      HOME
+                    </Link>
+                    <Link
+                      href="/catalogo"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`border-l-2 px-6 py-3 text-sm tracking-wider transition-all hover:bg-muted ${
+                        pathname === "/catalogo"
+                          ? "border-foreground font-medium text-foreground"
+                          : "border-transparent font-light text-muted-foreground"
+                      }`}
+                    >
+                      CATÁLOGO
+                    </Link>
+                  </nav>
+                </div>
+
+                {categories.length > 0 && (
+                  <>
+                    <Separator />
+                    <div className="flex flex-col gap-1 py-4">
+                      <p className="px-6 pb-1 pt-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
                         Categorias
                       </p>
                       <div className="flex flex-col">
                         <Link
                           href="/catalogo"
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`px-4 py-2 text-sm transition-colors hover:text-foreground ${!currentCategory ? "font-medium text-foreground" : "text-muted-foreground"}`}
+                          className={`border-l-2 px-6 py-3 text-sm transition-all hover:bg-muted ${
+                            !currentCategory
+                              ? "border-foreground font-medium text-foreground"
+                              : "border-transparent text-muted-foreground"
+                          }`}
                         >
                           Todos
                         </Link>
@@ -145,15 +163,19 @@ export function CatalogHeader({ categories = [] }: CatalogHeaderProps) {
                             key={cat}
                             href={`/catalogo?categoria=${encodeURIComponent(cat)}`}
                             onClick={() => setMobileMenuOpen(false)}
-                            className={`px-4 py-2 text-sm transition-colors hover:text-foreground ${currentCategory === cat ? "font-medium text-foreground" : "text-muted-foreground"}`}
+                            className={`border-l-2 px-6 py-3 text-sm transition-all hover:bg-muted ${
+                              currentCategory === cat
+                                ? "border-foreground font-medium text-foreground"
+                                : "border-transparent text-muted-foreground"
+                            }`}
                           >
                             {cat}
                           </Link>
                         ))}
                       </div>
                     </div>
-                  )}
-                </div>
+                  </>
+                )}
               </SheetContent>
             </Sheet>
           </div>
