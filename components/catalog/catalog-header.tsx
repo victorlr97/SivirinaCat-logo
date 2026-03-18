@@ -4,13 +4,18 @@ import Image from "next/image"
 import Link from "next/link"
 import { createBrowserClient } from "@supabase/ssr"
 import { useEffect, useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 // import { LogOut, User } from 'lucide-react'
 
-export function CatalogHeader() {
+interface CatalogHeaderProps {
+  categories?: string[]
+}
+
+export function CatalogHeader({ categories = [] }: CatalogHeaderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -62,6 +67,9 @@ export function CatalogHeader() {
     router.refresh()
   }
 
+  const searchParams = useSearchParams()
+  const currentCategory = searchParams.get("categoria")
+
   return (
     <header className="z-50 border-b border-border bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -80,15 +88,73 @@ export function CatalogHeader() {
               />
             </Link>
 
-            {/* Hamburguer Menu - Right */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="ml-auto"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
+            {/* Menu unificado - Right */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="ml-auto"
+                onClick={() => setMobileMenuOpen(true)}
+                aria-label="Abrir menu"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              <SheetContent side="right" className="w-[280px]">
+                <SheetTitle className="sr-only">Menu</SheetTitle>
+                <div className="flex flex-col gap-6 pt-8">
+                  {/* Navegação */}
+                  <div>
+                    <p className="mb-2 px-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                      Navegação
+                    </p>
+                    <nav className="font-display flex flex-col">
+                      <Link
+                        href="/"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`px-4 py-2 text-sm tracking-wider transition-opacity hover:opacity-70 ${pathname === "/" ? "font-medium" : "font-light text-muted-foreground"}`}
+                      >
+                        HOME
+                      </Link>
+                      <Link
+                        href="/catalogo"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`px-4 py-2 text-sm tracking-wider transition-opacity hover:opacity-70 ${pathname === "/catalogo" ? "font-medium" : "font-light text-muted-foreground"}`}
+                      >
+                        CATÁLOGO
+                      </Link>
+                    </nav>
+                  </div>
+
+                  {/* Categorias */}
+                  {categories.length > 0 && (
+                    <div>
+                      <p className="mb-2 px-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                        Categorias
+                      </p>
+                      <div className="flex flex-col">
+                        <Link
+                          href="/catalogo"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`px-4 py-2 text-sm transition-colors hover:text-foreground ${!currentCategory ? "font-medium text-foreground" : "text-muted-foreground"}`}
+                        >
+                          Todos
+                        </Link>
+                        {categories.map((cat) => (
+                          <Link
+                            key={cat}
+                            href={`/catalogo?categoria=${encodeURIComponent(cat)}`}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={`px-4 py-2 text-sm transition-colors hover:text-foreground ${currentCategory === cat ? "font-medium text-foreground" : "text-muted-foreground"}`}
+                          >
+                            {cat}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
 
           {/* Desktop Layout (≥ 441px) */}
@@ -109,13 +175,13 @@ export function CatalogHeader() {
             <nav className="font-display absolute left-1/2 flex -translate-x-1/2 items-center gap-6 text-sm tracking-wider">
               <Link
                 href="/"
-                className={`transition-opacity hover:opacity-70 ${pathname === '/' ? 'font-medium' : 'font-light text-muted-foreground'}`}
+                className={`transition-opacity hover:opacity-70 ${pathname === "/" ? "font-medium" : "font-light text-muted-foreground"}`}
               >
                 HOME
               </Link>
               <Link
                 href="/catalogo"
-                className={`transition-opacity hover:opacity-70 ${pathname === '/catalogo' ? 'font-medium' : 'font-light text-muted-foreground'}`}
+                className={`transition-opacity hover:opacity-70 ${pathname === "/catalogo" ? "font-medium" : "font-light text-muted-foreground"}`}
               >
                 CATÁLOGO
               </Link>
@@ -125,26 +191,6 @@ export function CatalogHeader() {
             <div className="w-24" />
           </div>
         </div>
-
-        {/* Mobile Menu Dropdown */}
-        {mobileMenuOpen && (
-          <nav className="font-display flex flex-col gap-4 border-t border-border py-4 sm:hidden">
-            <Link
-              href="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`text-center text-sm tracking-wider transition-opacity hover:opacity-70 ${pathname === '/' ? 'font-medium' : 'font-light text-muted-foreground'}`}
-            >
-              HOME
-            </Link>
-            <Link
-              href="/catalogo"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`text-center text-sm tracking-wider transition-opacity hover:opacity-70 ${pathname === '/catalogo' ? 'font-medium' : 'font-light text-muted-foreground'}`}
-            >
-              CATÁLOGO
-            </Link>
-          </nav>
-        )}
       </div>
     </header>
   )

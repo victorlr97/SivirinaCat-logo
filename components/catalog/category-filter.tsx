@@ -7,7 +7,6 @@ import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Menu, Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 interface CategoryFilterProps {
   categories: string[]
@@ -19,7 +18,6 @@ export function CategoryFilter({ categories, searchQuery = "", onSearchChange }:
   const searchParams = useSearchParams()
   const router = useRouter()
   const currentCategory = searchParams.get("categoria")
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -160,23 +158,9 @@ export function CategoryFilter({ categories, searchQuery = "", onSearchChange }:
           ) : (
             <>
               <span className="text-sm font-medium">{currentCategory || "Todas as Categorias"}</span>
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" onClick={handleOpenSearch} aria-label="Abrir busca">
-                  <Search className="h-5 w-5" />
-                </Button>
-                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                  <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <Menu className="h-5 w-5" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="right" className="w-[280px]">
-                    <div className="flex flex-col gap-1 pt-8">
-                      <CategoryLinks />
-                    </div>
-                  </SheetContent>
-                </Sheet>
-              </div>
+              <Button variant="ghost" size="icon" onClick={handleOpenSearch} aria-label="Abrir busca">
+                <Search className="h-5 w-5" />
+              </Button>
             </>
           )}
         </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { CatalogHeader } from "@/components/catalog/catalog-header"
 import { CategoryFilter } from "@/components/catalog/category-filter"
 import { ProductGrid } from "@/components/catalog/product-grid"
 
@@ -33,6 +34,7 @@ export function CatalogClient({ categories, products }: CatalogClientProps) {
 
   return (
     <>
+      <CatalogHeader categories={categories} />
       <CategoryFilter
         categories={categories}
         searchQuery={searchQuery}

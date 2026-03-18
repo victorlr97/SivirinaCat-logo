@@ -1,5 +1,4 @@
 import { createServerClient } from "@/lib/supabase/server"
-import { CatalogHeader } from "@/components/catalog/catalog-header"
 import { CatalogClient } from "@/components/catalog/catalog-client"
 
 export default async function CatalogPage({
@@ -34,7 +33,6 @@ export default async function CatalogPage({
 
   return (
     <div className="min-h-screen">
-      <CatalogHeader />
       <CatalogClient categories={categories} products={products || []} />
     </div>
   )
