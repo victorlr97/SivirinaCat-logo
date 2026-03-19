@@ -117,24 +117,24 @@ export function CatalogHeader({ categories = [] }: CatalogHeaderProps) {
                     <Link
                       href="/"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`border-l-2 px-6 py-3 text-sm tracking-wider transition-all hover:bg-muted ${
+                      className={`border-l-2 px-6 py-3 text-sm transition-all hover:bg-muted ${
                         pathname === "/"
                           ? "border-foreground font-medium text-foreground"
                           : "border-transparent font-light text-muted-foreground"
                       }`}
                     >
-                      HOME
+                      Home
                     </Link>
                     <Link
                       href="/catalogo"
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`border-l-2 px-6 py-3 text-sm tracking-wider transition-all hover:bg-muted ${
+                      className={`border-l-2 px-6 py-3 text-sm transition-all hover:bg-muted ${
                         pathname === "/catalogo"
                           ? "border-foreground font-medium text-foreground"
                           : "border-transparent font-light text-muted-foreground"
                       }`}
                     >
-                      CATÁLOGO
+                      Catálogo
                     </Link>
                   </nav>
                 </div>
