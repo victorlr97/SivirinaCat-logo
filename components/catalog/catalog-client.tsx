@@ -34,7 +34,11 @@ export function CatalogClient({ categories, products }: CatalogClientProps) {
 
   return (
     <>
-      <CatalogHeader categories={categories} />
+      <CatalogHeader
+        categories={categories}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
       <CategoryFilter
         categories={categories}
         searchQuery={searchQuery}

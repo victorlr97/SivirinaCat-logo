@@ -1,11 +1,12 @@
 "use client"
 
+import type React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { createBrowserClient } from "@supabase/ssr"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
-import { Menu, X } from "lucide-react"
+import { Menu, Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Separator } from "@/components/ui/separator"
@@ -14,12 +15,16 @@ import { Separator } from "@/components/ui/separator"
 
 interface CatalogHeaderProps {
   categories?: string[]
+  searchQuery?: string
+  onSearchChange?: (value: string) => void
 }
 
-export function CatalogHeader({ categories = [] }: CatalogHeaderProps) {
+export function CatalogHeader({ categories = [], searchQuery = "", onSearchChange }: CatalogHeaderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const pathname = usePathname()
 
@@ -70,6 +75,20 @@ export function CatalogHeader({ categories = [] }: CatalogHeaderProps) {
 
   const searchParams = useSearchParams()
   const currentCategory = searchParams.get("categoria")
+
+  const handleOpenSearch = () => {
+    setSearchOpen(true)
+    setTimeout(() => searchInputRef.current?.focus(), 50)
+  }
+
+  const handleCloseSearch = () => {
+    setSearchOpen(false)
+    onSearchChange?.("")
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape") handleCloseSearch()
+  }
 
   return (
     <header className="z-50 border-b border-border bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/60">
@@ -210,8 +229,33 @@ export function CatalogHeader({ categories = [] }: CatalogHeaderProps) {
               </Link>
             </nav>
 
-            {/* Right Spacer */}
-            <div className="w-24" />
+            {/* Lupa - Right */}
+            <div className="flex items-center gap-1">
+              <div
+                className={`flex items-center overflow-hidden rounded-full border border-border bg-background transition-all duration-300 ease-in-out ${
+                  searchOpen ? "w-56 px-3" : "w-0 border-transparent px-0"
+                }`}
+              >
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => onSearchChange?.(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Nome, código ou preço..."
+                  className="w-full bg-transparent py-1.5 text-sm outline-none placeholder:text-muted-foreground"
+                />
+              </div>
+              {searchOpen ? (
+                <Button variant="ghost" size="icon" onClick={handleCloseSearch} aria-label="Fechar busca">
+                  <X className="h-5 w-5" />
+                </Button>
+              ) : (
+                <Button variant="ghost" size="icon" onClick={handleOpenSearch} aria-label="Abrir busca">
+                  <Search className="h-5 w-5" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

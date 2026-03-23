@@ -7,7 +7,6 @@ import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
 interface CategoryFilterProps {
   categories: string[]
   searchQuery?: string
@@ -92,46 +91,11 @@ export function CategoryFilter({ categories, searchQuery = "", onSearchChange }:
       className={`sticky top-12 z-40 border-b border-border bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/60 md:top-14 ${scrolled ? "" : ""}`}
     >
       <div className="container mx-auto px-4">
-        {/* Desktop: Horizontal bar */}
+        {/* Desktop: Horizontal bar — apenas categorias centralizadas */}
         <nav
-          className={`hidden items-center justify-between gap-2 transition-all duration-300 md:flex ${scrolled ? "py-2" : "py-4"}`}
+          className={`hidden items-center justify-center gap-2 transition-all duration-300 md:flex ${scrolled ? "py-2" : "py-4"}`}
         >
-          {/* Categorias — some quando busca está aberta */}
-          <div
-            className={`flex items-center gap-2 overflow-hidden transition-all duration-300 ${
-              searchOpen ? "w-0 opacity-0 pointer-events-none" : "w-full opacity-100"
-            }`}
-          >
-            <CategoryLinks />
-          </div>
-
-          {/* Campo de busca expansível */}
-          <div className="flex items-center gap-2">
-            <div
-              className={`flex items-center overflow-hidden rounded-full border border-border bg-background transition-all duration-300 ease-in-out ${
-                searchOpen ? "w-64 px-3" : "w-0 px-0 border-transparent"
-              }`}
-            >
-              <input
-                ref={inputRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => onSearchChange?.(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Nome, código ou preço..."
-                className="w-full bg-transparent py-1.5 text-sm outline-none placeholder:text-muted-foreground"
-              />
-            </div>
-            {searchOpen ? (
-              <Button variant="ghost" size="icon" onClick={handleCloseSearch} aria-label="Fechar busca">
-                <X className="h-5 w-5" />
-              </Button>
-            ) : (
-              <Button variant="ghost" size="icon" onClick={handleOpenSearch} aria-label="Abrir busca">
-                <Search className="h-5 w-5" />
-              </Button>
-            )}
-          </div>
+          <CategoryLinks />
         </nav>
 
         {/* Mobile: Hamburger menu */}
