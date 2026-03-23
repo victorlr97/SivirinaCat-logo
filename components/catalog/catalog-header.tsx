@@ -229,8 +229,8 @@ export function CatalogHeader({ categories = [], searchQuery = "", onSearchChang
               </Link>
             </nav>
 
-            {/* Lupa - Right */}
-            <div className="flex items-center gap-1">
+            {/* Lupa - Right (apenas no catálogo) */}
+            <div className="flex items-center gap-1" style={{ visibility: onSearchChange ? "visible" : "hidden" }}>
               <div
                 className={`flex items-center overflow-hidden rounded-full border border-border bg-background transition-all duration-300 ease-in-out ${
                   searchOpen ? "w-56 px-3" : "w-0 border-transparent px-0"
