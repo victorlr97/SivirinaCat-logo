@@ -1,7 +1,5 @@
 import { createServerClient } from "@/lib/supabase/server"
-import { CatalogHeader } from "@/components/catalog/catalog-header"
-import { CategoryFilter } from "@/components/catalog/category-filter"
-import { ProductGrid } from "@/components/catalog/product-grid"
+import { CatalogClient } from "@/components/catalog/catalog-client"
 
 export default async function CatalogPage({
   searchParams,
@@ -35,11 +33,7 @@ export default async function CatalogPage({
 
   return (
     <div className="min-h-screen">
-      <CatalogHeader />
-      <CategoryFilter categories={categories} />
-      <main className="container mx-auto px-4 py-12 md:py-16">
-        <ProductGrid products={products || []} />
-      </main>
+      <CatalogClient categories={categories} products={products || []} />
     </div>
   )
 }

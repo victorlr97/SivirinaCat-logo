@@ -15,13 +15,18 @@ interface Product {
 
 interface ProductGridProps {
   products: Product[]
+  searchQuery?: string
 }
 
-export function ProductGrid({ products }: ProductGridProps) {
+export function ProductGrid({ products, searchQuery }: ProductGridProps) {
   if (products.length === 0) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <p className="text-muted-foreground">Nenhum produto disponível no momento.</p>
+        <p className="text-muted-foreground">
+          {searchQuery?.trim()
+            ? `Nenhum produto encontrado para "${searchQuery}".`
+            : "Nenhum produto disponível no momento."}
+        </p>
       </div>
     )
   }

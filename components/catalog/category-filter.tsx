@@ -2,23 +2,24 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
-import { Menu } from "lucide-react"
+import { Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-
 interface CategoryFilterProps {
   categories: string[]
+  searchQuery?: string
+  onSearchChange?: (value: string) => void
 }
 
-export function CategoryFilter({ categories }: CategoryFilterProps) {
+export function CategoryFilter({ categories, searchQuery = "", onSearchChange }: CategoryFilterProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const currentCategory = searchParams.get("categoria")
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,9 +30,29 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  useEffect(() => {
+    if (searchOpen) {
+      inputRef.current?.focus()
+    }
+  }, [searchOpen])
+
+  const handleOpenSearch = () => {
+    setSearchOpen(true)
+  }
+
+  const handleCloseSearch = () => {
+    setSearchOpen(false)
+    onSearchChange?.("")
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape") {
+      handleCloseSearch()
+    }
+  }
+
   const handleTodosClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    setMobileMenuOpen(false)
     router.push("/catalogo")
     router.refresh()
   }
@@ -54,7 +75,6 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
           className={`px-4 py-2 text-sm transition-colors hover:text-foreground ${
             currentCategory === category ? "font-medium text-foreground" : "text-muted-foreground"
           }`}
-          onClick={() => setMobileMenuOpen(false)}
         >
           {category}
         </Link>
@@ -71,7 +91,7 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
       className={`sticky top-12 z-40 border-b border-border bg-background/95 backdrop-blur transition-all duration-300 supports-[backdrop-filter]:bg-background/60 md:top-14 ${scrolled ? "" : ""}`}
     >
       <div className="container mx-auto px-4">
-        {/* Desktop: Horizontal bar */}
+        {/* Desktop: Horizontal bar — apenas categorias centralizadas */}
         <nav
           className={`hidden items-center justify-center gap-2 transition-all duration-300 md:flex ${scrolled ? "py-2" : "py-4"}`}
         >
@@ -82,19 +102,29 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
         <div
           className={`flex items-center justify-between transition-all duration-300 md:hidden ${scrolled ? "py-1" : "py-2"}`}
         >
-          <span className="text-sm font-medium">{currentCategory || "Todas as Categorias"}</span>
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
+          {searchOpen ? (
+            <div className="flex flex-1 items-center gap-2">
+              <input
+                ref={inputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => onSearchChange?.(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Nome, código ou preço..."
+                className="flex-1 bg-transparent py-1.5 text-sm outline-none placeholder:text-muted-foreground"
+              />
+              <Button variant="ghost" size="icon" onClick={handleCloseSearch} aria-label="Fechar busca">
+                <X className="h-5 w-5" />
               </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[280px]">
-              <div className="flex flex-col gap-1 pt-8">
-                <CategoryLinks />
-              </div>
-            </SheetContent>
-          </Sheet>
+            </div>
+          ) : (
+            <>
+              <span className="text-sm font-medium">{currentCategory || "Todas as Categorias"}</span>
+              <Button variant="ghost" size="icon" onClick={handleOpenSearch} aria-label="Abrir busca">
+                <Search className="h-5 w-5" />
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
