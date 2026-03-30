@@ -43,14 +43,16 @@ export function ProductGrid({ products, searchQuery }: ProductGridProps) {
 function ProductCard({ product }: { product: Product }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const touchStartX = useRef<number>(0)
   const touchEndX = useRef<number>(0)
 
   const hasMultipleImages = product.images && product.images.length > 1
   const totalImages = product.images?.length || 0
 
-  // Detecta swipe no mobile
+  // Detecta se é dispositivo touch
   const handleTouchStart = (e: React.TouchEvent) => {
+    isMobile || setIsMobile(true)
     touchStartX.current = e.touches[0].clientX
   }
 
@@ -62,21 +64,19 @@ function ProductCard({ product }: { product: Product }) {
     if (!hasMultipleImages) return
 
     const swipeDistance = touchStartX.current - touchEndX.current
-    const minSwipeDistance = 50 // mínimo de 50px para considerar um swipe
+    const minSwipeDistance = 50
 
     if (Math.abs(swipeDistance) > minSwipeDistance) {
       if (swipeDistance > 0) {
-        // Swipe para esquerda - próxima imagem
         setCurrentImageIndex((prev) => (prev + 1) % totalImages)
       } else {
-        // Swipe para direita - imagem anterior
         setCurrentImageIndex((prev) => (prev - 1 + totalImages) % totalImages)
       }
     }
   }
 
-  // No desktop, mostra segunda imagem no hover
-  const displayImageIndex = isHovered && hasMultipleImages ? 1 : currentImageIndex
+  // Desktop: troca imagem no hover — Mobile: usa índice do swipe
+  const displayImageIndex = !isMobile && isHovered && hasMultipleImages ? 1 : currentImageIndex
 
   return (
     <Link
@@ -101,7 +101,7 @@ function ProductCard({ product }: { product: Product }) {
                   src={image || "/placeholder.svg"}
                   alt={`${product.name}${index > 0 ? ` - vista ${index + 1}` : ''}`}
                   fill
-                  className={`object-cover transition-all duration-500 group-hover:scale-105 ${
+                  className={`object-cover transition-all duration-500 md:group-hover:scale-105 ${
                     index === displayImageIndex ? "opacity-100" : "opacity-0"
                   }`}
                   sizes="(max-width: 768px) 100vw, 33vw"
