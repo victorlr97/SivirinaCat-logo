@@ -1,30 +1,24 @@
-# Digital clothing catalog
+#  SIVIRINA - Sales & Inventory Management System
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+### 🔗 [Website](sivirina.com.br)
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/victorlopesr15-gmailcoms-projects/v0-digital-clothing-catalog)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/Zg8xjmNwPoc)
+---
 
-## Overview
+##  Description
+SIVIRINA is a comprehensive sales platform featuring a public product catalog and a secure internal management system. Built to bridge the gap between customer-facing interfaces and business operations, it handles everything from inventory control to customer data management.
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+##  Tech Stack
+* **Frontend:** React / Next.js with **Tailwind CSS**.
+* **Backend & Database:** **Supabase** (PostgreSQL) for real-time data persistence.
+* **Storage:** **Vercel Blob** for dynamic product image hosting.
+* **Development:** **AI-Assisted Development** (v0, Claude) for rapid prototyping and logic implementation.
 
-## Deployment
+##  Key Features
+* **Full Product Catalog:** Dynamic display of items with real-time updates.
+* **Admin Dashboard:** Secure, password-protected area for management.
+* **Inventory Control:** Comprehensive system to track stock levels, sales, and customer information.
+* **Integrated CMS:** Direct site editor allowing admins to manage content and visibility without touching the code.
+* **Authentication:** Secure login flow for administrative access.
 
-Your project is live at:
-
-**[https://vercel.com/victorlopesr15-gmailcoms-projects/v0-digital-clothing-catalog](https://vercel.com/victorlopesr15-gmailcoms-projects/v0-digital-clothing-catalog)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/projects/Zg8xjmNwPoc](https://v0.app/chat/projects/Zg8xjmNwPoc)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+##  Approach & Logic
+This project was developed with a **Product-First** mindset. By leveraging advanced AI tools and modern cloud infrastructure (Supabase/Vercel), I focused on building a scalable architecture and robust business logic to solve real-world retail challenges. It showcases my ability to translate complex business needs into a functional digital product.
