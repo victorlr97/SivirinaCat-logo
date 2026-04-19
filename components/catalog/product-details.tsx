@@ -2,11 +2,20 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import Link from "next/link"
-import { Instagram } from "lucide-react"
+import { Check, Copy, Instagram } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { formatCurrency } from "@/lib/utils"
 import { ImageZoom } from "./image-zoom"
+
+const INSTAGRAM_URL = "https://ig.me/m/sivirinamoda"
 
 interface Product {
   id: string
@@ -24,7 +33,34 @@ interface ProductDetailsProps {
 
 export function ProductDetails({ product }: ProductDetailsProps) {
   const [selectedImage, setSelectedImage] = useState(0)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
   const images = product.images || []
+
+  const productUrl = typeof window !== "undefined" ? window.location.href : ""
+
+  const prefilledMessage = `Olá! Tenho interesse neste produto:
+
+${product.name}${product.product_code ? ` (Código: ${product.product_code})` : ""}
+Valor: ${formatCurrency(product.price)}
+
+Link: ${productUrl}`
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(prefilledMessage)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      console.error("[v0] Erro ao copiar mensagem:", error)
+    }
+  }
+
+  const handleCopyAndOpen = async () => {
+    await handleCopy()
+    window.open(INSTAGRAM_URL, "_blank", "noopener,noreferrer")
+    setIsDialogOpen(false)
+  }
 
   return (
     <div className="grid gap-12 md:grid-cols-2 md:gap-16">
@@ -104,19 +140,69 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         )}
 
         <div className="pt-4">
-          <Button asChild size="lg" className="w-full md:w-auto">
-            <Link
-              href="https://ig.me/m/sivirinamoda"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2"
-            >
-              <Instagram className="h-5 w-5" />
-              Comprar via Instagram
-            </Link>
+          <Button
+            size="lg"
+            className="w-full md:w-auto"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <Instagram className="h-5 w-5" />
+            Comprar via Instagram
           </Button>
         </div>
       </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Finalize sua compra no Instagram</DialogTitle>
+            <DialogDescription>
+              Copie a mensagem abaixo e cole no chat para que a loja já saiba qual produto voc&ecirc; quer.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <div className="rounded-md border border-border bg-muted/50 p-4">
+              <pre className="whitespace-pre-wrap break-words font-sans text-sm leading-relaxed text-foreground">
+                {prefilledMessage}
+              </pre>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCopy}
+              className="w-full sm:w-auto"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  Mensagem copiada
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4" />
+                  Copiar mensagem
+                </>
+              )}
+            </Button>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setIsDialogOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button type="button" onClick={handleCopyAndOpen}>
+              <Instagram className="h-4 w-4" />
+              Copiar e abrir Instagram
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
