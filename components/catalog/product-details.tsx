@@ -189,15 +189,7 @@ Link: ${productUrl}`
             </Button>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-2 sm:justify-between">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setIsDialogOpen(false)}
-              className="w-full sm:w-auto"
-            >
-              Cancelar
-            </Button>
+          <DialogFooter>
             <Button
               type="button"
               onClick={handleCopyAndOpen}
