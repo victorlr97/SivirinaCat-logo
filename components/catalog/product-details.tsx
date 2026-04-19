@@ -189,7 +189,7 @@ Link: ${productUrl}`
             </Button>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-2">
+          <DialogFooter className="gap-2 sm:gap-2 sm:justify-between">
             <Button
               type="button"
               variant="ghost"
