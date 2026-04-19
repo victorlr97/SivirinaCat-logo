@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import { Check, Copy, Instagram } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -16,6 +16,7 @@ import { formatCurrency } from "@/lib/utils"
 import { ImageZoom } from "./image-zoom"
 
 const INSTAGRAM_URL = "https://ig.me/m/sivirinamoda"
+const SITE_URL = "https://sivirina.com.br"
 
 interface Product {
   id: string
@@ -35,14 +36,9 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const [selectedImage, setSelectedImage] = useState(0)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [productUrl, setProductUrl] = useState("")
   const images = product.images || []
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setProductUrl(`${window.location.origin}/produto/${product.id}`)
-    }
-  }, [product.id])
+  const productUrl = `${SITE_URL}/produto/${product.id}`
 
   const prefilledMessage = `Olá! Tenho interesse neste produto:
 
