@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import { Check, Copy, Instagram } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -35,9 +35,14 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const [selectedImage, setSelectedImage] = useState(0)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [productUrl, setProductUrl] = useState("")
   const images = product.images || []
 
-  const productUrl = typeof window !== "undefined" ? window.location.href : ""
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setProductUrl(`${window.location.origin}/produto/${product.id}`)
+    }
+  }, [product.id])
 
   const prefilledMessage = `Olá! Tenho interesse neste produto:
 
