@@ -152,19 +152,19 @@ Link: ${productUrl}`
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Finalize sua compra no Instagram</DialogTitle>
-            <DialogDescription>
+        <DialogContent className="max-w-[calc(100%-2rem)] overflow-hidden sm:max-w-lg">
+          <DialogHeader className="min-w-0 pr-6">
+            <DialogTitle className="text-balance">Finalize sua compra no Instagram</DialogTitle>
+            <DialogDescription className="text-pretty">
               Copie a mensagem abaixo e cole no chat para que a loja já saiba qual produto voc&ecirc; quer.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3">
-            <div className="rounded-md border border-border bg-muted/50 p-4">
-              <pre className="whitespace-pre-wrap break-words font-sans text-sm leading-relaxed text-foreground">
+          <div className="min-w-0 space-y-3">
+            <div className="overflow-hidden rounded-md border border-border bg-muted/50 p-4">
+              <p className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-foreground [overflow-wrap:anywhere]">
                 {prefilledMessage}
-              </pre>
+              </p>
             </div>
 
             <Button
@@ -188,15 +188,20 @@ Link: ${productUrl}`
             </Button>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-2">
             <Button
               type="button"
               variant="ghost"
               onClick={() => setIsDialogOpen(false)}
+              className="w-full sm:w-auto"
             >
               Cancelar
             </Button>
-            <Button type="button" onClick={handleCopyAndOpen}>
+            <Button
+              type="button"
+              onClick={handleCopyAndOpen}
+              className="w-full sm:w-auto"
+            >
               <Instagram className="h-4 w-4" />
               Copiar e abrir Instagram
             </Button>
