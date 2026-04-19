@@ -161,17 +161,18 @@ Link: ${productUrl}`
             </DialogDescription>
           </DialogHeader>
 
-          <div className="min-w-0 space-y-3">
+          <div className="min-w-0">
             <div className="overflow-hidden rounded-md border border-border bg-muted/50 p-4">
               <p className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-foreground [overflow-wrap:anywhere]">
                 {prefilledMessage}
               </p>
             </div>
+          </div>
 
+          <DialogFooter className="gap-2 sm:justify-between">
             <Button
               type="button"
               variant="outline"
-              size="sm"
               onClick={handleCopy}
               className="w-full sm:w-auto"
             >
@@ -186,17 +187,6 @@ Link: ${productUrl}`
                   Copiar mensagem
                 </>
               )}
-            </Button>
-          </div>
-
-          <DialogFooter className="gap-2 sm:gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setIsDialogOpen(false)}
-              className="w-full sm:w-auto"
-            >
-              Cancelar
             </Button>
             <Button
               type="button"
