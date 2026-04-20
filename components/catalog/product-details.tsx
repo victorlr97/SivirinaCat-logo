@@ -3,12 +3,10 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Instagram } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/lib/utils"
 import { ImageZoom } from "./image-zoom"
 
-const INSTAGRAM_URL = "https://ig.me/m/sivirinamoda"
 const WHATSAPP_NUMBER = "5532984026283"
 const SITE_URL = "https://sivirina.com.br"
 
@@ -121,11 +119,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           </div>
         )}
 
-        <div className="flex flex-col gap-3 pt-4 sm:flex-row">
+        <div className="pt-4">
           <Button
             asChild
             size="lg"
-            className="w-full bg-[#25D366] text-white hover:bg-[#1ebe5d] sm:w-auto"
+            className="w-full bg-[#25D366] text-white hover:bg-[#1ebe5d] md:w-auto"
           >
             <Link
               href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
@@ -137,18 +135,6 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             >
               <WhatsAppIcon className="h-5 w-5" />
               Comprar via WhatsApp
-            </Link>
-          </Button>
-
-          <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
-            <Link
-              href={INSTAGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2"
-            >
-              <Instagram className="h-5 w-5" />
-              Comprar via Instagram
             </Link>
           </Button>
         </div>
