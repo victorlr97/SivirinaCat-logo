@@ -162,7 +162,6 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
   const touchStartX = useRef<number>(0)
   const touchEndX = useRef<number>(0)
   const titleRef = useRef<HTMLDivElement>(null)
-  const ctaRef = useRef<HTMLDivElement>(null)
 
   // Conceitos emocionais para as peças
   const emotionalContext = [
@@ -195,22 +194,7 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
         }
       )
 
-      // CTA animation
-      gsap.fromTo(
-        ctaRef.current,
-        { opacity: 0, y: 30 },
-        {
-          opacity: 1,
-          y: 0,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: ctaRef.current,
-            start: "top 80%",
-            end: "bottom 20%",
-            scrub: 1,
-          },
-        }
-      )
+
     })
 
     return () => ctx.revert()
@@ -359,7 +343,7 @@ export function FeaturedCollectionSection({ products }: FeaturedCollectionSectio
         </div>
 
         {/* CTA */}
-        <div ref={ctaRef} className="text-center">
+        <div className="text-center">
           <Link href="/catalogo">
             <Button
               size="lg"
