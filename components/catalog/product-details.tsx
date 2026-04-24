@@ -32,7 +32,7 @@ interface Product {
   images: string[]
   sizes?: string[]
   product_code?: string
-  installments?: string
+  parcelas?: string
 }
 
 interface ProductDetailsProps {
@@ -95,8 +95,8 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           {product.product_code && <p className="text-sm text-muted-foreground">Código: {product.product_code}</p>}
 
           <p className="text-2xl font-medium">{formatCurrency(product.price)}</p>
-          {product.installments && (
-            <p className="text-sm text-muted-foreground">{product.installments}</p>
+          {product.parcelas && (
+            <p className="text-sm text-muted-foreground">{product.parcelas}</p>
           )}
         </div>
 
