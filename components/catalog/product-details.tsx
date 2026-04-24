@@ -105,11 +105,11 @@ export function ProductDetails({ product }: ProductDetailsProps) {
       {/* Detalhes do Produto */}
       <div className="space-y-8">
         <div className="space-y-4">
-          <h1 className="text-balance text-3xl font-medium leading-tight tracking-tight md:text-4xl">{product.name}</h1>
+          <h1 className="text-balance text-3xl font-medium leading-tight tracking-tight md:text-4xl mb-0">{product.name}</h1>
 
           {product.product_code && <p className="text-sm text-muted-foreground">Código: {product.product_code}</p>}
 
-          <p className="text-2xl font-medium">{formatCurrency(product.price)}</p>
+          <p className="text-2xl font-medium mb-0">{formatCurrency(product.price)}</p>
           {product.parcelas && (
             <p className="text-sm text-muted-foreground">{product.parcelas}</p>
           )}
@@ -117,15 +117,15 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
         {product.description && (
           <div className="space-y-2">
-            <h2 className="text-sm font-medium text-muted-foreground">Descrição</h2>
+            <h2 className="text-sm font-medium text-muted-foreground mb-0">Descrição</h2>
             <p className="text-pretty leading-relaxed">{product.description}</p>
           </div>
         )}
 
         {product.sizes && product.sizes.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-2 mb-3">
             <h2 className="text-sm font-medium text-muted-foreground">Tamanhos disponíveis</h2>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mb-0">
               {product.sizes.map((size) => (
                 <span
                   key={size}
