@@ -100,6 +100,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             ))}
           </div>
         )}
+
+        <p className="max-w-xs text-xs text-muted-foreground">
+          *Modelo digital criada por IA. A peça é real e pode apresentar leves variações de tom e de detalhes.
+        </p>
       </div>
 
       {/* Detalhes do Produto */}
