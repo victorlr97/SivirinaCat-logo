@@ -3,9 +3,22 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { Ruler } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { formatCurrency } from "@/lib/utils"
 import { ImageZoom } from "./image-zoom"
+
+interface TabelaMedidas {
+  colunas: string[]
+  linhas: string[][]
+  notas?: string[]
+}
 
 const WHATSAPP_NUMBER = "5532984026283"
 const SITE_URL = "https://sivirina.com.br"
@@ -33,6 +46,7 @@ interface Product {
   sizes?: string[]
   product_code?: string
   parcelas?: string
+  tabela_medidas?: TabelaMedidas | null
 }
 
 interface ProductDetailsProps {
@@ -41,6 +55,7 @@ interface ProductDetailsProps {
 
 export function ProductDetails({ product }: ProductDetailsProps) {
   const [selectedImage, setSelectedImage] = useState(0)
+  const [showMedidasModal, setShowMedidasModal] = useState(false)
   const images = product.images || []
 
   return (
@@ -120,6 +135,17 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                 </span>
               ))}
             </div>
+
+            {product.tabela_medidas && product.tabela_medidas.colunas.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowMedidasModal(true)}
+                className="mt-2 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <Ruler className="h-4 w-4" />
+                Tabela de Medidas
+              </button>
+            )}
           </div>
         )}
 
@@ -143,6 +169,58 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           </Button>
         </div>
       </div>
+
+      {/* Modal Tabela de Medidas */}
+      <Dialog open={showMedidasModal} onOpenChange={setShowMedidasModal}>
+        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Tabela de Medidas</DialogTitle>
+          </DialogHeader>
+
+          {product.tabela_medidas && (
+            <div className="space-y-4">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-sm">
+                  <thead>
+                    <tr>
+                      {product.tabela_medidas.colunas.map((coluna, index) => (
+                        <th
+                          key={index}
+                          className="border-b border-border px-4 py-3 text-left font-medium"
+                        >
+                          {coluna}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {product.tabela_medidas.linhas.map((linha, rowIndex) => (
+                      <tr key={rowIndex} className="border-b border-border last:border-0">
+                        {linha.map((celula, cellIndex) => (
+                          <td
+                            key={cellIndex}
+                            className={`px-4 py-3 ${cellIndex === 0 ? "font-medium" : "text-muted-foreground"}`}
+                          >
+                            {celula}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {product.tabela_medidas.notas && product.tabela_medidas.notas.length > 0 && (
+                <div className="space-y-1 text-xs text-muted-foreground">
+                  {product.tabela_medidas.notas.map((nota, index) => (
+                    <p key={index}>{nota}</p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
