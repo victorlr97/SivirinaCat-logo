@@ -32,6 +32,7 @@ interface Product {
   images: string[]
   sizes?: string[]
   product_code?: string
+  parcelas?: string
 }
 
 interface ProductDetailsProps {
@@ -94,18 +95,21 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           {product.product_code && <p className="text-sm text-muted-foreground">Código: {product.product_code}</p>}
 
           <p className="text-2xl font-medium">{formatCurrency(product.price)}</p>
+          {product.parcelas && (
+            <p className="text-sm text-muted-foreground">{product.parcelas}</p>
+          )}
         </div>
 
         {product.description && (
           <div className="space-y-2">
-            <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Descrição</h2>
+            <h2 className="text-sm font-medium text-muted-foreground">Descrição</h2>
             <p className="text-pretty leading-relaxed">{product.description}</p>
           </div>
         )}
 
         {product.sizes && product.sizes.length > 0 && (
           <div className="space-y-2">
-            <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Tamanhos Disponíveis</h2>
+            <h2 className="text-sm font-medium text-muted-foreground">Tamanhos disponíveis</h2>
             <div className="flex flex-wrap gap-2">
               {product.sizes.map((size) => (
                 <span
@@ -123,7 +127,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           <Button
             asChild
             size="lg"
-            className="w-full bg-[#25D366] text-white hover:bg-[#1ebe5d] md:w-auto"
+            className="w-full bg-black text-white hover:bg-black/90 md:w-auto"
           >
             <Link
               href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
