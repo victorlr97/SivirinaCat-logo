@@ -26,6 +26,7 @@ type ProductFormProps = {
     images: string[]
     product_code: string | null
     quantidade_estoque: number
+    installments: string | null
   }
   onSuccess?: () => void
   onCancel?: () => void
@@ -35,6 +36,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
   const [name, setName] = useState(product?.name || "")
   const [description, setDescription] = useState(product?.description || "")
   const [price, setPrice] = useState(product?.price?.toString() || "")
+  const [installments, setInstallments] = useState(product?.installments || "")
   const [category, setCategory] = useState(product?.category || "")
   const [categories, setCategories] = useState<string[]>([])
   const [showNewCategory, setShowNewCategory] = useState(false)
@@ -134,6 +136,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         name,
         description: description || null,
         price: Number.parseFloat(price),
+        installments: installments || null,
         category: finalCategory || null,
         sizes: sizesArray,
         quantidade_estoque: Number.parseInt(quantidadeEstoque),
@@ -307,6 +310,18 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="installments">Parcelamento sem juros</Label>
+              <Input
+                id="installments"
+                value={installments}
+                onChange={(e) => setInstallments(e.target.value)}
+                placeholder="Ex: em até 10x sem juros"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="category">Categoria</Label>
               {!showNewCategory ? (
