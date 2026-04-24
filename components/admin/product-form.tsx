@@ -11,8 +11,14 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
-import { Upload, X, Star } from "lucide-react"
+import { Upload, X, Star, Plus, Trash2, Ruler } from "lucide-react"
 import Image from "next/image"
+
+interface TabelaMedidas {
+  colunas: string[]
+  linhas: string[][]
+  notas: string[]
+}
 
 type ProductFormProps = {
   product?: {
@@ -27,6 +33,7 @@ type ProductFormProps = {
     product_code: string | null
     quantidade_estoque: number
     parcelas: string | null
+    tabela_medidas: TabelaMedidas | null
   }
   onSuccess?: () => void
   onCancel?: () => void
@@ -45,6 +52,12 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
   const [quantidadeEstoque, setQuantidadeEstoque] = useState(product?.quantidade_estoque?.toString() || "0")
   const [images, setImages] = useState<string[]>(product?.images || [])
   const [productCode, setProductCode] = useState(product?.product_code || "")
+  const [tabelaMedidas, setTabelaMedidas] = useState<TabelaMedidas>(
+    product?.tabela_medidas || { colunas: [], linhas: [], notas: [] }
+  )
+  const [showTabelaEditor, setShowTabelaEditor] = useState(
+    !!(product?.tabela_medidas && product.tabela_medidas.colunas.length > 0)
+  )
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const router = useRouter()
@@ -142,6 +155,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         quantidade_estoque: Number.parseInt(quantidadeEstoque),
         images: images,
         product_code: productCode || null,
+        tabela_medidas: showTabelaEditor && tabelaMedidas.colunas.length > 0 ? tabelaMedidas : null,
       }
 
       if (product?.id) {
@@ -401,6 +415,191 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
               placeholder="Ex: P, M, G (separados por vírgula)"
             />
             <p className="text-xs text-muted-foreground">Separe os tamanhos por vírgula</p>
+          </div>
+
+          {/* Tabela de Medidas */}
+          <div className="space-y-4 rounded-lg border border-border p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Ruler className="h-4 w-4 text-muted-foreground" />
+                <Label>Tabela de Medidas</Label>
+              </div>
+              <Button
+                type="button"
+                variant={showTabelaEditor ? "destructive" : "outline"}
+                size="sm"
+                onClick={() => {
+                  if (showTabelaEditor) {
+                    setTabelaMedidas({ colunas: [], linhas: [], notas: [] })
+                  } else {
+                    setTabelaMedidas({
+                      colunas: ["Tamanho", "Busto", "Cintura", "Quadril"],
+                      linhas: [["P", "", "", ""]],
+                      notas: ["*Medidas em cm"],
+                    })
+                  }
+                  setShowTabelaEditor(!showTabelaEditor)
+                }}
+              >
+                {showTabelaEditor ? "Remover Tabela" : "Adicionar Tabela"}
+              </Button>
+            </div>
+
+            {showTabelaEditor && (
+              <div className="space-y-4">
+                {/* Tabela Editável */}
+                <div className="overflow-x-auto rounded-lg border border-border">
+                  <table className="w-full border-collapse text-sm">
+                    <thead>
+                      <tr className="bg-muted/50">
+                        {tabelaMedidas.colunas.map((coluna, index) => (
+                          <th key={index} className="group relative border-b border-r border-border last:border-r-0">
+                            <input
+                              type="text"
+                              value={coluna}
+                              onChange={(e) => {
+                                const newColunas = [...tabelaMedidas.colunas]
+                                newColunas[index] = e.target.value
+                                setTabelaMedidas({ ...tabelaMedidas, colunas: newColunas })
+                              }}
+                              className="w-full bg-transparent px-3 py-2 text-left font-medium outline-none focus:bg-background"
+                              placeholder="Coluna"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newColunas = tabelaMedidas.colunas.filter((_, i) => i !== index)
+                                const newLinhas = tabelaMedidas.linhas.map((linha) =>
+                                  linha.filter((_, i) => i !== index)
+                                )
+                                setTabelaMedidas({ ...tabelaMedidas, colunas: newColunas, linhas: newLinhas })
+                              }}
+                              className="absolute -top-2 -right-2 hidden h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs group-hover:flex"
+                              title="Remover coluna"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </th>
+                        ))}
+                        <th className="w-10 border-b border-border bg-muted/30">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newColunas = [...tabelaMedidas.colunas, ""]
+                              const newLinhas = tabelaMedidas.linhas.map((linha) => [...linha, ""])
+                              setTabelaMedidas({ ...tabelaMedidas, colunas: newColunas, linhas: newLinhas })
+                            }}
+                            className="flex h-full w-full items-center justify-center py-2 text-muted-foreground hover:text-foreground"
+                            title="Adicionar coluna"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </button>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tabelaMedidas.linhas.map((linha, rowIndex) => (
+                        <tr key={rowIndex} className="group border-b border-border last:border-b-0">
+                          {linha.map((celula, cellIndex) => (
+                            <td key={cellIndex} className="border-r border-border last:border-r-0">
+                              <input
+                                type="text"
+                                value={celula}
+                                onChange={(e) => {
+                                  const newLinhas = [...tabelaMedidas.linhas]
+                                  newLinhas[rowIndex][cellIndex] = e.target.value
+                                  setTabelaMedidas({ ...tabelaMedidas, linhas: newLinhas })
+                                }}
+                                className={`w-full bg-transparent px-3 py-2 outline-none focus:bg-muted/30 ${cellIndex === 0 ? "font-medium" : ""}`}
+                                placeholder={tabelaMedidas.colunas[cellIndex] || ""}
+                              />
+                            </td>
+                          ))}
+                          <td className="w-10 bg-muted/10">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newLinhas = tabelaMedidas.linhas.filter((_, i) => i !== rowIndex)
+                                setTabelaMedidas({ ...tabelaMedidas, linhas: newLinhas })
+                              }}
+                              className="flex h-full w-full items-center justify-center py-2 text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+                              title="Remover linha"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      <tr className="bg-muted/10">
+                        <td colSpan={tabelaMedidas.colunas.length + 1}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newLinha = new Array(tabelaMedidas.colunas.length).fill("")
+                              setTabelaMedidas({
+                                ...tabelaMedidas,
+                                linhas: [...tabelaMedidas.linhas, newLinha],
+                              })
+                            }}
+                            className="flex w-full items-center justify-center gap-1 py-2 text-sm text-muted-foreground hover:text-foreground"
+                          >
+                            <Plus className="h-3 w-3" />
+                            Adicionar linha
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Notas */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Notas de rodapé (opcional)</Label>
+                  <div className="space-y-2">
+                    {tabelaMedidas.notas.map((nota, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Input
+                          value={nota}
+                          onChange={(e) => {
+                            const newNotas = [...tabelaMedidas.notas]
+                            newNotas[index] = e.target.value
+                            setTabelaMedidas({ ...tabelaMedidas, notas: newNotas })
+                          }}
+                          className="h-8"
+                          placeholder="Ex: *Medidas em cm"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0"
+                          onClick={() => {
+                            const newNotas = tabelaMedidas.notas.filter((_, i) => i !== index)
+                            setTabelaMedidas({ ...tabelaMedidas, notas: newNotas })
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setTabelaMedidas({
+                          ...tabelaMedidas,
+                          notas: [...tabelaMedidas.notas, ""],
+                        })
+                      }}
+                    >
+                      <Plus className="mr-1 h-3 w-3" />
+                      Adicionar Nota
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
