@@ -447,112 +447,114 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
 
             {showTabelaEditor && (
               <div className="space-y-4">
-                {/* Colunas */}
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Colunas (cabeçalho)</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {tabelaMedidas.colunas.map((coluna, index) => (
-                      <div key={index} className="flex items-center gap-1">
-                        <Input
-                          value={coluna}
-                          onChange={(e) => {
-                            const newColunas = [...tabelaMedidas.colunas]
-                            newColunas[index] = e.target.value
-                            setTabelaMedidas({ ...tabelaMedidas, colunas: newColunas })
-                          }}
-                          className="h-8 w-24"
-                          placeholder="Coluna"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => {
-                            const newColunas = tabelaMedidas.colunas.filter((_, i) => i !== index)
-                            const newLinhas = tabelaMedidas.linhas.map((linha) =>
-                              linha.filter((_, i) => i !== index)
-                            )
-                            setTabelaMedidas({ ...tabelaMedidas, colunas: newColunas, linhas: newLinhas })
-                          }}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-8"
-                      onClick={() => {
-                        const newColunas = [...tabelaMedidas.colunas, ""]
-                        const newLinhas = tabelaMedidas.linhas.map((linha) => [...linha, ""])
-                        setTabelaMedidas({ ...tabelaMedidas, colunas: newColunas, linhas: newLinhas })
-                      }}
-                    >
-                      <Plus className="mr-1 h-3 w-3" />
-                      Coluna
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Linhas */}
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Linhas (medidas)</Label>
-                  <div className="space-y-2">
-                    {tabelaMedidas.linhas.map((linha, rowIndex) => (
-                      <div key={rowIndex} className="flex items-center gap-2">
-                        <div className="flex flex-wrap gap-2">
-                          {linha.map((celula, cellIndex) => (
-                            <Input
-                              key={cellIndex}
-                              value={celula}
+                {/* Tabela Editável */}
+                <div className="overflow-x-auto rounded-lg border border-border">
+                  <table className="w-full border-collapse text-sm">
+                    <thead>
+                      <tr className="bg-muted/50">
+                        {tabelaMedidas.colunas.map((coluna, index) => (
+                          <th key={index} className="group relative border-b border-r border-border last:border-r-0">
+                            <input
+                              type="text"
+                              value={coluna}
                               onChange={(e) => {
-                                const newLinhas = [...tabelaMedidas.linhas]
-                                newLinhas[rowIndex][cellIndex] = e.target.value
+                                const newColunas = [...tabelaMedidas.colunas]
+                                newColunas[index] = e.target.value
+                                setTabelaMedidas({ ...tabelaMedidas, colunas: newColunas })
+                              }}
+                              className="w-full bg-transparent px-3 py-2 text-left font-medium outline-none focus:bg-background"
+                              placeholder="Coluna"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newColunas = tabelaMedidas.colunas.filter((_, i) => i !== index)
+                                const newLinhas = tabelaMedidas.linhas.map((linha) =>
+                                  linha.filter((_, i) => i !== index)
+                                )
+                                setTabelaMedidas({ ...tabelaMedidas, colunas: newColunas, linhas: newLinhas })
+                              }}
+                              className="absolute -top-2 -right-2 hidden h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs group-hover:flex"
+                              title="Remover coluna"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </th>
+                        ))}
+                        <th className="w-10 border-b border-border bg-muted/30">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newColunas = [...tabelaMedidas.colunas, ""]
+                              const newLinhas = tabelaMedidas.linhas.map((linha) => [...linha, ""])
+                              setTabelaMedidas({ ...tabelaMedidas, colunas: newColunas, linhas: newLinhas })
+                            }}
+                            className="flex h-full w-full items-center justify-center py-2 text-muted-foreground hover:text-foreground"
+                            title="Adicionar coluna"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </button>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tabelaMedidas.linhas.map((linha, rowIndex) => (
+                        <tr key={rowIndex} className="group border-b border-border last:border-b-0">
+                          {linha.map((celula, cellIndex) => (
+                            <td key={cellIndex} className="border-r border-border last:border-r-0">
+                              <input
+                                type="text"
+                                value={celula}
+                                onChange={(e) => {
+                                  const newLinhas = [...tabelaMedidas.linhas]
+                                  newLinhas[rowIndex][cellIndex] = e.target.value
+                                  setTabelaMedidas({ ...tabelaMedidas, linhas: newLinhas })
+                                }}
+                                className={`w-full bg-transparent px-3 py-2 outline-none focus:bg-muted/30 ${cellIndex === 0 ? "font-medium" : ""}`}
+                                placeholder={tabelaMedidas.colunas[cellIndex] || ""}
+                              />
+                            </td>
+                          ))}
+                          <td className="w-10 bg-muted/10">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newLinhas = tabelaMedidas.linhas.filter((_, i) => i !== rowIndex)
                                 setTabelaMedidas({ ...tabelaMedidas, linhas: newLinhas })
                               }}
-                              className="h-8 w-24"
-                              placeholder={tabelaMedidas.colunas[cellIndex] || ""}
-                            />
-                          ))}
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 shrink-0"
-                          onClick={() => {
-                            const newLinhas = tabelaMedidas.linhas.filter((_, i) => i !== rowIndex)
-                            setTabelaMedidas({ ...tabelaMedidas, linhas: newLinhas })
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    ))}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const newLinha = new Array(tabelaMedidas.colunas.length).fill("")
-                        setTabelaMedidas({
-                          ...tabelaMedidas,
-                          linhas: [...tabelaMedidas.linhas, newLinha],
-                        })
-                      }}
-                    >
-                      <Plus className="mr-1 h-3 w-3" />
-                      Adicionar Linha
-                    </Button>
-                  </div>
+                              className="flex h-full w-full items-center justify-center py-2 text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
+                              title="Remover linha"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      <tr className="bg-muted/10">
+                        <td colSpan={tabelaMedidas.colunas.length + 1}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newLinha = new Array(tabelaMedidas.colunas.length).fill("")
+                              setTabelaMedidas({
+                                ...tabelaMedidas,
+                                linhas: [...tabelaMedidas.linhas, newLinha],
+                              })
+                            }}
+                            className="flex w-full items-center justify-center gap-1 py-2 text-sm text-muted-foreground hover:text-foreground"
+                          >
+                            <Plus className="h-3 w-3" />
+                            Adicionar linha
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
 
                 {/* Notas */}
                 <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Notas de rodapé</Label>
+                  <Label className="text-xs text-muted-foreground">Notas de rodapé (opcional)</Label>
                   <div className="space-y-2">
                     {tabelaMedidas.notas.map((nota, index) => (
                       <div key={index} className="flex items-center gap-2">
@@ -596,53 +598,6 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
                     </Button>
                   </div>
                 </div>
-
-                {/* Preview da Tabela */}
-                {tabelaMedidas.colunas.length > 0 && tabelaMedidas.linhas.length > 0 && (
-                  <div className="space-y-2 border-t border-border pt-4">
-                    <Label className="text-xs text-muted-foreground">Visualização final</Label>
-                    <div className="rounded-lg border border-border bg-background p-4">
-                      <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-sm">
-                          <thead>
-                            <tr>
-                              {tabelaMedidas.colunas.map((coluna, index) => (
-                                <th
-                                  key={index}
-                                  className="border-b border-border px-4 py-3 text-left font-medium"
-                                >
-                                  {coluna || "-"}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {tabelaMedidas.linhas.map((linha, rowIndex) => (
-                              <tr key={rowIndex} className="border-b border-border last:border-0">
-                                {linha.map((celula, cellIndex) => (
-                                  <td
-                                    key={cellIndex}
-                                    className={`px-4 py-3 ${cellIndex === 0 ? "font-medium" : "text-muted-foreground"}`}
-                                  >
-                                    {celula || "-"}
-                                  </td>
-                                ))}
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-
-                      {tabelaMedidas.notas.filter(n => n.trim()).length > 0 && (
-                        <div className="mt-3 space-y-1 text-xs text-muted-foreground">
-                          {tabelaMedidas.notas.filter(n => n.trim()).map((nota, index) => (
-                            <p key={index}>{nota}</p>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
