@@ -596,6 +596,53 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
                     </Button>
                   </div>
                 </div>
+
+                {/* Preview da Tabela */}
+                {tabelaMedidas.colunas.length > 0 && tabelaMedidas.linhas.length > 0 && (
+                  <div className="space-y-2 border-t border-border pt-4">
+                    <Label className="text-xs text-muted-foreground">Visualização final</Label>
+                    <div className="rounded-lg border border-border bg-background p-4">
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-sm">
+                          <thead>
+                            <tr>
+                              {tabelaMedidas.colunas.map((coluna, index) => (
+                                <th
+                                  key={index}
+                                  className="border-b border-border px-4 py-3 text-left font-medium"
+                                >
+                                  {coluna || "-"}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {tabelaMedidas.linhas.map((linha, rowIndex) => (
+                              <tr key={rowIndex} className="border-b border-border last:border-0">
+                                {linha.map((celula, cellIndex) => (
+                                  <td
+                                    key={cellIndex}
+                                    className={`px-4 py-3 ${cellIndex === 0 ? "font-medium" : "text-muted-foreground"}`}
+                                  >
+                                    {celula || "-"}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {tabelaMedidas.notas.filter(n => n.trim()).length > 0 && (
+                        <div className="mt-3 space-y-1 text-xs text-muted-foreground">
+                          {tabelaMedidas.notas.filter(n => n.trim()).map((nota, index) => (
+                            <p key={index}>{nota}</p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
