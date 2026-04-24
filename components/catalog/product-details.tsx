@@ -102,7 +102,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         )}
 
         <p className="text-xs text-muted-foreground text-center">
-          Imagem ilustrativa gerada por IA. Tons e detalhes podem ter leves variações.
+          *Modelo digital criada por IA. A peça é real e pode apresentar leves variações de tom e de detalhes.
         </p>
       </div>
 
