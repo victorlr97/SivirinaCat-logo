@@ -98,14 +98,14 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
         {product.description && (
           <div className="space-y-2">
-            <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Descrição</h2>
+            <h2 className="text-sm font-medium text-muted-foreground">Descrição</h2>
             <p className="text-pretty leading-relaxed">{product.description}</p>
           </div>
         )}
 
         {product.sizes && product.sizes.length > 0 && (
           <div className="space-y-2">
-            <h2 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">Tamanhos Disponíveis</h2>
+            <h2 className="text-sm font-medium text-muted-foreground">Tamanhos disponíveis</h2>
             <div className="flex flex-wrap gap-2">
               {product.sizes.map((size) => (
                 <span
