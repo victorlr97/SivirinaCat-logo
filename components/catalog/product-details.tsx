@@ -100,6 +100,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             ))}
           </div>
         )}
+
+        <p className="text-xs text-muted-foreground text-center">
+          Imagem ilustrativa gerada por IA. Tons e detalhes podem ter leves variações.
+        </p>
       </div>
 
       {/* Detalhes do Produto */}
