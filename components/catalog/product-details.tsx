@@ -109,7 +109,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
           {product.product_code && <p className="text-sm text-muted-foreground">Código: {product.product_code}</p>}
 
-          <p className="text-2xl font-medium">{formatCurrency(product.price)}</p>
+          <p className="text-2xl font-medium mb-0">{formatCurrency(product.price)}</p>
           {product.parcelas && (
             <p className="text-sm text-muted-foreground">{product.parcelas}</p>
           )}
