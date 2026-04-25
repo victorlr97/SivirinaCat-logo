@@ -177,7 +177,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
       {/* Modal Tabela de Medidas */}
       <Dialog open={showMedidasModal} onOpenChange={setShowMedidasModal}>
         <DialogContent className="max-w-[calc(100%-2rem)] overflow-hidden p-0 sm:max-w-lg sm:p-6">
-          <DialogHeader className="p-4 pb-0 sm:p-0">
+          <DialogHeader className="p-4 pb-0 pr-10 sm:p-0 sm:pr-8">
             <DialogTitle>Tabela de Medidas</DialogTitle>
           </DialogHeader>
 
