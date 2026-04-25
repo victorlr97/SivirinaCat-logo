@@ -176,21 +176,21 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
       {/* Modal Tabela de Medidas */}
       <Dialog open={showMedidasModal} onOpenChange={setShowMedidasModal}>
-        <DialogContent className="max-w-[calc(100%-2rem)] overflow-hidden p-0 sm:max-w-lg sm:p-6">
-          <DialogHeader className="p-4 pb-0 pr-10 sm:p-0 sm:pr-8">
+        <DialogContent className="max-w-[95vw] p-4 sm:max-w-lg sm:p-6">
+          <DialogHeader className="text-left pr-8">
             <DialogTitle>Tabela de Medidas</DialogTitle>
           </DialogHeader>
 
           {product.tabela_medidas && (
-            <div className="space-y-4 p-4 pt-2 sm:p-0">
-              <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-                <table className="w-full min-w-[300px] border-collapse text-sm">
+            <div className="space-y-4">
+              <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                <table className="w-full border-collapse text-sm">
                   <thead>
                     <tr>
                       {product.tabela_medidas.colunas.map((coluna, index) => (
                         <th
                           key={index}
-                          className="whitespace-nowrap border-b border-border px-3 py-3 text-left font-medium sm:px-4"
+                          className="whitespace-nowrap border-b border-border px-2 py-2 text-left text-xs font-medium sm:px-4 sm:py-3 sm:text-sm"
                         >
                           {coluna}
                         </th>
@@ -203,7 +203,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                         {linha.map((celula, cellIndex) => (
                           <td
                             key={cellIndex}
-                            className={`whitespace-nowrap px-3 py-3 sm:px-4 ${cellIndex === 0 ? "font-medium" : "text-muted-foreground"}`}
+                            className={`whitespace-nowrap px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm ${cellIndex === 0 ? "font-medium" : "text-muted-foreground"}`}
                           >
                             {celula}
                           </td>
