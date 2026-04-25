@@ -176,13 +176,13 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
       {/* Modal Tabela de Medidas */}
       <Dialog open={showMedidasModal} onOpenChange={setShowMedidasModal}>
-        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg">
-          <DialogHeader>
+        <DialogContent className="max-w-[90vw] overflow-hidden p-4 sm:max-w-lg sm:p-6">
+          <DialogHeader className="text-left pr-8">
             <DialogTitle>Tabela de Medidas</DialogTitle>
           </DialogHeader>
 
           {product.tabela_medidas && (
-            <div className="space-y-4">
+            <div className="space-y-4 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-sm">
                   <thead>
@@ -190,7 +190,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                       {product.tabela_medidas.colunas.map((coluna, index) => (
                         <th
                           key={index}
-                          className="border-b border-border px-4 py-3 text-left font-medium"
+                          className="whitespace-nowrap border-b border-border px-2 py-2 text-left text-xs font-medium sm:px-4 sm:py-3 sm:text-sm"
                         >
                           {coluna}
                         </th>
@@ -203,7 +203,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                         {linha.map((celula, cellIndex) => (
                           <td
                             key={cellIndex}
-                            className={`px-4 py-3 ${cellIndex === 0 ? "font-medium" : "text-muted-foreground"}`}
+                            className={`whitespace-nowrap px-2 py-2 text-xs sm:px-4 sm:py-3 sm:text-sm ${cellIndex === 0 ? "font-medium" : "text-muted-foreground"}`}
                           >
                             {celula}
                           </td>
