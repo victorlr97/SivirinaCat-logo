@@ -176,21 +176,21 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
       {/* Modal Tabela de Medidas */}
       <Dialog open={showMedidasModal} onOpenChange={setShowMedidasModal}>
-        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg">
-          <DialogHeader>
+        <DialogContent className="max-w-[calc(100%-2rem)] overflow-hidden p-0 sm:max-w-lg sm:p-6">
+          <DialogHeader className="p-4 pb-0 sm:p-0">
             <DialogTitle>Tabela de Medidas</DialogTitle>
           </DialogHeader>
 
           {product.tabela_medidas && (
-            <div className="space-y-4">
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-sm">
+            <div className="space-y-4 p-4 pt-2 sm:p-0">
+              <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                <table className="w-full min-w-[300px] border-collapse text-sm">
                   <thead>
                     <tr>
                       {product.tabela_medidas.colunas.map((coluna, index) => (
                         <th
                           key={index}
-                          className="border-b border-border px-4 py-3 text-left font-medium"
+                          className="whitespace-nowrap border-b border-border px-3 py-3 text-left font-medium sm:px-4"
                         >
                           {coluna}
                         </th>
@@ -203,7 +203,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                         {linha.map((celula, cellIndex) => (
                           <td
                             key={cellIndex}
-                            className={`px-4 py-3 ${cellIndex === 0 ? "font-medium" : "text-muted-foreground"}`}
+                            className={`whitespace-nowrap px-3 py-3 sm:px-4 ${cellIndex === 0 ? "font-medium" : "text-muted-foreground"}`}
                           >
                             {celula}
                           </td>
