@@ -1,5 +1,6 @@
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getStorage } from "firebase-admin/storage";
+import { getAuth } from "firebase-admin/auth";
 
 if (!getApps().length) {
   initializeApp({
@@ -13,3 +14,4 @@ if (!getApps().length) {
 }
 
 export const storage = getStorage();
+export const auth = getAuth();

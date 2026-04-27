@@ -1,18 +1,9 @@
-import { redirect } from "next/navigation"
 import { createServerClient } from "@/lib/supabase/server"
 import { AdminHeader } from "@/components/admin/admin-header"
 import { DashboardStats } from "@/components/admin/dashboard-stats"
 
 export default async function AdminDashboardPage() {
   const supabase = await createServerClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect("/admin")
-  }
 
   // Datas para filtros
   const now = new Date()

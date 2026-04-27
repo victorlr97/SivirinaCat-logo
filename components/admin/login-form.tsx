@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { signIn } from "@/lib/firebase/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,36 +17,23 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = createBrowserClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        toast({
-          title: "Erro ao fazer login",
-          description: error.message,
-          variant: "destructive",
-        })
-      } else {
-        toast({
-          title: "Login realizado",
-          description: "Redirecionando para o dashboard...",
-        })
-        router.push("/admin/dashboard")
-        router.refresh()
-      }
-    } catch (error) {
+      await signIn(email, password)
       toast({
-        title: "Erro inesperado",
-        description: "Tente novamente mais tarde",
+        title: "Login realizado",
+        description: "Redirecionando para o dashboard...",
+      })
+      router.push("/admin/dashboard")
+      router.refresh()
+    } catch (error: any) {
+      toast({
+        title: "Erro ao fazer login",
+        description: "Verifique seu email e senha",
         variant: "destructive",
       })
     } finally {

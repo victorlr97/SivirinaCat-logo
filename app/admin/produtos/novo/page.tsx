@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation"
 import { createServerClient } from "@/lib/supabase/server"
 import { AdminHeader } from "@/components/admin/admin-header"
 import { ProductForm } from "@/components/admin/product-form"
@@ -8,14 +7,6 @@ import Link from "next/link"
 
 export default async function NewProductPage() {
   const supabase = await createServerClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect("/admin")
-  }
 
   return (
     <div className="min-h-screen bg-background">

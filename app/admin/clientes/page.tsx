@@ -1,18 +1,9 @@
-import { redirect } from "next/navigation"
 import { createServerClient } from "@/lib/supabase/server"
 import { AdminHeader } from "@/components/admin/admin-header"
 import { ClientesList } from "@/components/admin/clientes-list"
 
 export default async function AdminClientesPage() {
   const supabase = await createServerClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect("/admin")
-  }
 
   const { data: clientes } = await supabase.from("clientes").select("*").order("created_at", { ascending: false })
 

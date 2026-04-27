@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { signIn, signUp } from "@/lib/firebase/auth"
 import { createBrowserClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -39,7 +40,7 @@ export function ClientAuthForm() {
 
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() // mantido para operações no banco (clientes) até Etapa 5
 
   const handleCepChange = async (value: string) => {
     const cleanCep = value.replace(/\D/g, "")
@@ -85,11 +86,13 @@ export function ClientAuthForm() {
     setLoading(true)
 
     try {
-      const { data, error } = await supabase.rpc("check_email_for_login", {
-        email_input: email,
+      const response = await fetch("/api/auth/check-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
       })
 
-      if (error) {
+      if (!response.ok) {
         toast({
           title: "Erro ao verificar email",
           description: "Tente novamente",
@@ -99,7 +102,7 @@ export function ClientAuthForm() {
         return
       }
 
-      const result = data as { exists: boolean; has_password: boolean }
+      const result = await response.json() as { exists: boolean; has_password: boolean }
 
       if (result.exists) {
         if (result.has_password) {
@@ -132,12 +135,9 @@ export function ClientAuthForm() {
     setLoading(true)
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (signInError) {
+      try {
+        await signIn(email, password)
+      } catch {
         toast({
           title: "Erro ao fazer login",
           description: "Verifique seu email e senha",
@@ -179,18 +179,13 @@ export function ClientAuthForm() {
       setLoading(true)
 
       try {
-        const { data: authData, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: window.location.origin,
-          },
-        })
-
-        if (signUpError) {
+        let authData
+        try {
+          authData = await signUp(email, password)
+        } catch (err: any) {
           toast({
             title: "Erro ao criar senha",
-            description: signUpError.message,
+            description: err.message,
             variant: "destructive",
           })
           setLoading(false)
@@ -247,18 +242,13 @@ export function ClientAuthForm() {
     setLoading(true)
 
     try {
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: window.location.origin,
-        },
-      })
-
-      if (signUpError) {
+      let authData
+      try {
+        authData = await signUp(email, password)
+      } catch (err: any) {
         toast({
           title: "Erro ao criar conta",
-          description: signUpError.message,
+          description: err.message,
           variant: "destructive",
         })
         setLoading(false)

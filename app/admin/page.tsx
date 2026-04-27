@@ -1,20 +1,7 @@
-import { redirect } from "next/navigation"
-import { createServerClient } from "@/lib/supabase/server"
 import { LoginForm } from "@/components/admin/login-form"
 import Image from "next/image"
 
 export default async function AdminLoginPage() {
-  const supabase = await createServerClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Se já estiver autenticado, redireciona para o dashboard
-  if (user) {
-    redirect("/admin/dashboard")
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">

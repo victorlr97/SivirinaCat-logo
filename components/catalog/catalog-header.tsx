@@ -3,7 +3,9 @@
 import type React from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { createBrowserClient } from "@supabase/ssr"
+import { onAuthStateChanged } from "firebase/auth"
+import { auth, signOut } from "@/lib/firebase/auth"
+import { createBrowserClient } from "@/lib/supabase/client"
 import { useEffect, useRef, useState } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { Menu, Search, X } from "lucide-react"
@@ -28,45 +30,26 @@ export function CatalogHeader({ categories = [], searchQuery = "", onSearchChang
   const router = useRouter()
   const pathname = usePathname()
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  )
+  const supabase = createBrowserClient() // mantido para query de clientes até Etapa 5
 
   useEffect(() => {
-    const checkUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (user) {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
         setIsLoggedIn(true)
-
-        // Get user name from clientes table
-        const { data: clientData } = await supabase.from("clientes").select("nome").eq("user_id", user.id).single()
-
-        if (clientData) {
-          setUserName(clientData.nome)
-        }
+        // query ainda usa Supabase até Etapa 5 — user_id não vai corresponder durante a transição
+        const { data: clientData } = await supabase.from("clientes").select("nome").eq("email", firebaseUser.email).single()
+        if (clientData) setUserName(clientData.nome)
       } else {
         setIsLoggedIn(false)
         setUserName(null)
       }
-    }
-
-    checkUser()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      checkUser()
     })
 
-    return () => subscription.unsubscribe()
-  }, [supabase])
+    return () => unsubscribe()
+  }, [])
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    await signOut()
     setIsLoggedIn(false)
     setUserName(null)
     router.push("/")

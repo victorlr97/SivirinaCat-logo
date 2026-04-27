@@ -1,19 +1,9 @@
-import { redirect } from "next/navigation"
 import { createServerClient } from "@/lib/supabase/server"
 import { AdminHeader } from "@/components/admin/admin-header"
 import { ProductsList } from "@/components/admin/products-list"
 
 export default async function AdminProductsPage() {
   const supabase = await createServerClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Se não estiver autenticado, redireciona para login
-  if (!user) {
-    redirect("/admin")
-  }
 
   // Busca todos os produtos (incluindo indisponíveis)
   const { data: products } = await supabase.from("products").select("*").order("created_at", { ascending: false })

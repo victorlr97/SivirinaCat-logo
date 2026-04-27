@@ -9,28 +9,12 @@ export default function ClearSessionPage() {
   const [cleared, setCleared] = useState(false)
   const router = useRouter()
 
-  const clearSession = () => {
-    // Limpar todos os itens do localStorage relacionados ao Supabase
-    const keys = Object.keys(localStorage)
-    keys.forEach((key) => {
-      if (key.startsWith("sb-")) {
-        localStorage.removeItem(key)
-      }
-    })
-
-    // Limpar sessionStorage também
-    const sessionKeys = Object.keys(sessionStorage)
-    sessionKeys.forEach((key) => {
-      if (key.startsWith("sb-")) {
-        sessionStorage.removeItem(key)
-      }
-    })
-
+  const clearSession = async () => {
+    await fetch("/api/auth/session", { method: "DELETE" })
     setCleared(true)
   }
 
   useEffect(() => {
-    // Tentar limpar automaticamente ao carregar a página
     clearSession()
   }, [])
 

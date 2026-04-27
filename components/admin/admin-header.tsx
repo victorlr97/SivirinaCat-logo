@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter, usePathname } from "next/navigation"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { signOut } from "@/lib/firebase/auth"
 import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
@@ -13,10 +13,8 @@ export function AdminHeader() {
   const router = useRouter()
   const pathname = usePathname()
   const { toast } = useToast()
-  const supabase = createBrowserClient()
-
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    await signOut()
     toast({
       title: "Logout realizado",
       description: "Até logo!",
