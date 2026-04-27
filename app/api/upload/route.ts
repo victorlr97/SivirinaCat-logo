@@ -1,5 +1,6 @@
-import { put } from "@vercel/blob"
 import { NextResponse } from "next/server"
+import { storage } from "@/lib/firebase/admin"
+import { randomUUID } from "crypto"
 
 export async function POST(request: Request) {
   try {
@@ -10,14 +11,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
     }
 
-    const blob = await put(file.name, file, {
-      access: "public",
-      addRandomSuffix: true,
+    const buffer = Buffer.from(await file.arrayBuffer())
+    const ext = file.name.split(".").pop()
+    const fileName = `produtos/${randomUUID()}.${ext}`
+
+    const bucket = storage.bucket()
+    const fileRef = bucket.file(fileName)
+
+    await fileRef.save(buffer, {
+      metadata: { contentType: file.type },
     })
 
-    return NextResponse.json({ url: blob.url })
+    await fileRef.makePublic()
+
+    const url = `https://storage.googleapis.com/${bucket.name}/${fileName}`
+
+    return NextResponse.json({ url })
   } catch (error) {
-    console.error("[v0] Upload error:", error)
+    console.error("[firebase] Upload error:", error)
     return NextResponse.json({ error: (error as Error).message }, { status: 500 })
   }
 }
