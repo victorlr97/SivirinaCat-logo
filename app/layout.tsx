@@ -1,7 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Montserrat_Alternates, Montserrat } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
+import { FirebaseAnalytics } from "@/components/firebase-analytics"
 import { Toaster } from "@/components/ui/toaster"
 import { SmoothScroll } from "@/components/smooth-scroll"
 import "./globals.css"
@@ -38,7 +38,7 @@ export default function RootLayout({
           {children}
         </SmoothScroll>
         <Toaster />
-        <Analytics />
+        <FirebaseAnalytics />
       </body>
     </html>
   )
