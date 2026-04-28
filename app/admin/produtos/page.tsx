@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getProducts } from "@/lib/firebase/db-server"
 import { AdminHeader } from "@/components/admin/admin-header"
 import { ProductsList } from "@/components/admin/products-list"
