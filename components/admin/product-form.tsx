@@ -177,6 +177,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         router.refresh()
       }
     } catch (error) {
+      console.error("[product-form] erro ao salvar:", error)
       toast({
         title: "Erro ao salvar",
         description: "Não foi possível salvar o produto",
