@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { getVendaItens, updateProduct, updateVenda, getProduct } from "@/lib/firebase/db"
 import {
   Dialog,
   DialogContent,
@@ -60,7 +59,6 @@ export function VendaStatusDialog({ open, onOpenChange, vendaId, statusAtual }: 
   const { toast } = useToast()
 
   const precisaMotivo = novoStatus === "cancelada" || novoStatus === "devolucao"
-  const restauraEstoque = novoStatus === "cancelada" || novoStatus === "devolucao"
 
   const handleSave = async () => {
     if (!vendaId || !novoStatus) return
@@ -71,22 +69,12 @@ export function VendaStatusDialog({ open, onOpenChange, vendaId, statusAtual }: 
 
     setSaving(true)
     try {
-      if (restauraEstoque) {
-        const itens = await getVendaItens(vendaId)
-        for (const item of itens) {
-          const prod = await getProduct(item.produto_id)
-          if (prod) {
-            await updateProduct(item.produto_id, {
-              quantidade_estoque: prod.quantidade_estoque + item.quantidade,
-            })
-          }
-        }
-      }
-
-      await updateVenda(vendaId, {
-        status: novoStatus,
-        motivo_cancelamento: motivo.trim() || null,
+      const res = await fetch(`/api/vendas/${vendaId}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: novoStatus, motivo_cancelamento: motivo.trim() || null }),
       })
+      if (!res.ok) throw new Error("Falha ao atualizar status")
 
       toast({ title: "Status atualizado", description: `Venda marcada como ${STATUS_OPTIONS.find(s => s.value === novoStatus)?.label}` })
       onOpenChange(false)

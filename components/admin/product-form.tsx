@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { getProducts, createProduct, updateProduct } from "@/lib/firebase/db"
+import { getProducts, createProduct } from "@/lib/firebase/db"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -154,10 +154,17 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         images: images,
         product_code: productCode || null,
         tabela_medidas: showTabelaEditor && tabelaMedidas.colunas.length > 0 ? tabelaMedidas : null,
+        available: true,
+        visivel_catalogo: true,
       }
 
       if (product?.id) {
-        await updateProduct(product.id, productData)
+        const res = await fetch(`/api/products/${product.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(productData),
+        })
+        if (!res.ok) throw new Error("Falha ao atualizar produto")
         toast({
           title: "Produto atualizado",
           description: "As alterações foram salvas com sucesso",

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { deleteProduct, updateProduct } from "@/lib/firebase/db"
+import { deleteProduct } from "@/lib/firebase/db"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -36,6 +36,9 @@ type Product = {
   available: boolean
   quantidade_estoque: number
   visivel_catalogo: boolean
+  description: string | null
+  parcelas: string | null
+  tabela_medidas: any | null
 }
 
 export function ProductsList({ products }: { products: Product[] }) {
@@ -89,7 +92,12 @@ export function ProductsList({ products }: { products: Product[] }) {
 
   const handleToggleVisibility = async (productId: string, currentValue: boolean) => {
     try {
-      await updateProduct(productId, { visivel_catalogo: !currentValue })
+      const res = await fetch(`/api/products/${productId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visivel_catalogo: !currentValue }),
+      })
+      if (!res.ok) throw new Error("Falha ao atualizar visibilidade")
       toast({
         title: "Visibilidade atualizada",
         description: !currentValue ? "Produto agora está visível no catálogo" : "Produto foi ocultado do catálogo",

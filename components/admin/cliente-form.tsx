@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { createCliente, updateCliente } from "@/lib/firebase/db"
+import { createCliente } from "@/lib/firebase/db"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -70,7 +70,12 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
       }
 
       if (cliente?.id) {
-        await updateCliente(cliente.id, clienteData)
+        const res = await fetch(`/api/clientes/${cliente.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(clienteData),
+        })
+        if (!res.ok) throw new Error("Falha ao atualizar cliente")
         toast({
           title: "Cliente atualizado",
           description: "As alterações foram salvas com sucesso",

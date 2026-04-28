@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { getClientes, getProducts, getProduct, getVendaItens, createVenda, updateVenda, updateProduct, deleteVenda } from "@/lib/firebase/db"
+import { getClientes, getProducts, getProduct, getVendaItens, createVenda, deleteVenda } from "@/lib/firebase/db"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -207,21 +207,27 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
         for (const itemAntigo of itensAntigos) {
           const prod = await getProduct(itemAntigo.produto_id)
           if (prod) {
-            await updateProduct(itemAntigo.produto_id, {
-              quantidade_estoque: prod.quantidade_estoque + itemAntigo.quantidade,
+            await fetch(`/api/products/${itemAntigo.produto_id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ quantidade_estoque: prod.quantidade_estoque + itemAntigo.quantidade }),
             })
           }
         }
 
         // Atualiza venda e substitui itens
-        await updateVenda(venda.id, {
-          cliente_id: clienteId,
-          cliente_nome: clienteSelecionado?.nome ?? "",
-          forma_pagamento: formaPagamento,
-          parcelas: formaPagamento === "credito" ? Number.parseInt(parcelas) : null,
-          desconto: descontoValor,
-          total,
-          observacoes: observacoes || null,
+        await fetch(`/api/vendas/${venda.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cliente_id: clienteId,
+            cliente_nome: clienteSelecionado?.nome ?? "",
+            forma_pagamento: formaPagamento,
+            parcelas: formaPagamento === "credito" ? Number.parseInt(parcelas) : null,
+            desconto: descontoValor,
+            total,
+            observacoes: observacoes || null,
+          }),
         })
 
         // Deleta venda antiga e recria com novos itens (reusa deleteVenda só para itens)
@@ -238,8 +244,10 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
         for (const item of novosItens) {
           const prod = await getProduct(item.produto_id)
           if (prod) {
-            await updateProduct(item.produto_id, {
-              quantidade_estoque: prod.quantidade_estoque - item.quantidade,
+            await fetch(`/api/products/${item.produto_id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ quantidade_estoque: prod.quantidade_estoque - item.quantidade }),
             })
           }
         }
@@ -276,8 +284,10 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
         for (const item of carrinho) {
           const prod = await getProduct(item.produto_id)
           if (prod) {
-            await updateProduct(item.produto_id, {
-              quantidade_estoque: prod.quantidade_estoque - item.quantidade,
+            await fetch(`/api/products/${item.produto_id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ quantidade_estoque: prod.quantidade_estoque - item.quantidade }),
             })
           }
         }
