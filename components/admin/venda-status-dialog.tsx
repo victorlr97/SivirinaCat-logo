@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { getVendaItens, updateProduct, updateVenda, getProduct } from "@/lib/firebase/db"
 import {
   Dialog,
   DialogContent,
@@ -58,7 +58,6 @@ export function VendaStatusDialog({ open, onOpenChange, vendaId, statusAtual }: 
   const [saving, setSaving] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = createBrowserClient()
 
   const precisaMotivo = novoStatus === "cancelada" || novoStatus === "devolucao"
   const restauraEstoque = novoStatus === "cancelada" || novoStatus === "devolucao"
@@ -72,39 +71,22 @@ export function VendaStatusDialog({ open, onOpenChange, vendaId, statusAtual }: 
 
     setSaving(true)
     try {
-      // Restaura estoque se cancelar ou devolver
       if (restauraEstoque) {
-        const { data: itens } = await supabase
-          .from("itens_venda")
-          .select("produto_id, quantidade")
-          .eq("venda_id", vendaId)
-
-        if (itens) {
-          for (const item of itens) {
-            const { data: prod } = await supabase
-              .from("products")
-              .select("quantidade_estoque")
-              .eq("id", item.produto_id)
-              .single()
-            if (prod) {
-              await supabase
-                .from("products")
-                .update({ quantidade_estoque: prod.quantidade_estoque + item.quantidade })
-                .eq("id", item.produto_id)
-            }
+        const itens = await getVendaItens(vendaId)
+        for (const item of itens) {
+          const prod = await getProduct(item.produto_id)
+          if (prod) {
+            await updateProduct(item.produto_id, {
+              quantidade_estoque: prod.quantidade_estoque + item.quantidade,
+            })
           }
         }
       }
 
-      const { error } = await supabase
-        .from("vendas")
-        .update({
-          status: novoStatus,
-          motivo_cancelamento: motivo.trim() || null,
-        })
-        .eq("id", vendaId)
-
-      if (error) throw error
+      await updateVenda(vendaId, {
+        status: novoStatus,
+        motivo_cancelamento: motivo.trim() || null,
+      })
 
       toast({ title: "Status atualizado", description: `Venda marcada como ${STATUS_OPTIONS.find(s => s.value === novoStatus)?.label}` })
       onOpenChange(false)

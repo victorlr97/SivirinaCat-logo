@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { createServerClient } from "@/lib/supabase/server"
+import { getCliente } from "@/lib/firebase/db-server"
 import { AdminHeader } from "@/components/admin/admin-header"
 import { ClienteForm } from "@/components/admin/cliente-form"
 import { Button } from "@/components/ui/button"
@@ -8,9 +8,7 @@ import Link from "next/link"
 
 export default async function EditarClientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = await createServerClient()
-
-  const { data: cliente } = await supabase.from("clientes").select("*").eq("id", id).single()
+  const cliente = await getCliente(id)
 
   if (!cliente) {
     notFound()

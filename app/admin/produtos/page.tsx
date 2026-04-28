@@ -1,12 +1,9 @@
-import { createServerClient } from "@/lib/supabase/server"
+import { getProducts } from "@/lib/firebase/db-server"
 import { AdminHeader } from "@/components/admin/admin-header"
 import { ProductsList } from "@/components/admin/products-list"
 
 export default async function AdminProductsPage() {
-  const supabase = await createServerClient()
-
-  // Busca todos os produtos (incluindo indisponíveis)
-  const { data: products } = await supabase.from("products").select("*").order("created_at", { ascending: false })
+  const products = await getProducts()
 
   return (
     <div className="min-h-screen bg-background">

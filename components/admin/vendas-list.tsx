@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { deleteVenda, getVenda, getVendaItens, getProducts } from "@/lib/firebase/db"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils"
 type Venda = {
   id: string
   cliente_id: string
+  cliente_nome: string
   data_venda: string
   forma_pagamento: string
   parcelas: number | null
@@ -37,10 +38,6 @@ type Venda = {
   status: VendaStatus | null
   pago: boolean | null
   motivo_cancelamento: string | null
-  clientes: {
-    id: string
-    nome: string
-  }
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -70,7 +67,6 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
   const [statusAtual, setStatusAtual] = useState<VendaStatus | null>(null)
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = createBrowserClient()
 
   const handleInspect = (vendaId: string) => {
     setInspectVendaId(vendaId)
@@ -84,24 +80,24 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
   }
 
   const handleEdit = async (vendaId: string) => {
-    const { data } = await supabase
-      .from("vendas")
-      .select("*, itens_venda(produto_id, quantidade, preco_unitario, subtotal, products(name))")
-      .eq("id", vendaId)
-      .single()
+    const [venda, itens, products] = await Promise.all([
+      getVenda(vendaId),
+      getVendaItens(vendaId),
+      getProducts(),
+    ])
 
-    if (data) {
+    if (venda) {
       setEditVenda({
-        id: data.id,
-        cliente_id: data.cliente_id,
-        forma_pagamento: data.forma_pagamento,
-        parcelas: data.parcelas,
-        desconto: data.desconto,
-        total: data.total,
-        observacoes: data.observacoes,
-        itens: data.itens_venda.map((item: any) => ({
+        id: venda.id,
+        cliente_id: venda.cliente_id,
+        forma_pagamento: venda.forma_pagamento,
+        parcelas: venda.parcelas,
+        desconto: venda.desconto,
+        total: venda.total,
+        observacoes: venda.observacoes,
+        itens: itens.map((item) => ({
           produto_id: item.produto_id,
-          name: item.products?.name ?? "",
+          name: item.name || products.find((p) => p.id === item.produto_id)?.name || "",
           quantidade: item.quantidade,
           preco_unitario: item.preco_unitario,
           subtotal: item.subtotal,
@@ -115,8 +111,7 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
     if (!deleteId) return
     setDeleting(true)
     try {
-      const { error } = await supabase.from("vendas").delete().eq("id", deleteId)
-      if (error) throw error
+      await deleteVenda(deleteId)
       toast({ title: "Venda deletada", description: "A venda foi removida com sucesso" })
       router.refresh()
     } catch {
@@ -150,7 +145,7 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
 
   const filteredVendas = vendas.filter((venda) => {
     const search = searchTerm.toLowerCase()
-    return venda.clientes.nome.toLowerCase().includes(search) || venda.id.toLowerCase().includes(search)
+    return venda.cliente_nome.toLowerCase().includes(search) || venda.id.toLowerCase().includes(search)
   })
 
   if (vendas.length === 0) {
@@ -199,7 +194,7 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
                 <div key={venda.id} className="flex items-center gap-3 px-4 py-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-medium truncate">{venda.clientes.nome}</p>
+                      <p className="text-sm font-medium truncate">{venda.cliente_nome}</p>
                       <StatusBadge status={venda.status} />
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">
@@ -259,7 +254,7 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
                     <TableRow key={venda.id}>
                       <TableCell>
                         <div>
-                          <span className="font-medium">{venda.clientes.nome}</span>
+                          <span className="font-medium">{venda.cliente_nome}</span>
                           {venda.pago === false && (
                             <p className="text-xs text-yellow-600 font-medium">Não pago</p>
                           )}

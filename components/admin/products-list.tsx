@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { deleteProduct, updateProduct } from "@/lib/firebase/db"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -47,22 +47,17 @@ export function ProductsList({ products }: { products: Product[] }) {
   const [deleting, setDeleting] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = createBrowserClient()
 
   const handleDelete = async () => {
     if (!deleteId) return
 
     setDeleting(true)
     try {
-      const { error } = await supabase.from("products").delete().eq("id", deleteId)
-
-      if (error) throw error
-
+      await deleteProduct(deleteId)
       toast({
         title: "Produto deletado",
         description: "O produto foi removido com sucesso",
       })
-
       router.refresh()
     } catch (error) {
       toast({
@@ -94,15 +89,11 @@ export function ProductsList({ products }: { products: Product[] }) {
 
   const handleToggleVisibility = async (productId: string, currentValue: boolean) => {
     try {
-      const { error } = await supabase.from("products").update({ visivel_catalogo: !currentValue }).eq("id", productId)
-
-      if (error) throw error
-
+      await updateProduct(productId, { visivel_catalogo: !currentValue })
       toast({
         title: "Visibilidade atualizada",
         description: !currentValue ? "Produto agora está visível no catálogo" : "Produto foi ocultado do catálogo",
       })
-
       router.refresh()
     } catch (error) {
       toast({

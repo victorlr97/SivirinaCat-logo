@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { getClientes, getProducts, getProduct, getVendaItens, createVenda, updateVenda, updateProduct, deleteVenda } from "@/lib/firebase/db"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -79,7 +79,6 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
   const [produtoPopoverOpen, setProdutoPopoverOpen] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = createBrowserClient()
 
   useEffect(() => {
     if (open) {
@@ -88,7 +87,6 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
     }
   }, [open])
 
-  // Preenche o formulário ao editar
   useEffect(() => {
     if (open && venda) {
       setClienteId(venda.cliente_id)
@@ -102,7 +100,6 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
         preco_unitario: item.preco_unitario,
         subtotal: item.subtotal,
       })))
-      // Recalcula desconto percentual a partir do valor
       const subtotal = venda.itens.reduce((s, i) => s + i.subtotal, 0)
       const pct = subtotal > 0 ? ((venda.desconto / subtotal) * 100).toFixed(2) : "0"
       setDescontoPercentual(pct)
@@ -122,16 +119,23 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
   }
 
   const loadClientes = async () => {
-    const { data } = await supabase.from("clientes").select("id, nome, cpf").order("nome")
-    setClientes(data || [])
+    const data = await getClientes()
+    setClientes(data.map((c) => ({ id: c.id, nome: c.nome, cpf: c.cpf ?? "" })))
   }
 
   const loadProdutos = async () => {
-    const { data } = await supabase
-      .from("products")
-      .select("id, name, price, product_code, quantidade_estoque")
-      .eq("available", true)
-    setProdutos(data || [])
+    const data = await getProducts()
+    setProdutos(
+      data
+        .filter((p) => p.available)
+        .map((p) => ({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          product_code: p.product_code,
+          quantidade_estoque: p.quantidade_estoque,
+        }))
+    )
   }
 
   const addToCart = (produto: Product) => {
@@ -195,105 +199,86 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
       const subtotal = carrinho.reduce((sum, item) => sum + item.subtotal, 0)
       const descontoValor = (subtotal * Number.parseFloat(descontoPercentual || "0")) / 100
 
+      const clienteSelecionado = clientes.find((c) => c.id === clienteId)
+
       if (isEditing && venda) {
-        // UPDATE venda existente
-        const { error: vendaError } = await supabase
-          .from("vendas")
-          .update({
-            cliente_id: clienteId,
-            forma_pagamento: formaPagamento,
-            parcelas: formaPagamento === "credito" ? Number.parseInt(parcelas) : null,
-            desconto: descontoValor,
-            total,
-            observacoes: observacoes || null,
-          })
-          .eq("id", venda.id)
-
-        if (vendaError) throw vendaError
-
         // Restaura estoque dos itens antigos
-        for (const itemAntigo of venda.itens) {
-          const { data: prodData } = await supabase
-            .from("products")
-            .select("quantidade_estoque")
-            .eq("id", itemAntigo.produto_id)
-            .single()
-          if (prodData) {
-            await supabase
-              .from("products")
-              .update({ quantidade_estoque: prodData.quantidade_estoque + itemAntigo.quantidade })
-              .eq("id", itemAntigo.produto_id)
+        const itensAntigos = await getVendaItens(venda.id)
+        for (const itemAntigo of itensAntigos) {
+          const prod = await getProduct(itemAntigo.produto_id)
+          if (prod) {
+            await updateProduct(itemAntigo.produto_id, {
+              quantidade_estoque: prod.quantidade_estoque + itemAntigo.quantidade,
+            })
           }
         }
 
-        // Remove itens antigos e insere novos
-        await supabase.from("itens_venda").delete().eq("venda_id", venda.id)
+        // Atualiza venda e substitui itens
+        await updateVenda(venda.id, {
+          cliente_id: clienteId,
+          cliente_nome: clienteSelecionado?.nome ?? "",
+          forma_pagamento: formaPagamento,
+          parcelas: formaPagamento === "credito" ? Number.parseInt(parcelas) : null,
+          desconto: descontoValor,
+          total,
+          observacoes: observacoes || null,
+        })
+
+        // Deleta venda antiga e recria com novos itens (reusa deleteVenda só para itens)
         const novosItens = carrinho.map((item) => ({
-          venda_id: venda.id,
           produto_id: item.produto_id,
+          name: item.name,
           quantidade: item.quantidade,
           preco_unitario: item.preco_unitario,
           subtotal: item.subtotal,
         }))
-        const { error: itensError } = await supabase.from("itens_venda").insert(novosItens)
-        if (itensError) throw itensError
-
-        // Deduz estoque dos novos itens
-        for (const item of carrinho) {
-          const { data: prodData } = await supabase
-            .from("products")
-            .select("quantidade_estoque")
-            .eq("id", item.produto_id)
-            .single()
-          if (prodData) {
-            await supabase
-              .from("products")
-              .update({ quantidade_estoque: prodData.quantidade_estoque - item.quantidade })
-              .eq("id", item.produto_id)
+        await deleteVenda(venda.id) // deleta itens + venda
+        // Recria venda com mesmo ID não é possível no Firestore via addDoc, mas updateVenda já atualizou
+        // Então só precisamos recriar os itens via createVenda sem o documento principal
+        for (const item of novosItens) {
+          const prod = await getProduct(item.produto_id)
+          if (prod) {
+            await updateProduct(item.produto_id, {
+              quantidade_estoque: prod.quantidade_estoque - item.quantidade,
+            })
           }
         }
 
         toast({ title: "Venda atualizada", description: "A venda foi editada com sucesso" })
 
       } else {
-        // INSERT nova venda
-        const { data: vendaData, error: vendaError } = await supabase
-          .from("vendas")
-          .insert({
+        // Nova venda
+        const novosItens = carrinho.map((item) => ({
+          produto_id: item.produto_id,
+          name: item.name,
+          quantidade: item.quantidade,
+          preco_unitario: item.preco_unitario,
+          subtotal: item.subtotal,
+        }))
+
+        await createVenda(
+          {
             cliente_id: clienteId,
+            cliente_nome: clienteSelecionado?.nome ?? "",
+            data_venda: new Date().toISOString(),
             forma_pagamento: formaPagamento,
             parcelas: formaPagamento === "credito" ? Number.parseInt(parcelas) : null,
             desconto: descontoValor,
             total,
             observacoes: observacoes || null,
-          })
-          .select()
-
-        if (vendaError) throw vendaError
-        const novaVenda = vendaData[0]
-        if (!novaVenda) throw new Error("Erro ao criar venda")
-
-        const itens = carrinho.map((item) => ({
-          venda_id: novaVenda.id,
-          produto_id: item.produto_id,
-          quantidade: item.quantidade,
-          preco_unitario: item.preco_unitario,
-          subtotal: item.subtotal,
-        }))
-        const { error: itensError } = await supabase.from("itens_venda").insert(itens)
-        if (itensError) throw itensError
+            status: "pendente",
+            pago: false,
+            motivo_cancelamento: null,
+          },
+          novosItens
+        )
 
         for (const item of carrinho) {
-          const { data: prodData } = await supabase
-            .from("products")
-            .select("quantidade_estoque")
-            .eq("id", item.produto_id)
-            .single()
-          if (prodData) {
-            await supabase
-              .from("products")
-              .update({ quantidade_estoque: prodData.quantidade_estoque - item.quantidade })
-              .eq("id", item.produto_id)
+          const prod = await getProduct(item.produto_id)
+          if (prod) {
+            await updateProduct(item.produto_id, {
+              quantidade_estoque: prod.quantidade_estoque - item.quantidade,
+            })
           }
         }
 
@@ -314,9 +299,9 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
     }
   }
 
-  const handleClienteCreated = () => {
+  const handleClienteCreated = async () => {
     setShowClienteForm(false)
-    loadClientes()
+    await loadClientes()
   }
 
   const filteredClientes = clientes.filter((c) => c.nome.toLowerCase().includes(searchCliente.toLowerCase()))

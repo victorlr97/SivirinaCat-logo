@@ -1,4 +1,4 @@
-import { createServerClient } from "@/lib/supabase/server"
+import { getProductsForCatalog } from "@/lib/firebase/db-server"
 import { CatalogHeader } from "@/components/catalog/catalog-header"
 import { HeroSection } from "@/components/home/hero-section"
 import { ManifestoSection } from "@/components/home/manifesto-section"
@@ -8,15 +8,7 @@ import { FeaturedCollectionSection } from "@/components/home/featured-collection
 import { CTASection } from "@/components/home/cta-section"
 
 export default async function HomePage() {
-  const supabase = await createServerClient()
-
-  // Buscar todos os produtos para a seção de coleção
-  const { data: products } = await supabase
-    .from("products")
-    .select("*")
-    .eq("available", true)
-    .eq("visivel_catalogo", true)
-    .order("created_at", { ascending: false })
+  const products = await getProductsForCatalog()
 
   return (
     <div className="min-h-screen">
@@ -26,7 +18,7 @@ export default async function HomePage() {
         <ManifestoSection />
         <BrandStorySection />
         <PhilosophySection />
-        <FeaturedCollectionSection products={products || []} />
+        <FeaturedCollectionSection products={products} />
         <CTASection />
       </main>
     </div>

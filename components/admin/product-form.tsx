@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { getProducts, createProduct, updateProduct } from "@/lib/firebase/db"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -62,16 +62,14 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
   const [saving, setSaving] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = createBrowserClient()
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const { data } = await supabase.from("products").select("category").not("category", "is", null).order("category")
-
-      if (data) {
-        const uniqueCategories = Array.from(new Set(data.map((p) => p.category).filter(Boolean))) as string[]
-        setCategories(uniqueCategories)
-      }
+      const products = await getProducts()
+      const uniqueCategories = Array.from(
+        new Set(products.map((p) => p.category).filter(Boolean))
+      ) as string[]
+      setCategories(uniqueCategories.sort())
     }
     fetchCategories()
   }, [])
@@ -159,19 +157,13 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
       }
 
       if (product?.id) {
-        const { error } = await supabase.from("products").update(productData).eq("id", product.id)
-
-        if (error) throw error
-
+        await updateProduct(product.id, productData)
         toast({
           title: "Produto atualizado",
           description: "As alterações foram salvas com sucesso",
         })
       } else {
-        const { error } = await supabase.from("products").insert(productData)
-
-        if (error) throw error
-
+        await createProduct(productData)
         toast({
           title: "Produto criado",
           description: "O produto foi adicionado ao catálogo",

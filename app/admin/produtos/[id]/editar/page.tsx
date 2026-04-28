@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { createServerClient } from "@/lib/supabase/server"
+import { getProduct } from "@/lib/firebase/db-server"
 import { AdminHeader } from "@/components/admin/admin-header"
 import { ProductForm } from "@/components/admin/product-form"
 import { Button } from "@/components/ui/button"
@@ -12,9 +12,7 @@ export default async function EditProductPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const supabase = await createServerClient()
-
-  const { data: product } = await supabase.from("products").select("*").eq("id", id).single()
+  const product = await getProduct(id)
 
   if (!product) {
     notFound()

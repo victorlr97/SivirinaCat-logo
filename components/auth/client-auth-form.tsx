@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { signIn, signUp } from "@/lib/firebase/auth"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { createCliente, updateCliente, getClientes } from "@/lib/firebase/db"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -40,7 +40,6 @@ export function ClientAuthForm() {
 
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = createBrowserClient() // mantido para operações no banco (clientes) até Etapa 5
 
   const handleCepChange = async (value: string) => {
     const cleanCep = value.replace(/\D/g, "")
@@ -193,26 +192,14 @@ export function ClientAuthForm() {
         }
 
         if (authData.user) {
-          const { data: clientData } = await supabase.from("clientes").select("id").eq("email", email).single()
+          const clientes = await getClientes()
+          const clienteExistente = clientes.find((c) => c.email === email)
 
-          if (clientData) {
-            const { error: updateError } = await supabase
-              .from("clientes")
-              .update({
-                user_id: authData.user.id,
-                origem: "vinculado",
-              })
-              .eq("id", clientData.id)
-
-            if (updateError) {
-              toast({
-                title: "Erro ao vincular conta",
-                description: "Tente novamente",
-                variant: "destructive",
-              })
-              setLoading(false)
-              return
-            }
+          if (clienteExistente) {
+            await updateCliente(clienteExistente.id, {
+              user_id: authData.user.uid,
+              origem: "vinculado",
+            })
 
             toast({
               title: "Conta criada com sucesso!",
@@ -256,8 +243,8 @@ export function ClientAuthForm() {
       }
 
       if (authData.user) {
-        const { error: insertError } = await supabase.from("clientes").insert({
-          user_id: authData.user.id,
+        await createCliente({
+          user_id: authData.user.uid,
           email,
           nome,
           cpf,
@@ -272,16 +259,6 @@ export function ClientAuthForm() {
           data_nascimento: dataNascimento,
           origem: "self_register",
         })
-
-        if (insertError) {
-          toast({
-            title: "Erro ao criar cadastro",
-            description: insertError.message,
-            variant: "destructive",
-          })
-          setLoading(false)
-          return
-        }
 
         toast({
           title: "Conta criada com sucesso!",

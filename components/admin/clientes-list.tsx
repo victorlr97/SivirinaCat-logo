@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { deleteCliente } from "@/lib/firebase/db"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -54,22 +54,17 @@ export function ClientesList({ clientes }: { clientes: Cliente[] }) {
   const [deleting, setDeleting] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = createBrowserClient()
 
   const handleDelete = async () => {
     if (!deleteId) return
 
     setDeleting(true)
     try {
-      const { error } = await supabase.from("clientes").delete().eq("id", deleteId)
-
-      if (error) throw error
-
+      await deleteCliente(deleteId)
       toast({
         title: "Cliente deletado",
         description: "O cliente foi removido com sucesso",
       })
-
       router.refresh()
     } catch (error) {
       toast({

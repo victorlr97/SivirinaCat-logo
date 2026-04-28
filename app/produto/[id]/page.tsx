@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { createServerClient } from "@/lib/supabase/server"
+import { getProduct } from "@/lib/firebase/db-server"
 import { CatalogHeader } from "@/components/catalog/catalog-header"
 import { ProductDetails } from "@/components/catalog/product-details"
 
@@ -9,11 +9,9 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params
-  const supabase = await createServerClient()
+  const product = await getProduct(id)
 
-  const { data: product } = await supabase.from("products").select("*").eq("id", id).eq("available", true).single()
-
-  if (!product) {
+  if (!product || !product.available) {
     notFound()
   }
 

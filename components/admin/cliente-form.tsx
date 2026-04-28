@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { createCliente, updateCliente } from "@/lib/firebase/db"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -46,7 +46,6 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
   const [dataNascimento, setDataNascimento] = useState(cliente?.data_nascimento || "")
   const [saving, setSaving] = useState(false)
   const { toast } = useToast()
-  const supabase = createBrowserClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,24 +64,19 @@ export function ClienteForm({ cliente, onSuccess, onCancel }: ClienteFormProps) 
         cidade: cidade || null,
         estado: estado || null,
         cep: cep || null,
-        ano_nascimento: anoNascimento ? Number.parseInt(anoNascimento) : null,
-        data_nascimento: dataNascimento || null, // Include data_nascimento in save
+        data_nascimento: dataNascimento || null,
+        user_id: null,
+        origem: "admin",
       }
 
       if (cliente?.id) {
-        const { error } = await supabase.from("clientes").update(clienteData).eq("id", cliente.id)
-
-        if (error) throw error
-
+        await updateCliente(cliente.id, clienteData)
         toast({
           title: "Cliente atualizado",
           description: "As alterações foram salvas com sucesso",
         })
       } else {
-        const { error } = await supabase.from("clientes").insert(clienteData)
-
-        if (error) throw error
-
+        await createCliente(clienteData)
         toast({
           title: "Cliente criado",
           description: "O cliente foi adicionado com sucesso",

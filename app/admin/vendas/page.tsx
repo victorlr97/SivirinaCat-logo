@@ -1,22 +1,9 @@
-import { createServerClient } from "@/lib/supabase/server"
+import { getVendas } from "@/lib/firebase/db-server"
 import { AdminHeader } from "@/components/admin/admin-header"
 import { VendasList } from "@/components/admin/vendas-list"
 
 export default async function VendasPage() {
-  const supabase = await createServerClient()
-
-  const { data: vendas } = await supabase
-    .from("vendas")
-    .select(
-      `
-      *,
-      clientes (
-        id,
-        nome
-      )
-    `,
-    )
-    .order("data_venda", { ascending: false })
+  const vendas = await getVendas()
 
   return (
     <div className="min-h-screen bg-background">

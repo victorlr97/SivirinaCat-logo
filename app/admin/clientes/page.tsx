@@ -1,11 +1,9 @@
-import { createServerClient } from "@/lib/supabase/server"
+import { getClientes } from "@/lib/firebase/db-server"
 import { AdminHeader } from "@/components/admin/admin-header"
 import { ClientesList } from "@/components/admin/clientes-list"
 
 export default async function AdminClientesPage() {
-  const supabase = await createServerClient()
-
-  const { data: clientes } = await supabase.from("clientes").select("*").order("created_at", { ascending: false })
+  const clientes = await getClientes()
 
   return (
     <div className="min-h-screen bg-background">

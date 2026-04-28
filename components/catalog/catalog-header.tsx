@@ -5,8 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { onAuthStateChanged } from "firebase/auth"
 import { auth, signOut } from "@/lib/firebase/auth"
-import { createBrowserClient } from "@/lib/supabase/client"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, Suspense } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { Menu, Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -21,7 +20,7 @@ interface CatalogHeaderProps {
   onSearchChange?: (value: string) => void
 }
 
-export function CatalogHeader({ categories = [], searchQuery = "", onSearchChange }: CatalogHeaderProps) {
+function CatalogHeaderInner({ categories = [], searchQuery = "", onSearchChange }: CatalogHeaderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -30,15 +29,10 @@ export function CatalogHeader({ categories = [], searchQuery = "", onSearchChang
   const router = useRouter()
   const pathname = usePathname()
 
-  const supabase = createBrowserClient() // mantido para query de clientes até Etapa 5
-
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         setIsLoggedIn(true)
-        // query ainda usa Supabase até Etapa 5 — user_id não vai corresponder durante a transição
-        const { data: clientData } = await supabase.from("clientes").select("nome").eq("email", firebaseUser.email).single()
-        if (clientData) setUserName(clientData.nome)
       } else {
         setIsLoggedIn(false)
         setUserName(null)
@@ -243,5 +237,13 @@ export function CatalogHeader({ categories = [], searchQuery = "", onSearchChang
         </div>
       </div>
     </header>
+  )
+}
+
+export function CatalogHeader(props: CatalogHeaderProps) {
+  return (
+    <Suspense fallback={<div className="h-14 border-b bg-background" />}>
+      <CatalogHeaderInner {...props} />
+    </Suspense>
   )
 }

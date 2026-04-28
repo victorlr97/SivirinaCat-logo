@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createBrowserClient } from "@/lib/supabase/client"
+import { getVenda, getVendaItens, getClientes } from "@/lib/firebase/db"
 import {
   Dialog,
   DialogContent,
@@ -16,31 +16,24 @@ import { Loader2 } from "lucide-react"
 type VendaDetails = {
   id: string
   cliente_id: string
+  cliente_nome: string
   data_venda: string
   forma_pagamento: string
   parcelas: number | null
   desconto: number
   total: number
   observacoes: string | null
-  clientes: {
-    id: string
-    nome: string
-    cpf: string
-    telefone: string
-  }
+  cpf?: string
+  telefone?: string
 }
 
 type ItemVenda = {
   id: string
   produto_id: string
+  name: string
   quantidade: number
   preco_unitario: number
   subtotal: number
-  products: {
-    id: string
-    name: string
-    product_code: string
-  }
 }
 
 interface VendaDetailsDialogProps {
@@ -54,7 +47,6 @@ export function VendaDetailsDialog({ vendaId, open, onOpenChange }: VendaDetails
   const [itens, setItens] = useState<ItemVenda[]>([])
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
-  const supabase = createBrowserClient()
 
   useEffect(() => {
     if (vendaId && open) {
@@ -67,27 +59,22 @@ export function VendaDetailsDialog({ vendaId, open, onOpenChange }: VendaDetails
 
     setLoading(true)
     try {
-      // Buscar dados da venda
-      const { data: vendaData, error: vendaError } = await supabase
-        .from("vendas")
-        .select("*, clientes(id, nome, cpf, telefone)")
-        .eq("id", vendaId)
-        .single()
+      const [vendaData, itensData, clientes] = await Promise.all([
+        getVenda(vendaId),
+        getVendaItens(vendaId),
+        getClientes(),
+      ])
 
-      if (vendaError) throw vendaError
+      if (!vendaData) throw new Error("Venda não encontrada")
 
-      // Buscar itens da venda
-      const { data: itensData, error: itensError } = await supabase
-        .from("itens_venda")
-        .select("*, products(id, name, product_code)")
-        .eq("venda_id", vendaId)
-
-      if (itensError) throw itensError
-
-      setVenda(vendaData)
-      setItens(itensData || [])
+      const cliente = clientes.find((c) => c.id === vendaData.cliente_id)
+      setVenda({
+        ...vendaData,
+        cpf: cliente?.cpf ?? undefined,
+        telefone: cliente?.telefone ?? undefined,
+      })
+      setItens(itensData)
     } catch (error) {
-      console.error("Erro ao carregar detalhes da venda:", error)
       toast({
         title: "Erro",
         description: "Não foi possível carregar os detalhes da venda",
@@ -145,15 +132,15 @@ export function VendaDetailsDialog({ vendaId, open, onOpenChange }: VendaDetails
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Cliente</p>
-                  <p className="font-medium">{venda.clientes.nome}</p>
+                  <p className="font-medium">{venda.cliente_nome}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Celular</p>
-                  <p className="font-medium">{venda.clientes.telefone || "Não informado"}</p>
+                  <p className="font-medium">{venda.telefone || "Não informado"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">CPF</p>
-                  <p className="font-medium">{venda.clientes.cpf || "Não informado"}</p>
+                  <p className="font-medium">{venda.cpf || "Não informado"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Data</p>
@@ -187,8 +174,8 @@ export function VendaDetailsDialog({ vendaId, open, onOpenChange }: VendaDetails
                     {itens.map((item) => (
                       <div key={item.id} className="flex items-center gap-3 px-4 py-3">
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{item.products.name}</p>
-                          <p className="text-xs text-muted-foreground font-mono">{item.products.product_code}</p>
+                          <p className="text-sm font-medium truncate">{item.name}</p>
+                          <p className="text-xs text-muted-foreground font-mono">{item.produto_id}</p>
                           <p className="text-xs text-muted-foreground mt-0.5">
                             {item.quantidade}x {formatCurrency(item.preco_unitario)}
                           </p>
@@ -213,8 +200,8 @@ export function VendaDetailsDialog({ vendaId, open, onOpenChange }: VendaDetails
                       <tbody>
                         {itens.map((item) => (
                           <tr key={item.id} className="border-t">
-                            <td className="p-3 text-sm">{item.products.name}</td>
-                            <td className="p-3 text-sm text-center font-mono">{item.products.product_code}</td>
+                            <td className="p-3 text-sm">{item.name}</td>
+                            <td className="p-3 text-sm text-center font-mono">{item.produto_id}</td>
                             <td className="p-3 text-sm text-center">{item.quantidade}</td>
                             <td className="p-3 text-sm text-right">{formatCurrency(item.preco_unitario)}</td>
                             <td className="p-3 text-sm text-right font-medium">{formatCurrency(item.subtotal)}</td>

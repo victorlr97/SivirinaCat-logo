@@ -1,4 +1,3 @@
-import { createServerClient } from "@/lib/supabase/server"
 import { AdminHeader } from "@/components/admin/admin-header"
 import { ClienteForm } from "@/components/admin/cliente-form"
 import { Button } from "@/components/ui/button"
@@ -6,8 +5,6 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
 export default async function NovoClientePage() {
-  const supabase = await createServerClient()
-
   return (
     <div className="min-h-screen bg-background">
       <AdminHeader />
