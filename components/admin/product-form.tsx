@@ -155,7 +155,6 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         product_code: productCode || null,
         tabela_medidas: showTabelaEditor && tabelaMedidas.colunas.length > 0 ? tabelaMedidas : null,
         available: true,
-        visivel_catalogo: true,
       }
 
       if (product?.id) {
@@ -170,7 +169,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
           description: "As alterações foram salvas com sucesso",
         })
       } else {
-        await createProduct(productData)
+        await createProduct({ ...productData, visivel_catalogo: false })
         toast({
           title: "Produto criado",
           description: "O produto foi adicionado ao catálogo",
