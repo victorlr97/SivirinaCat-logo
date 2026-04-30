@@ -22,9 +22,7 @@ export async function POST(request: Request) {
       metadata: { contentType: file.type },
     })
 
-    await fileRef.makePublic()
-
-    const url = `https://storage.googleapis.com/${bucket.name}/${fileName}`
+    const url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media`
 
     return NextResponse.json({ url })
   } catch (error) {
