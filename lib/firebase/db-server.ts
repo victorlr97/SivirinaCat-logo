@@ -1,7 +1,5 @@
-import { getFirestore, Timestamp } from "firebase-admin/firestore"
-import "./admin" // garante inicialização do Admin SDK
-
-const db = getFirestore()
+import { Timestamp } from "firebase-admin/firestore"
+import { db } from "./admin"
 
 function serialize(data: Record<string, any>): Record<string, any> {
   const result: Record<string, any> = {}

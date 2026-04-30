@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/lib/firebase/admin"
 
+export const dynamic = 'force-dynamic'
+
 const ADMIN_EMAILS = [
   "renatorosaemail@gmail.com",
   "carlosrenato.fzc@gmail.com",

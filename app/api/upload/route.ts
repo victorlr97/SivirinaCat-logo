@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import { storage } from "@/lib/firebase/admin"
+
+export const dynamic = 'force-dynamic'
 import { randomUUID } from "crypto"
 
 export async function POST(request: Request) {

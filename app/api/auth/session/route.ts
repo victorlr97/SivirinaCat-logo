@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { auth } from "@/lib/firebase/admin"
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: Request) {
   const { token } = await request.json()
 
