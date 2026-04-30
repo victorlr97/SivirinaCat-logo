@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getProductsForCatalog } from "@/lib/firebase/db-server"
 import { CatalogHeader } from "@/components/catalog/catalog-header"
 import { HeroSection } from "@/components/home/hero-section"

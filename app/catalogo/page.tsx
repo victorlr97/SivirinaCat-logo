@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getProductsForCatalog } from "@/lib/firebase/db-server"
 import { CatalogClient } from "@/components/catalog/catalog-client"
 

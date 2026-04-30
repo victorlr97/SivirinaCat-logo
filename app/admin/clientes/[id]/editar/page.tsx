@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { notFound } from "next/navigation"
 import { getCliente } from "@/lib/firebase/db-server"
 import { AdminHeader } from "@/components/admin/admin-header"
