@@ -9,7 +9,7 @@ export function CTASection() {
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Footer-6SsP6PPRPaDrlDPyiQSJbLOrEELtaF.webp')",
+          backgroundImage: "url('https://firebasestorage.googleapis.com/v0/b/sivirina.firebasestorage.app/o/Footer-6SsP6PPRPaDrlDPyiQSJbLOrEELtaF.webp?alt=media')",
           opacity: 0.2,
         }}
       />

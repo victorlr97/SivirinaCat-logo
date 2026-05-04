@@ -12,7 +12,7 @@ export function HeroSection() {
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: "url('https://avbqlvwld8wfjalv.public.blob.vercel-storage.com/hero/foto_bg.webp')",
+          backgroundImage: "url('https://firebasestorage.googleapis.com/v0/b/sivirina.firebasestorage.app/o/hero%2Ffoto_bg.webp?alt=media')",
           opacity: 0.6,
         }}
       />
