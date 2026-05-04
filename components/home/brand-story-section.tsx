@@ -9,7 +9,7 @@ export function BrandStorySection() {
           {/* Image side */}
           <div className="relative aspect-[3/4] overflow-hidden rounded-sm bg-muted animate-in fade-in slide-in-from-left-8 duration-700">
             <img
-              src="https://firebasestorage.googleapis.com/v0/b/sivirina.firebasestorage.app/o/brand-story%2FIMG_8391.webp?alt=media"
+              src="https://firebasestorage.googleapis.com/v0/b/sivirina.firebasestorage.app/o/Homeimagens%2FIMG_8391.webp?alt=media"
               alt="Tecido branco com botões artesanais e carretel de linha mostarda, representando o artesanato da marca Sivirina"
               className="h-full w-full object-cover"
             />
