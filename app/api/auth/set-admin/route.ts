@@ -7,6 +7,7 @@ const ADMIN_EMAILS = [
   "renatorosaemail@gmail.com",
   "carlosrenato.fzc@gmail.com",
   "victorlopesr15@gmail.com",
+  "victor@sivirina.com.br",
 ]
 
 export async function POST(request: Request) {
