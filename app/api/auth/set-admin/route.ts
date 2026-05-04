@@ -8,6 +8,8 @@ const ADMIN_EMAILS = [
   "carlosrenato.fzc@gmail.com",
   "victorlopesr15@gmail.com",
   "victor@sivirina.com.br",
+  "renato@sivirina.com.br",
+  "carlos@sivirina.com.br",
 ]
 
 export async function POST(request: Request) {
