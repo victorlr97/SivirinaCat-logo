@@ -205,6 +205,17 @@ export async function updateVenda(id: string, data: Partial<Omit<Venda, "id">>) 
   await updateDoc(doc(db, "vendas", id), data)
 }
 
+export async function replaceVendaItens(vendaId: string, itens: ItemVenda[]) {
+  const itensSnap = await getDocs(collection(db, "vendas", vendaId, "itens"))
+  const batch = writeBatch(db)
+  itensSnap.docs.forEach((d) => batch.delete(d.ref))
+  for (const item of itens) {
+    const itemRef = doc(collection(db, "vendas", vendaId, "itens"))
+    batch.set(itemRef, item)
+  }
+  await batch.commit()
+}
+
 export async function deleteVenda(id: string) {
   const itensSnap = await getDocs(collection(db, "vendas", id, "itens"))
   const batch = writeBatch(db)

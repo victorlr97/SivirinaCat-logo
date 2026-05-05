@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { getClientes, getProducts, getProduct, getVendaItens, createVenda, deleteVenda } from "@/lib/firebase/db"
+import { getClientes, getProducts, getProduct, getVendaItens, createVenda, replaceVendaItens } from "@/lib/firebase/db"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -230,7 +230,6 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
           }),
         })
 
-        // Deleta venda antiga e recria com novos itens (reusa deleteVenda só para itens)
         const novosItens = carrinho.map((item) => ({
           produto_id: item.produto_id,
           name: item.name,
@@ -238,9 +237,7 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
           preco_unitario: item.preco_unitario,
           subtotal: item.subtotal,
         }))
-        await deleteVenda(venda.id) // deleta itens + venda
-        // Recria venda com mesmo ID não é possível no Firestore via addDoc, mas updateVenda já atualizou
-        // Então só precisamos recriar os itens via createVenda sem o documento principal
+        await replaceVendaItens(venda.id, novosItens)
         for (const item of novosItens) {
           const prod = await getProduct(item.produto_id)
           if (prod) {
