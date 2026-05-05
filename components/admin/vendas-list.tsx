@@ -203,7 +203,6 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
                     <p className="text-xs text-muted-foreground">
                       {getPaymentLabel(venda.forma_pagamento)}
                       {venda.parcelas && venda.parcelas > 1 && ` (${venda.parcelas}x)`}
-                      {venda.pago === false && <span className="ml-2 text-yellow-600 font-medium">Não pago</span>}
                     </p>
                   </div>
                   <div className="flex gap-1 flex-shrink-0">
@@ -253,12 +252,7 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
                   filteredVendas.map((venda) => (
                     <TableRow key={venda.id}>
                       <TableCell>
-                        <div>
-                          <span className="font-medium">{venda.cliente_nome}</span>
-                          {venda.pago === false && (
-                            <p className="text-xs text-yellow-600 font-medium">Não pago</p>
-                          )}
-                        </div>
+                        <span className="font-medium">{venda.cliente_nome}</span>
                       </TableCell>
                       <TableCell><span className="text-sm">{formatDate(venda.data_venda)}</span></TableCell>
                       <TableCell>
