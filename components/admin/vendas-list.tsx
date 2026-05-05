@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation"
 import { deleteVenda, getVenda, getVendaItens, getProducts } from "@/lib/firebase/db"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Search, Plus, Eye, Trash2, Pencil, RefreshCw } from "lucide-react"
+import { Search, Plus, Eye, Trash2, Pencil } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   AlertDialog,
@@ -22,8 +21,9 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { VendaFormDialog } from "./venda-form-dialog"
 import { VendaDetailsDialog } from "./venda-details-dialog"
-import { VendaStatusDialog, type VendaStatus } from "./venda-status-dialog"
 import { cn } from "@/lib/utils"
+
+type VendaStatus = "pendente" | "concluida" | "cancelada" | "devolucao"
 
 type Venda = {
   id: string
@@ -62,21 +62,12 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
   const [deleting, setDeleting] = useState(false)
   const [inspectVendaId, setInspectVendaId] = useState<string | null>(null)
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
-  const [statusDialogOpen, setStatusDialogOpen] = useState(false)
-  const [statusVendaId, setStatusVendaId] = useState<string | null>(null)
-  const [statusAtual, setStatusAtual] = useState<VendaStatus | null>(null)
   const router = useRouter()
   const { toast } = useToast()
 
   const handleInspect = (vendaId: string) => {
     setInspectVendaId(vendaId)
     setDetailsDialogOpen(true)
-  }
-
-  const handleChangeStatus = (venda: Venda) => {
-    setStatusVendaId(venda.id)
-    setStatusAtual(venda.status ?? "concluida")
-    setStatusDialogOpen(true)
   }
 
   const handleEdit = async (vendaId: string) => {
@@ -95,6 +86,7 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
         desconto: venda.desconto,
         total: venda.total,
         observacoes: venda.observacoes,
+        status: venda.status ?? "pendente",
         itens: itens.map((item) => ({
           produto_id: item.produto_id,
           name: item.name || products.find((p) => p.id === item.produto_id)?.name || "",
@@ -209,9 +201,6 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleInspect(venda.id)} title="Ver detalhes">
                       <Eye className="h-3.5 w-3.5" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleChangeStatus(venda)} title="Alterar status">
-                      <RefreshCw className="h-3.5 w-3.5" />
-                    </Button>
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleEdit(venda.id)} title="Editar">
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
@@ -268,9 +257,6 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
                           <Button variant="ghost" size="sm" onClick={() => handleInspect(venda.id)} title="Ver detalhes">
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" onClick={() => handleChangeStatus(venda)} title="Alterar status">
-                            <RefreshCw className="h-4 w-4" />
-                          </Button>
                           <Button variant="ghost" size="sm" onClick={() => handleEdit(venda.id)} title="Editar">
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -290,7 +276,6 @@ export function VendasList({ vendas }: { vendas: Venda[] }) {
 
       <VendaFormDialog open={dialogOpen} onOpenChange={(v) => { setDialogOpen(v); if (!v) setEditVenda(null) }} venda={editVenda} />
       <VendaDetailsDialog vendaId={inspectVendaId} open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen} />
-      <VendaStatusDialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen} vendaId={statusVendaId} statusAtual={statusAtual} />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>

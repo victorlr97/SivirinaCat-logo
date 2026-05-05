@@ -45,6 +45,7 @@ type VendaExistente = {
   desconto: number
   total: number
   observacoes: string | null
+  status: "pendente" | "concluida" | "cancelada" | "devolucao" | null
   itens: {
     produto_id: string
     name: string
@@ -73,6 +74,7 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
   const [parcelas, setParcelas] = useState("1")
   const [descontoPercentual, setDescontoPercentual] = useState("0")
   const [observacoes, setObservacoes] = useState("")
+  const [status, setStatus] = useState<"pendente" | "concluida" | "cancelada" | "devolucao">("pendente")
   const [saving, setSaving] = useState(false)
   const [showClienteForm, setShowClienteForm] = useState(false)
   const [clientePopoverOpen, setClientePopoverOpen] = useState(false)
@@ -103,6 +105,7 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
       const subtotal = venda.itens.reduce((s, i) => s + i.subtotal, 0)
       const pct = subtotal > 0 ? ((venda.desconto / subtotal) * 100).toFixed(2) : "0"
       setDescontoPercentual(pct)
+      setStatus((venda.status as "pendente" | "concluida" | "cancelada" | "devolucao") ?? "pendente")
     } else if (open && !venda) {
       resetForm()
     }
@@ -116,6 +119,7 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
     setParcelas("1")
     setDescontoPercentual("0")
     setObservacoes("")
+    setStatus("pendente")
   }
 
   const loadClientes = async () => {
@@ -227,6 +231,7 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
             desconto: descontoValor,
             total,
             observacoes: observacoes || null,
+            status,
           }),
         })
 
@@ -271,7 +276,7 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
             desconto: descontoValor,
             total,
             observacoes: observacoes || null,
-            status: "pendente",
+            status,
             pago: false,
             motivo_cancelamento: null,
           },
@@ -482,6 +487,19 @@ export function VendaFormDialog({ open, onOpenChange, venda }: Props) {
                       <SelectItem value="pix">PIX</SelectItem>
                       <SelectItem value="credito">Crédito</SelectItem>
                       <SelectItem value="debito">Débito</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select value={status} onValueChange={(v) => setStatus(v as typeof status)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pendente">Pendente</SelectItem>
+                      <SelectItem value="concluida">Concluída</SelectItem>
+                      <SelectItem value="cancelada">Cancelada</SelectItem>
+                      <SelectItem value="devolucao">Devolução</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
