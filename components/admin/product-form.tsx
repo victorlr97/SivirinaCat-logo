@@ -431,8 +431,13 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
                     setTabelaMedidas({ colunas: [], linhas: [], notas: [] })
                   } else {
                     setTabelaMedidas({
-                      colunas: ["Tamanho", "Busto", "Cintura", "Quadril"],
-                      linhas: [["P", "", "", ""]],
+                      colunas: ["Tamanho", "Busto", "Ombro", "Manga", "Comprimento"],
+                      linhas: [
+                        ["P", "", "", "", ""],
+                        ["M", "", "", "", ""],
+                        ["G", "", "", "", ""],
+                        ["GG", "", "", "", ""],
+                      ],
                       notas: ["*Medidas em cm"],
                     })
                   }
