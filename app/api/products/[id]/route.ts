@@ -14,14 +14,15 @@ export async function PATCH(
   const { id } = await params
   const data = await request.json()
 
-  const toSave = {
-    ...data,
-    tabela_medidas:
+  const toSave: Record<string, any> = { ...data }
+
+  if ("tabela_medidas" in data) {
+    toSave.tabela_medidas =
       data.tabela_medidas != null
         ? typeof data.tabela_medidas === "string"
           ? data.tabela_medidas
           : JSON.stringify(data.tabela_medidas)
-        : null,
+        : null
   }
 
   await db.collection("products").doc(id).update(toSave)
