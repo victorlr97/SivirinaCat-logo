@@ -10,9 +10,8 @@ SIVIRINA is a comprehensive sales platform featuring a public product catalog an
 
 ##  Tech Stack
 * **Frontend:** React / Next.js with **Tailwind CSS**.
-* **Backend & Database:** **Supabase** (PostgreSQL) for real-time data persistence.
-* **Storage:** **Vercel Blob** for dynamic product image hosting.
-* **Development:** **AI-Assisted Development** (v0) for rapid prototyping and logic implementation.
+* **Backend & Database:** **Firebase** (Firestore, Auth, Storage) for authentication, real-time data persistence and image storage.
+* **Development:** **AI-Assisted Development** (v0, Claude Code) for rapid prototyping and logic implementation.
 
 ##  Key Features
 * **Full Product Catalog:** Dynamic display of items with real-time updates.
@@ -24,7 +23,7 @@ SIVIRINA is a comprehensive sales platform featuring a public product catalog an
 <img width="1920" height="1080" alt="Sivirina5" src="https://github.com/user-attachments/assets/a14c5337-3100-49d0-96a1-049ec450aeb0" />
 
 ##  Approach & Logic
-This project was developed with a **Product-First** mindset. By leveraging advanced AI tools and modern cloud infrastructure (Supabase/Vercel), I focused on building a scalable architecture and robust business logic to solve real-world retail challenges. It showcases my ability to translate complex business needs into a functional digital product.
+This project was developed with a **Product-First** mindset. Initially built with Supabase and Vercel Blob, later migrated to Firebase for a more integrated and secure cloud ecosystem. By leveraging advanced AI tools, I focused on building a scalable architecture and robust business logic to solve real-world retail challenges. It showcases my ability to translate complex business needs into a functional digital product — and to make intentional technical decisions as the project evolves.
 
 ---
 
@@ -36,9 +35,8 @@ SIVIRINA é uma plataforma de vendas completa que conta com um catálogo de prod
 
 ##  Tecnologias Utilizadas
 * **Frontend:** React / Next.js com **Tailwind CSS**.
-* **Backend e Banco de Dados:** **Supabase** (PostgreSQL) para persistência de dados em tempo real.
-* **Armazenamento:** **Vercel Blob** para hospedagem dinâmica de imagens dos produtos.
-* **Desenvolvimento:** **Desenvolvimento Assistido por IA** (v0, Claude) para prototipagem rápida e implementação de lógica.
+* **Backend e Banco de Dados:** **Firebase** (Firestore, Auth, Storage) para autenticação, persistência de dados em tempo real e armazenamento de imagens.
+* **Desenvolvimento:** **Desenvolvimento Assistido por IA** (v0, Claude Code) para prototipagem rápida e implementação de lógica.
 
 ##  Principais Funcionalidades
 * **Catálogo de Produtos Completo:** Exibição dinâmica de itens com atualizações em tempo real.
@@ -48,4 +46,4 @@ SIVIRINA é uma plataforma de vendas completa que conta com um catálogo de prod
 * **Autenticação:** Fluxo de login seguro para acesso administrativo.
 
 ##  Abordagem e Lógica
-Este projeto foi desenvolvido com uma mentalidade **Focada no Produto**. Utilizando ferramentas avançadas de IA e infraestrutura moderna em nuvem (Supabase/Vercel), foquei em construir uma arquitetura escalável e uma lógica de negócio robusta para resolver desafios reais do varejo. O projeto demonstra minha capacidade de traduzir necessidades complexas de negócio em um produto digital funcional.
+Este projeto foi desenvolvido com uma mentalidade **Focada no Produto**. Iniciado com Supabase e Vercel Blob, posteriormente migrado para Firebase por maior integração e segurança no ecossistema Google. Utilizando ferramentas avançadas de IA, foquei em construir uma arquitetura escalável e lógica de negócio robusta para resolver desafios reais do varejo. O projeto demonstra minha capacidade de traduzir necessidades complexas em produto funcional e de tomar decisões técnicas intencionais conforme o projeto evolui.
