@@ -1,8 +1,6 @@
 import { updateSession } from "@/lib/firebase/middleware"
 import type { NextRequest } from "next/server"
 
-export const runtime = "nodejs"
-
 export async function proxy(request: NextRequest) {
   return await updateSession(request)
 }
