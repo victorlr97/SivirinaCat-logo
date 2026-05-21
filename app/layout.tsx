@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Montserrat_Alternates, Montserrat } from "next/font/google"
 import { FirebaseAnalytics } from "@/components/firebase-analytics"
 import { MetaPixel } from "@/components/meta-pixel"
+import { GoogleAnalytics } from "@/components/google-analytics"
 import { Toaster } from "@/components/ui/toaster"
 import { SmoothScroll } from "@/components/smooth-scroll"
 import "./globals.css"
@@ -41,6 +42,7 @@ export default function RootLayout({
         <Toaster />
         <FirebaseAnalytics />
         <MetaPixel />
+        <GoogleAnalytics />
       </body>
     </html>
   )
