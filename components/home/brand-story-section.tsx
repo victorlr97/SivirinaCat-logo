@@ -1,6 +1,38 @@
+"use client"
+
+import { useEffect, useRef } from "react"
+import { trackBrandStoryViewed } from "@/lib/amplitude"
+
 export function BrandStorySection() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const tracked = useRef(false)
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !tracked.current) {
+          tracked.current = true
+          trackBrandStoryViewed({
+            sectionName: "Nossa História",
+            pageContext: "home",
+            contentLanguage: "pt-BR",
+          })
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.3 }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <section
+      ref={sectionRef}
       id="historia"
       className="relative min-h-screen w-full overflow-hidden bg-muted/30 py-24 md:py-32 lg:py-40"
     >

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Ruler } from "lucide-react"
@@ -13,6 +13,12 @@ import {
 } from "@/components/ui/dialog"
 import { formatCurrency } from "@/lib/utils"
 import { ImageZoom } from "./image-zoom"
+import {
+  trackProductViewed,
+  trackSizeGuideOpened,
+  trackPurchaseInquiryStarted,
+  trackOutboundLinkOpened,
+} from "@/lib/amplitude"
 
 interface TabelaMedidas {
   colunas: string[]
@@ -57,6 +63,47 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const [selectedImage, setSelectedImage] = useState(0)
   const [showMedidasModal, setShowMedidasModal] = useState(false)
   const images = product.images || []
+
+  useEffect(() => {
+    trackProductViewed({
+      productId: product.id,
+      productName: product.name,
+      productType: "produto",
+      priceBrl: product.price,
+      currency: "BRL",
+      availabilityStatus: "available",
+      entrySource: document.referrer.includes("/catalogo") ? "catalog" : "direct",
+    })
+  }, [product.id, product.name, product.price])
+
+  const handleSizeGuideOpen = () => {
+    setShowMedidasModal(true)
+    trackSizeGuideOpened({
+      productId: product.id,
+      productName: product.name,
+      productType: "produto",
+      sizeGuideType: "tabela_medidas",
+    })
+  }
+
+  const handleWhatsAppClick = () => {
+    trackPurchaseInquiryStarted({
+      productId: product.id,
+      productName: product.name,
+      productType: "produto",
+      priceBrl: product.price,
+      currency: "BRL",
+      outboundChannel: "whatsapp",
+      messageTemplate: "product_inquiry",
+    })
+    trackOutboundLinkOpened({
+      destinationDomain: "wa.me",
+      destinationPath: `/${WHATSAPP_NUMBER}`,
+      linkLabel: "Comprar via WhatsApp",
+      outboundChannel: "whatsapp",
+      pageContext: "product_page",
+    })
+  }
 
   return (
     <div className="grid gap-12 md:grid-cols-2 md:gap-16">
@@ -143,7 +190,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
             {product.tabela_medidas && product.tabela_medidas.colunas.length > 0 && (
               <button
                 type="button"
-                onClick={() => setShowMedidasModal(true)}
+                onClick={handleSizeGuideOpen}
                 className="mt-2 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
               >
                 <Ruler className="h-4 w-4" />
@@ -166,6 +213,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2"
+              onClick={handleWhatsAppClick}
             >
               <WhatsAppIcon className="h-5 w-5" />
               Comprar via WhatsApp

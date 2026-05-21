@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { CatalogHeader } from "@/components/catalog/catalog-header"
 import { CategoryFilter } from "@/components/catalog/category-filter"
 import { ProductGrid } from "@/components/catalog/product-grid"
+import { trackProductListViewed, trackSearchSubmitted } from "@/lib/amplitude"
 
 interface Product {
   id: string
@@ -20,6 +21,8 @@ interface CatalogClientProps {
 
 export function CatalogClient({ categories, products }: CatalogClientProps) {
   const [searchQuery, setSearchQuery] = useState("")
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const trackedQueries = useRef<Set<string>>(new Set())
 
   const filtered = searchQuery.trim()
     ? products.filter((p) => {
@@ -31,6 +34,40 @@ export function CatalogClient({ categories, products }: CatalogClientProps) {
         return matchName || matchCode || matchPrice
       })
     : products
+
+  useEffect(() => {
+    trackProductListViewed({
+      listName: "Catálogo",
+      listSource: "catalog_page",
+      productsShown: products.length,
+      pageNumber: 1,
+      collectionName: "Todas as peças",
+    })
+  }, [products.length])
+
+  useEffect(() => {
+    const query = searchQuery.trim()
+    if (!query) return
+
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
+
+    searchDebounceRef.current = setTimeout(() => {
+      if (trackedQueries.current.has(query)) return
+      trackedQueries.current.add(query)
+
+      trackSearchSubmitted({
+        searchQuery: query,
+        searchContext: "catalog",
+        resultsCount: filtered.length,
+        noResults: filtered.length === 0,
+        isAutocomplete: false,
+      })
+    }, 800)
+
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
+    }
+  }, [searchQuery, filtered.length])
 
   return (
     <>

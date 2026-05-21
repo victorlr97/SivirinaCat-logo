@@ -4,6 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { formatCurrency } from "@/lib/utils"
 import { useState, useRef } from "react"
+import { trackSearchResultSelected } from "@/lib/amplitude"
 
 interface Product {
   id: string
@@ -33,14 +34,14 @@ export function ProductGrid({ products, searchQuery }: ProductGridProps) {
 
   return (
     <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-12">
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+      {products.map((product, index) => (
+        <ProductCard key={product.id} product={product} position={index + 1} searchQuery={searchQuery} />
       ))}
     </div>
   )
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, position, searchQuery }: { product: Product; position: number; searchQuery?: string }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -78,10 +79,23 @@ function ProductCard({ product }: { product: Product }) {
   // Desktop: troca imagem no hover — Mobile: usa índice do swipe
   const displayImageIndex = !isMobile && isHovered && hasMultipleImages ? 1 : currentImageIndex
 
+  const handleClick = () => {
+    if (searchQuery?.trim()) {
+      trackSearchResultSelected({
+        searchQuery: searchQuery.trim(),
+        resultPosition: position,
+        productId: product.id,
+        productName: product.name,
+        productType: "produto",
+      })
+    }
+  }
+
   return (
     <Link
       href={`/produto/${product.id}`}
       className="group"
+      onClick={handleClick}
       onMouseEnter={() => hasMultipleImages && setIsHovered(true)}
       onMouseLeave={() => hasMultipleImages && setIsHovered(false)}
     >
