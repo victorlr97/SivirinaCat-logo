@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Pencil, Trash2, Search, Plus } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
@@ -39,10 +40,14 @@ type Product = {
   description: string | null
   parcelas: string | null
   tabela_medidas: any | null
+  created_at?: string
 }
+
+type SortBy = "newest" | "name_asc" | "name_desc" | "price_asc" | "price_desc" | "stock_desc"
 
 export function ProductsList({ products }: { products: Product[] }) {
   const [searchTerm, setSearchTerm] = useState("")
+  const [sortBy, setSortBy] = useState<SortBy>("newest")
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
@@ -112,14 +117,36 @@ export function ProductsList({ products }: { products: Product[] }) {
     }
   }
 
-  const filteredProducts = products.filter((product) => {
-    const search = searchTerm.toLowerCase()
-    return (
-      product.name.toLowerCase().includes(search) ||
-      product.product_code?.toLowerCase().includes(search) ||
-      product.category?.toLowerCase().includes(search)
-    )
-  })
+  const filteredProducts = products
+    .filter((product) => {
+      const search = searchTerm.toLowerCase()
+      return (
+        product.name.toLowerCase().includes(search) ||
+        product.product_code?.toLowerCase().includes(search) ||
+        product.category?.toLowerCase().includes(search)
+      )
+    })
+    .sort((a, b) => {
+      const aZero = a.quantidade_estoque === 0
+      const bZero = b.quantidade_estoque === 0
+      if (aZero && !bZero) return 1
+      if (!aZero && bZero) return -1
+
+      switch (sortBy) {
+        case "newest":
+          return new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime()
+        case "name_asc":
+          return a.name.localeCompare(b.name, "pt-BR")
+        case "name_desc":
+          return b.name.localeCompare(a.name, "pt-BR")
+        case "price_asc":
+          return a.price - b.price
+        case "price_desc":
+          return b.price - a.price
+        case "stock_desc":
+          return b.quantidade_estoque - a.quantidade_estoque
+      }
+    })
 
   if (products.length === 0) {
     return (
@@ -134,6 +161,17 @@ export function ProductsList({ products }: { products: Product[] }) {
               className="pl-10"
             />
           </div>
+          <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortBy)}>
+            <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Mais novos</SelectItem>
+              <SelectItem value="name_asc">Nome A-Z</SelectItem>
+              <SelectItem value="name_desc">Nome Z-A</SelectItem>
+              <SelectItem value="price_asc">Menor preço</SelectItem>
+              <SelectItem value="price_desc">Maior preço</SelectItem>
+              <SelectItem value="stock_desc">Maior estoque</SelectItem>
+            </SelectContent>
+          </Select>
           <Button onClick={() => setAddModalOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Adicionar Produto
@@ -175,6 +213,17 @@ export function ProductsList({ products }: { products: Product[] }) {
             className="pl-10"
           />
         </div>
+        <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortBy)}>
+          <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="newest">Mais novos</SelectItem>
+            <SelectItem value="name_asc">Nome A-Z</SelectItem>
+            <SelectItem value="name_desc">Nome Z-A</SelectItem>
+            <SelectItem value="price_asc">Menor preço</SelectItem>
+            <SelectItem value="price_desc">Maior preço</SelectItem>
+            <SelectItem value="stock_desc">Maior estoque</SelectItem>
+          </SelectContent>
+        </Select>
         <Button onClick={() => setAddModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Adicionar Produto
