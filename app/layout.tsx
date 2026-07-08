@@ -7,6 +7,7 @@ import { GoogleAnalytics } from "@/components/google-analytics"
 import { AmplitudeAnalytics } from "@/components/amplitude-analytics"
 import { Toaster } from "@/components/ui/toaster"
 import { SmoothScroll } from "@/components/smooth-scroll"
+import { CartProvider } from "@/lib/cart-context"
 import "./globals.css"
 
 const montserratAlternates = Montserrat_Alternates({ 
@@ -37,9 +38,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${montserratAlternates.variable} ${montserrat.variable} font-sans antialiased`}>
-        <SmoothScroll>
-          {children}
-        </SmoothScroll>
+        <CartProvider>
+          <SmoothScroll>
+            {children}
+          </SmoothScroll>
+        </CartProvider>
         <Toaster />
         <FirebaseAnalytics />
         <MetaPixel />
