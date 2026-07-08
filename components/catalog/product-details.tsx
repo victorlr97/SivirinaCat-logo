@@ -204,7 +204,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           <Button
             asChild
             size="lg"
-            className="w-full bg-black text-white hover:bg-black/90 md:w-auto"
+            className="w-full bg-green-700 text-white hover:bg-green-800 md:w-auto"
           >
             <Link
               href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
