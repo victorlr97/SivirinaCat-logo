@@ -7,10 +7,12 @@ import { onAuthStateChanged } from "firebase/auth"
 import { auth, signOut } from "@/lib/firebase/auth"
 import { useEffect, useRef, useState, Suspense } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
-import { Menu, Search, X } from "lucide-react"
+import { Menu, Search, ShoppingBag, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Separator } from "@/components/ui/separator"
+import { CartSheet } from "@/components/cart/cart-sheet"
+import { useCart } from "@/lib/cart-context"
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 // import { LogOut, User } from 'lucide-react'
 
@@ -20,14 +22,29 @@ interface CatalogHeaderProps {
   onSearchChange?: (value: string) => void
 }
 
+function CartTrigger({ itemCount, onClick }: { itemCount: number; onClick: () => void }) {
+  return (
+    <Button variant="ghost" size="icon" onClick={onClick} aria-label="Abrir carrinho" className="relative">
+      <ShoppingBag className="h-5 w-5" />
+      {itemCount > 0 && (
+        <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-medium text-background">
+          {itemCount}
+        </span>
+      )}
+    </Button>
+  )
+}
+
 function CatalogHeaderInner({ categories = [], searchQuery = "", onSearchChange }: CatalogHeaderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState<string | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [cartOpen, setCartOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const pathname = usePathname()
+  const { itemCount } = useCart()
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -85,18 +102,20 @@ function CatalogHeaderInner({ categories = [], searchQuery = "", onSearchChange 
               />
             </Link>
 
-            {/* Menu unificado - Right */}
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="ml-auto"
-                onClick={() => setMobileMenuOpen(true)}
-                aria-label="Abrir menu"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              <SheetContent side="right" className="w-[280px] px-0">
+            {/* Carrinho + Menu unificado - Right */}
+            <div className="ml-auto flex items-center gap-1">
+              <CartTrigger itemCount={itemCount} onClick={() => setCartOpen(true)} />
+
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMobileMenuOpen(true)}
+                  aria-label="Abrir menu"
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+                <SheetContent side="right" className="w-[280px] px-0">
                 <SheetHeader className="px-6 pb-4 pt-6">
                   <SheetTitle className="text-base font-medium tracking-wide">Menu</SheetTitle>
                   <SheetDescription className="sr-only">Navegação e categorias do catálogo</SheetDescription>
@@ -173,7 +192,8 @@ function CatalogHeaderInner({ categories = [], searchQuery = "", onSearchChange 
                   </>
                 )}
               </SheetContent>
-            </Sheet>
+              </Sheet>
+            </div>
           </div>
 
           {/* Desktop Layout (≥ 441px) */}
@@ -206,36 +226,42 @@ function CatalogHeaderInner({ categories = [], searchQuery = "", onSearchChange 
               </Link>
             </nav>
 
-            {/* Lupa - Right (apenas no catálogo) */}
-            <div className="flex items-center gap-1" style={{ visibility: onSearchChange ? "visible" : "hidden" }}>
-              <div
-                className={`flex items-center overflow-hidden rounded-full border border-border bg-background transition-all duration-300 ease-in-out ${
-                  searchOpen ? "w-56 px-3" : "w-0 border-transparent px-0"
-                }`}
-              >
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange?.(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Nome, código ou preço..."
-                  className="w-full bg-transparent py-1.5 text-sm outline-none placeholder:text-muted-foreground"
-                />
+            {/* Lupa + Carrinho - Right */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1" style={{ visibility: onSearchChange ? "visible" : "hidden" }}>
+                <div
+                  className={`flex items-center overflow-hidden rounded-full border border-border bg-background transition-all duration-300 ease-in-out ${
+                    searchOpen ? "w-56 px-3" : "w-0 border-transparent px-0"
+                  }`}
+                >
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => onSearchChange?.(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Nome, código ou preço..."
+                    className="w-full bg-transparent py-1.5 text-sm outline-none placeholder:text-muted-foreground"
+                  />
+                </div>
+                {searchOpen ? (
+                  <Button variant="ghost" size="icon" onClick={handleCloseSearch} aria-label="Fechar busca">
+                    <X className="h-5 w-5" />
+                  </Button>
+                ) : (
+                  <Button variant="ghost" size="icon" onClick={handleOpenSearch} aria-label="Abrir busca">
+                    <Search className="h-5 w-5" />
+                  </Button>
+                )}
               </div>
-              {searchOpen ? (
-                <Button variant="ghost" size="icon" onClick={handleCloseSearch} aria-label="Fechar busca">
-                  <X className="h-5 w-5" />
-                </Button>
-              ) : (
-                <Button variant="ghost" size="icon" onClick={handleOpenSearch} aria-label="Abrir busca">
-                  <Search className="h-5 w-5" />
-                </Button>
-              )}
+
+              <CartTrigger itemCount={itemCount} onClick={() => setCartOpen(true)} />
             </div>
           </div>
         </div>
       </div>
+
+      <CartSheet open={cartOpen} onOpenChange={setCartOpen} />
     </header>
   )
 }
